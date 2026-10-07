@@ -4,8 +4,15 @@
   "type": "module",
   "scripts": {
     "check": "node scripts/check.mjs",
-    "preview": "node scripts/serve.mjs",
-    "dev": "npx wrangler pages dev public",
-    "codes": "node scripts/gen-codes.mjs"
+    "preview": "DB_PATH=data/dev.db node --no-warnings server/index.mjs",
+    "start": "node --no-warnings server/index.mjs",
+    "admin": "node --no-warnings server/admin.mjs",
+    "notes": "node scripts/notes.mjs"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56"
   }
 }

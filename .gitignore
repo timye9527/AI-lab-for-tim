@@ -6,3 +6,8 @@ node_modules/
 # 兑换码是要卖的东西，绝不提交
 codes/
 .DS_Store
+# 服务器数据库
+data/
+# 生成的笔记素材
+out/
+backup/

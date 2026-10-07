@@ -8,39 +8,44 @@
 - 完整人格报告用兑换码解锁，负责赚钱：四维图谱、人物自画像、财商六维、共同底色、真实故事、盲点与反割建议、搭子与天敌
 - 兑换码在小红书等平台作为虚拟商品售卖
 
-运营打法（怎么发笔记、怎么定价、看什么数据）见 [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md)。
+## 文档导航
+
+| 文档 | 给谁看 | 讲什么 |
+|---|---|---|
+| [`docs/GAME-DESIGN.md`](docs/GAME-DESIGN.md) | 主理人 | 玩法设计逻辑：为什么这么设计能让人晒、让人买 |
+| [`docs/FRIEND-SOP.md`](docs/FRIEND-SOP.md) | 大陆伙伴 | 部署服务器、开店上架、每天运营、客服命令，一步步照做 |
+| [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | 主理人 | 笔记打法、定价、冷启动两周、看什么数据 |
+| [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
 
 ## 目录
 
 ```
-public/                     ← 网站根目录（静态文件，无构建步骤）
-  engine/                   ← 引擎，所有测试共用
-    app.js                  ← 页面流程：开场 → 答题 → 结果 → 解锁
-    score.js                ← 纯计分逻辑（网页和校验脚本共用）
-    poster.js               ← canvas 生成 3:4 段位海报
-    icons.js                ← 段位图标
-    style.css
-  tests/jiucai/config.js    ← 韭菜段位测试的全部内容（题目、段位、人物、文案、付费墙）
-  jiucai/index.html         ← 测试入口页，访问路径 /jiucai/
-  index.html                ← 测试合集首页
-functions/api/redeem.js     ← 兑换接口（Cloudflare Pages Functions + D1）
-db/schema.sql               ← 兑换码表
+public/                     ← 网站（静态文件，无构建步骤）
+  engine/                   ← 引擎，所有测试共用：页面流程、计分、海报、图标、样式
+  tests/jiucai/config.js    ← 韭菜段位测试的全部内容（题目、段位、人物、付费墙、笔记、上架信息）
+  jiucai/index.html         ← 测试入口，访问路径 /jiucai/
+server/
+  index.mjs                 ← 生产服务：静态页面 + 兑换接口 + 漏斗计数（零依赖，Node 22 自带 SQLite）
+  admin.mjs                 ← 管理工具：生成兑换码、看数据、客服加次数 / 作废、备份
+  db.mjs                    ← 数据库和业务逻辑
+db/schema.sql               ← 表结构
+deploy/                     ← 服务器部署：systemd、Caddy、nginx / 宝塔、一键更新脚本
 scripts/
-  check.mjs                 ← 校验配置 + 模拟作答看分布
-  gen-codes.mjs             ← 批量生成兑换码
-  serve.mjs                 ← 本地预览
+  check.mjs                 ← 校验配置、模拟作答看分布、扫描高危词
+  notes.mjs                 ← 生成小红书笔记配图 + 文案、商品图 + 上架文案
+  lint-words.mjs            ← 高危词表（导流 / 金融 / 迷信 / 夸大）
 ```
 
-## 本地预览
+## 常用命令
 
-只需要 Node 18 及以上，不用安装任何依赖。
+需要 Node 22.13 及以上。
 
 ```bash
-npm run preview          # 打开 http://localhost:8788/jiucai/
-npm run check            # 改完内容必跑：检查缺字段、看人格 / 段位分布
+npm run preview                 # 本地预览 http://localhost:8788/jiucai/（兑换码填 DEMO）
+npm run check                   # 改完内容必跑：缺字段、人格 / 段位分布、高危词
+npm install && npm run notes    # 生成笔记和商品素材到 out/notes/<id>/（需要本机装有 Chrome）
+npm run admin                   # 查看管理命令
 ```
-
-本地预览时兑换码填 `DEMO` 即可解锁（只在 localhost 生效）。
 
 ## 计分规则
 
@@ -56,29 +61,8 @@ npm run check            # 改完内容必跑：检查缺字段、看人格 / �
 
 ## 部署
 
-> ⚠️ **面向中国大陆用户时，不要用 `*.pages.dev`**：它在大陆多地无法访问。部署方案的选择，以及小红书开店、类目、合规的调研，见 [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md)。
-> 下面的 Cloudflare 步骤适合本地验证，或面向海外用户。
-
-### Cloudflare Pages（免费额度够用）
-
-1. **建项目**：Cloudflare 控制台 → Workers & Pages → Create → Pages → 连接这个 GitHub 仓库。
-   构建命令留空，输出目录填 `public`。`functions/` 目录会被自动识别成接口。
-2. **建兑换码数据库**：
-   ```bash
-   npx wrangler login
-   npx wrangler d1 create make-money-test                      # 记下 database_id
-   npx wrangler d1 execute make-money-test --remote --file=db/schema.sql
-   ```
-   把 `wrangler.toml` 里 D1 那一段取消注释，填上 `database_id`，提交后会自动重新部署。
-3. **生成并导入兑换码**：
-   ```bash
-   npm run codes -- jiucai 500 JC 3     # 500 个码，前缀 JC，每个码最多 3 台设备
-   npx wrangler d1 execute make-money-test --remote --file=codes/<批次>.sql
-   ```
-   `codes/*.csv` 用来上传到店铺做自动发货。**`codes/` 已被 git 忽略，不要提交。**
-4. 打开 `https://<项目名>.pages.dev/jiucai/`，用一个刚导入的码测一遍解锁。
-
-需要在本地带接口调试时：先运行 `npx wrangler d1 execute make-money-test --local --file=db/schema.sql`，再运行 `npm run dev`。
+香港服务器 + 自己的域名，不需要 ICP 备案，大陆可以访问。完整步骤见 [`docs/FRIEND-SOP.md`](docs/FRIEND-SOP.md) 的 B 节。
+不要用 Cloudflare 的 `*.pages.dev`：它在大陆多地打不开，原因见 [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md)。
 
 ## 出一套新测试（资产化的关键）
 
@@ -86,11 +70,22 @@ npm run check            # 改完内容必跑：检查缺字段、看人格 / �
 2. 复制 `public/jiucai/index.html` 为 `public/<新id>/index.html`，把 `data-test` 改成新 id，再改标题。
 3. 在 `public/index.html` 加一张卡片。
 4. 运行 `npm run check`，再用 `npm run preview` 在手机宽度下走一遍。
-5. 生成新前缀的兑换码，上架新商品。
+5. 运行 `npm run notes -- <新id>`，生成这一套的笔记和商品素材。
+6. 在服务器上用新前缀生成兑换码，上架新商品。
 
 题量、选项数、维度数、段位数都可以改，引擎按配置自适应。人格数量 = 2 的维度数次方，每一种都要写全。
 
 ## 已知取舍
 
-- 报告内容在前端，懂开发者工具的人可以绕过付费墙。0.99 元的产品不值得为此加服务端渲染。真要防的话，可以把 `types` 挪进 `functions/` 由接口返回。
+- 报告内容在前端，懂开发者工具的人可以绕过付费墙。0.99 元的产品不值得为此加服务端渲染。真要防的话，可以把 `types` 挪到服务端，由接口返回。
 - 解锁状态存在本机浏览器里。换设备时重新输一次码，所以每个码默认可用 3 次。
+
+## 和 Claude 协作的方式
+
+把这个仓库交给 Claude（Claude Code），下面这些事可以直接让它做：
+
+- **每周复盘**：把 `npm run admin -- stats` 的输出和小红书后台的数据截图发给它，它会定位漏斗卡在哪一步，并直接改文案、改题目、重新生成素材。
+- **批量出笔记**：说「再来 10 个钩子」或「按年终奖 / 春节做一批借势笔记」，它会改配置、跑 `npm run notes`，再把素材交给你。
+- **出新测试**：说「做一套粤语段位」，它会写配置，跑校验和分布模拟，截图验收，再生成笔记和商品素材。
+- **合规审查**：发布前把笔记文案发给它过一遍；遇到平台规则变化，让它查证后调整高危词表和文案。
+- **排障**：伙伴遇到报错或客服问题，截图发过来，它会给出命令或改代码。

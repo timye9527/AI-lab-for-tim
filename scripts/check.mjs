@@ -2,6 +2,7 @@
 // 用法：node scripts/check.mjs [测试id]   默认检查 public/tests 下全部
 import { readdirSync } from 'node:fs';
 import { score, flip } from '../public/engine/score.js';
+import { lintText } from './lint-words.mjs';
 
 const ids = process.argv[2] ? [process.argv[2]] : readdirSync(new URL('../public/tests/', import.meta.url));
 let failed = false;
@@ -33,6 +34,16 @@ for (const id of ids) {
   for (const d of test.dims) if (!d.posTrait || !d.negTrait) fail(`维度 ${d.label} 缺 posTrait / negTrait`);
   for (const r of Object.values(test.relations || {})) {
     if (!test.types[flip(test, codes[0], r.flip)]) fail(`关系 ${r.label} 推不出有效类型`);
+  }
+
+  // 合规词：段位、人物会出现在段位卡和笔记里，必须干净（题目是虚构情境，不扫）
+  for (const t of test.tiers) {
+    const hit = lintText(JSON.stringify(t));
+    if (hit.length) fail(`段位 ${t.name} 含高危词：${hit.join('、')}`);
+  }
+  for (const [c, t] of Object.entries(test.types)) {
+    const hit = lintText(JSON.stringify(t));
+    if (hit.length) fail(`人格 ${c}（${t.name}）含高危词：${hit.join('、')}`);
   }
 
   // 2. 维度两极是否大致对称（每个维度正负分加总）

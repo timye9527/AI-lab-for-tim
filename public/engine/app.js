@@ -37,6 +37,15 @@ const store = {
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
 
+// 漏斗计数：只发「哪个测试 + 哪一步」，不带任何个人信息；失败就算了
+function track(ev) {
+  try {
+    navigator.sendBeacon?.('/api/event', JSON.stringify({ test: test.id, ev }));
+  } catch {
+    /* 忽略 */
+  }
+}
+
 // 主题色写进 CSS 变量
 for (const [k, v] of Object.entries(test.theme)) document.documentElement.style.setProperty(`--${k}`, v);
 document.title = test.title;
@@ -186,6 +195,7 @@ function renderResult() {
       document.getElementById('poster-img').src = url;
       document.getElementById('poster-dl').href = url;
       document.getElementById('modal').hidden = false;
+      track('poster');
     } catch (err) {
       console.error(err);
       alert('生成失败，可以直接截图保存');
@@ -301,6 +311,7 @@ function bindUnlock(onDone) {
         }
       }
       store.set('unlock', code);
+      track('unlock');
       state.unlocked = true;
       onDone();
     } catch {
@@ -322,6 +333,7 @@ app.addEventListener('click', (e) => {
       } else {
         state.answers = state.answers.slice(0, test.questions.length);
         store.set('answers', state.answers);
+        track('finish');
         go('result');
       }
     }, 180);
@@ -329,6 +341,7 @@ app.addEventListener('click', (e) => {
   }
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'start') {
+    track('start');
     state.answers = [];
     qi = 0;
     go('quiz');
@@ -343,4 +356,5 @@ app.addEventListener('click', (e) => {
   } else if (act === 'close') document.getElementById('modal').hidden = true;
 });
 
+track('view');
 go(state.answers.length === test.questions.length && location.hash !== '#intro' ? 'result' : 'intro');
