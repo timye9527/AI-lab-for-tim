@@ -1,0 +1,8 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env*
+!.env.example
+# 兑换码是要卖的东西，绝不提交
+codes/
+.DS_Store
