@@ -54,7 +54,12 @@ npm run check            # 改完内容必跑：检查缺字段、看人格 / �
 
 每道题在每个维度上的加减分是正负抵消的，所以人格和段位基本互不影响。改题目后跑 `npm run check`：每个人格的随机出现率最好在 2% 以上。
 
-## 部署到 Cloudflare Pages（免费额度够用）
+## 部署
+
+> ⚠️ **面向中国大陆用户时，不要用 `*.pages.dev`**：它在大陆多地无法访问。部署方案的选择，以及小红书开店、类目、合规的调研，见 [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md)。
+> 下面的 Cloudflare 步骤适合本地验证，或面向海外用户。
+
+### Cloudflare Pages（免费额度够用）
 
 1. **建项目**：Cloudflare 控制台 → Workers & Pages → Create → Pages → 连接这个 GitHub 仓库。
    构建命令留空，输出目录填 `public`。`functions/` 目录会被自动识别成接口。
