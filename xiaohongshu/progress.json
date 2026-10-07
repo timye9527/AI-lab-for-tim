@@ -4,7 +4,7 @@
   "target_followers": 1000,
   "duration_days": 21,
   "planned_posts": 9,
-  "status": "E01-v4_ready_for_draft",
+  "status": "E01-v4_handoff_to_codex_for_draft",
   "codex_schedule": "paused",
   "active_schedule": null,
   "updated_at": "2026-10-07",
@@ -52,13 +52,14 @@
       "tools/prepublish.py",
       "tools/erase.py"
     ],
-    "publish_runbook": "PUBLISH_RUNBOOK.md"
+    "publish_runbook": "PUBLISH_RUNBOOK.md",
+    "codex_task": "CODEX_TASK.md"
   },
   "rebuild": "媒体文件（assets/*.mp4|png|jpg、skill/、review/**/图片）不进公开仓库；新会话先把交接包的 assets/ 与 skill/ 放回本目录，再按 review/E01-v3/README.md 的命令重建。",
-  "blockers": [
-    "云端会话无法访问委托方本机已登录的Chrome，且网络拦截小红书；浏览器发布需在已登录的电脑上用本机Claude会话按 PUBLISH_RUNBOOK.md 执行，或委托方用手机手动发布"
-  ],
-  "next_action": "把E01-v4存为小红书草稿：需在已登录小红书的电脑上用本机Claude会话按 PUBLISH_RUNBOOK.md 执行（云端会话做不到），或委托方用手机上传素材包存草稿；委托方手机端发布后发回链接，记Day1。随后按 PLAYBOOK.md 制作E02。",
+  "blockers": [],
+  "next_action": "Codex 按 CODEX_TASK.md 第1步把 E01-v4 存入小红书草稿箱（不点发布），记录 xhs_drafts；委托方手机端发布后按第2步记录链接与Day1。",
   "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）",
-  "preferences": "PLAYBOOK.md"
+  "preferences": "PLAYBOOK.md",
+  "xhs_drafts": [],
+  "executor": "Codex（已登录小红书的浏览器会话）；任务提示词见 CODEX_TASK.md"
 }

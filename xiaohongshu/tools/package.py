@@ -5,7 +5,25 @@ import sys
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
-FONT = "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"
+def _find_cjk_font():
+    """XHS_FONT 环境变量优先，其次 macOS / Windows / Linux 常见中文字体。"""
+    import os
+    cands = [os.environ.get("XHS_FONT", ""),
+             "/System/Library/Fonts/PingFang.ttc",
+             "/System/Library/Fonts/Hiragino Sans GB.ttc",
+             "/System/Library/Fonts/STHeiti Medium.ttc",
+             "/Library/Fonts/Arial Unicode.ttf",
+             "C:/Windows/Fonts/msyhbd.ttc", "C:/Windows/Fonts/msyh.ttc", "C:/Windows/Fonts/simhei.ttf",
+             "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
+             "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+             "/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"]
+    for c in cands:
+        if c and os.path.exists(c):
+            return c
+    raise SystemExit("找不到中文字体：请设置环境变量 XHS_FONT=字体文件路径")
+
+
+FONT = _find_cjk_font()
 
 
 def main(build, out_dir, order_json, title):
