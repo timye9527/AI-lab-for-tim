@@ -52,6 +52,6 @@
   "blockers": [
     "云端会话无法访问委托方本机已登录的Chrome，且网络拦截小红书；浏览器发布需在已登录的电脑上用本机Claude会话按 PUBLISH_RUNBOOK.md 执行，或委托方用手机手动发布"
   ],
-  "next_action": "在已登录小红书的电脑上按 PUBLISH_RUNBOOK.md 发布E01-v3（prepublish → 委托方回复“确认发布” → 发布 → 核验链接 → 记录Day1）；或手动发布后把链接发回。随后制作E02。",
+  "next_action": "草稿模式：在已登录小红书的电脑上按 PUBLISH_RUNBOOK.md 把E01-v3存为草稿，委托方手机端点发布（prepublish → 委托方回复“确认发布” → 发布 → 核验链接 → 记录Day1）；或手动发布后把链接发回。随后制作E02。",
   "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）"
 }
