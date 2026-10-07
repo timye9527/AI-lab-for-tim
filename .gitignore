@@ -11,3 +11,4 @@ data/
 # 生成的笔记素材
 out/
 backup/
+*.zip
