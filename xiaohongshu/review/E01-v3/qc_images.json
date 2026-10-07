@@ -1,0 +1,56 @@
+[
+  {
+    "page": 1,
+    "file": "upload/01_封面.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  },
+  {
+    "page": 2,
+    "file": "upload/02_原片字幕-起点.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  },
+  {
+    "page": 3,
+    "file": "upload/03_原片字幕-结论.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  },
+  {
+    "page": 4,
+    "file": "upload/04_本号解读.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  },
+  {
+    "page": 5,
+    "file": "upload/05_表达场景示范.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  },
+  {
+    "page": 6,
+    "file": "upload/06_每日练习.jpg",
+    "size": [
+      1086,
+      1448
+    ],
+    "ratio_3_4": true
+  }
+]

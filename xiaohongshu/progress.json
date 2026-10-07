@@ -1,0 +1,45 @@
+{
+  "project": "朋友委托的表达与成长账号",
+  "baseline_followers": 280,
+  "target_followers": 1000,
+  "duration_days": 21,
+  "planned_posts": 9,
+  "status": "E01-v3_ready_for_client_confirmation",
+  "codex_schedule": "paused",
+  "active_schedule": null,
+  "updated_at": "2026-10-07",
+  "current_draft": "E01-v3",
+  "drafts_pending_review": ["E01-v3"],
+  "approved_versions": [],
+  "published_posts": [],
+  "source_reuse_status": "unverified",
+  "identity_and_login": "not_included",
+  "completed": [
+    "回看全片27.24秒，逐句字幕时间轴见 review/E01-v3/QC.md",
+    "封面去掉右上角大“中新视频”标识，小字改为“画面来源：中新视频｜AI辅助设计封面”",
+    "原生字幕拼图 P2(0.5/1.2/3.4/5.9/6.9) 与 P3(17.3/19.3/20.5/21.8/22.9/24.6/26.0)",
+    "本号解读页 P4、虚构示范页 P5（tools/card.py 本地排版，可复用）",
+    "沿用已认可练习卡为 P6",
+    "标题、正文、5个Tag、来源、语义/错字/缺字/视觉质检",
+    "手机缩略预览 preview_phone.jpg"
+  ],
+  "files": {
+    "post_copy": "review/E01-v3/post.md",
+    "qc_and_sources": "review/E01-v3/QC.md",
+    "upload_images": "review/E01-v3/upload/01_封面.jpg … 06_每日练习.jpg",
+    "phone_preview": "review/E01-v3/preview_phone.jpg",
+    "native_evidence": "review/E01-v3/native/",
+    "frame_manifest": "assets/manifest-E01-v3.json",
+    "page_specs": "review/E01-v3/specs/",
+    "metrics_template": "review/metrics.json",
+    "tools": ["tools/card.py", "tools/cover_fix.py", "tools/cover_caption.py", "tools/package.py", "tools/glyph_check.py"]
+  },
+  "rebuild": "媒体文件（assets/*.mp4|png|jpg、skill/、review/**/图片）不进公开仓库；新会话先把交接包的 assets/ 与 skill/ 放回本目录，再按 review/E01-v3/README.md 的命令重建。",
+  "blockers": [
+    "来源再利用条件未核实：本环境网络拦截中新网，需委托方核实或取得许可后再发布",
+    "需委托方明确确认 E01-v3 这个具体版本",
+    "目标账号链接与发布身份验证由委托方处理；本环境无小红书发布工具"
+  ],
+  "next_action": "等待委托方对 E01-v3 的具体确认与来源条件；确认后交付上传包/按确认发布，记录帖子链接，Day1=实际发布日。随后制作 E02（原创：一分钟讲清读过的一个观点），最多两篇待审。",
+  "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）"
+}

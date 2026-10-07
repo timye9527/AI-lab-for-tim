@@ -1,0 +1,8 @@
+# 第三方素材与由其派生的图片不进公开仓库（再利用条件未核实）
+assets/*.mp4
+assets/*.png
+assets/*.jpg
+review/**/*.jpg
+review/**/*.png
+# 交接包内的第三方 Skill，未见许可证，不公开再分发
+skill/
