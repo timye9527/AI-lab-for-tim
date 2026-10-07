@@ -178,14 +178,20 @@ def paste_sprite(img, ref, box, at):
     img.paste(sp, at, feather_mask(sp.size, 8))
 
 
+BRAND = True  # 页脚账号名；--no-brand 关闭（冷启动期不带账号名）
+
+
 def frame(ref):
     img = background()
     paste_sprite(img, ref, HEADER_BOX, (HEADER_BOX[0], HEADER_BOX[1]))
-    paste_sprite(img, ref, FOOTER_BOX, (FOOTER_BOX[0], FOOTER_BOX[1]))
+    if BRAND:
+        paste_sprite(img, ref, FOOTER_BOX, (FOOTER_BOX[0], FOOTER_BOX[1]))
     return img
 
 
 def footer_note(draw, s):
+    if not s:
+        return
     f = font(22)
     draw.text((W - 44 - f.getlength(s), 1392), s, font=f, fill=(196, 192, 186))
 
@@ -272,7 +278,7 @@ def render_text(spec, ref):
             text_bold(d, ((W - bf.getlength(s)) // 2, y + (h - 46) // 2), s, 38, (255, 255, 255), sw=1)
             ticks(d, 70, y + h // 2 - 20, color=BLUE, seed=91, n=2, length=26, width=6)
             y += h + blk.get("gap", 20)
-    footer_note(d, spec["footnote"])
+    footer_note(d, spec.get("footnote", ""))
     if y > 1360:
         print(f"警告：内容底部 y={y} 已压到页脚", file=sys.stderr)
     return img
@@ -296,10 +302,10 @@ def render_native(path, ref, label, sub):
     d = ImageDraw.Draw(img)
     # 右上角横排标签（拼图外，不压画面）
     lf = font(36)
-    text_bold(d, (W - 44 - lf.getlength(label), 30), label, 36, LIME, sw=1)
-    sf = font(24)
-    d.text((W - 44 - sf.getlength(sub), 76), sub, font=sf, fill=(205, 201, 195))
-    footer_note(d, "原片画面与烧录字幕，仅等比缩放")
+    text_bold(d, (W - 44 - lf.getlength(label), 30 if sub else 50), label, 36, LIME, sw=1)
+    if sub:
+        sf = font(24)
+        d.text((W - 44 - sf.getlength(sub), 76), sub, font=sf, fill=(205, 201, 195))
     return img, scale, (x, top, nw, nh)
 
 
@@ -315,8 +321,12 @@ def main():
     b.add_argument("--style-ref", required=True)
     b.add_argument("--out", required=True)
     b.add_argument("--label", required=True)
-    b.add_argument("--sub", required=True)
+    b.add_argument("--sub", default="")
+    for p in (a, b):
+        p.add_argument("--no-brand", action="store_true", help="不贴页脚账号名")
     args = ap.parse_args()
+    global BRAND
+    BRAND = not args.no_brand
     ref = Image.open(args.style_ref).convert("RGB")
     if ref.size != (W, H):
         sys.exit("style-ref 应为 1086×1448 的已认可练习卡")

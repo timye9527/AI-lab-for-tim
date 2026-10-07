@@ -4,21 +4,26 @@
   "target_followers": 1000,
   "duration_days": 21,
   "planned_posts": 9,
-  "status": "E01-v3_approved_awaiting_publish",
+  "status": "E01-v4_ready_for_draft",
   "codex_schedule": "paused",
   "active_schedule": null,
   "updated_at": "2026-10-07",
-  "current_draft": "E01-v3",
+  "current_draft": "E01-v4",
   "drafts_pending_review": [],
   "approved_versions": [
     {
       "id": "E01-v3",
       "approved_on": "2026-10-07",
-      "scope": "图片顺序P1–P6、标题、正文、5个Tag按review/E01-v3/post.md原样"
+      "status": "superseded_by_E01-v4"
+    },
+    {
+      "id": "E01-v4",
+      "approved_on": "2026-10-07",
+      "scope": "委托方指示：去掉账号名与图上免责小字、文案更轻；按 review/E01-v4 原样存草稿，委托方手机端最终发布"
     }
   ],
   "published_posts": [],
-  "source_reuse_status": "client_accepted: 委托方确认按个人非纯商用使用、自行承担来源条件；未从版权方获得书面许可，本方未独立核实",
+  "source_reuse_status": "client_accepted（委托方判断个人、非纯商用可用；未从版权方取得许可）",
   "identity_and_login": "not_included",
   "completed": [
     "回看全片27.24秒，逐句字幕时间轴见 review/E01-v3/QC.md",
@@ -30,13 +35,13 @@
     "手机缩略预览 preview_phone.jpg"
   ],
   "files": {
-    "post_copy": "review/E01-v3/post.md",
+    "post_copy": "review/E01-v4/post.md",
     "qc_and_sources": "review/E01-v3/QC.md",
-    "upload_images": "review/E01-v3/upload/01_封面.jpg … 06_每日练习.jpg",
-    "phone_preview": "review/E01-v3/preview_phone.jpg",
+    "upload_images": "review/E01-v4/upload/01_封面.jpg … 06_每日练习.jpg",
+    "phone_preview": "review/E01-v4/preview_phone.jpg",
     "native_evidence": "review/E01-v3/native/",
     "frame_manifest": "assets/manifest-E01-v3.json",
-    "page_specs": "review/E01-v3/specs/",
+    "page_specs": "review/E01-v4/specs/",
     "metrics_template": "review/metrics.json",
     "tools": [
       "tools/card.py",
@@ -44,7 +49,8 @@
       "tools/cover_caption.py",
       "tools/package.py",
       "tools/glyph_check.py",
-      "tools/prepublish.py"
+      "tools/prepublish.py",
+      "tools/erase.py"
     ],
     "publish_runbook": "PUBLISH_RUNBOOK.md"
   },
@@ -52,6 +58,7 @@
   "blockers": [
     "云端会话无法访问委托方本机已登录的Chrome，且网络拦截小红书；浏览器发布需在已登录的电脑上用本机Claude会话按 PUBLISH_RUNBOOK.md 执行，或委托方用手机手动发布"
   ],
-  "next_action": "草稿模式：在已登录小红书的电脑上按 PUBLISH_RUNBOOK.md 把E01-v3存为草稿，委托方手机端点发布（prepublish → 委托方回复“确认发布” → 发布 → 核验链接 → 记录Day1）；或手动发布后把链接发回。随后制作E02。",
-  "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）"
+  "next_action": "把E01-v4存为小红书草稿：需在已登录小红书的电脑上用本机Claude会话按 PUBLISH_RUNBOOK.md 执行（云端会话做不到），或委托方用手机上传素材包存草稿；委托方手机端发布后发回链接，记Day1。随后按 PLAYBOOK.md 制作E02。",
+  "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）",
+  "preferences": "PLAYBOOK.md"
 }
