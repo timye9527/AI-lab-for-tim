@@ -1,0 +1,10 @@
+# Cloudflare Pages 配置
+name = "make-money-test"
+pages_build_output_dir = "public"
+compatibility_date = "2026-09-01"
+
+# 兑换码数据库。先 `npx wrangler d1 create make-money-test`，把输出的 database_id 填到下面，再取消注释
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "make-money-test"
+# database_id = "在这里填 database_id"

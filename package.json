@@ -1,0 +1,11 @@
+{
+  "name": "make-money-test",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "preview": "node scripts/serve.mjs",
+    "dev": "npx wrangler pages dev public",
+    "codes": "node scripts/gen-codes.mjs"
+  }
+}
