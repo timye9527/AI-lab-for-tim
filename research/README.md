@@ -14,6 +14,8 @@
 | [04-github-and-tools.md](04-github-and-tools.md) | GitHub 和工具地图：follow-builders、RSSHub、edgartools、女娲人物 Skill、投资追踪站 |
 | [05-watchlist-calendar.md](05-watchlist-calendar.md) | 2026 Q4 观察日历和长期信号清单 |
 | [06-tentacles-and-next-steps.md](06-tentacles-and-next-steps.md) | **10 个延伸研究方向、4 个可做的产品方向、待拍板的问题** |
+| [07-follow-builders-teardown.md](07-follow-builders-teardown.md) | follow-builders 拆解：26 个账号和 6 个播客分别是谁、架构怎么搭、我们要改哪些 |
+| [08-github-investing-sources.md](08-github-investing-sources.md) | GitHub 上的聪明投资者方法论和投研资源（ai-berkshire、serenity-skill、Mira、ai-hedge-fund 等） |
 | [sources.yaml](sources.yaml) | 机器可读的信息源清单（给以后的自动抓取用） |
 
 ## 方法论
