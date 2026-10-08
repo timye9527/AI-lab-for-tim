@@ -1,0 +1,101 @@
+# 双核观察：机器可读的信息源清单
+# tier: 1 = 一手 / 2 = 完整访谈或转录 / 3 = 分析 / 4 = 二手报道（只当线索）
+# rsshub 路由需要自建 RSSHub 实例（X 路由需要配置 cookie 或 token），见 https://docs.rsshub.app
+updated: 2026-10-08
+
+nvidia_jensen:
+  - name: NVIDIA Newsroom
+    tier: 1
+    url: https://nvidianews.nvidia.com/
+  - name: NVIDIA Blog
+    tier: 1
+    url: https://blogs.nvidia.com/
+    feed: https://blogs.nvidia.com/feed/
+  - name: NVIDIA Investor Relations
+    tier: 1
+    url: https://investor.nvidia.com/
+  - name: SEC EDGAR NVIDIA (10-K/10-Q/8-K/13F/Form 4)
+    tier: 1
+    url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001045810
+    tool: dgunning/edgartools
+  - name: NVIDIA YouTube (keynotes)
+    tier: 1
+    url: https://www.youtube.com/@NVIDIA
+    rsshub: /youtube/user/@NVIDIA
+  - name: GTC
+    tier: 1
+    url: https://www.nvidia.com/gtc/
+  - name: BG2 Pod
+    tier: 2
+    note: 黄仁勋 2024-10、2025-09 两期
+  - name: Dwarkesh Podcast
+    tier: 2
+  - name: Stratechery
+    tier: 3
+    url: https://stratechery.com/
+    paywall: true
+  - name: SemiAnalysis
+    tier: 3
+    url: https://semianalysis.com/
+    paywall: partial
+  - name: The Next Platform
+    tier: 3
+    url: https://www.nextplatform.com/
+
+musk:
+  - name: X @elonmusk
+    tier: 1
+    url: https://x.com/elonmusk
+    rsshub: /twitter/user/elonmusk
+  - name: X post counter (Polymarket)
+    tier: 1
+    url: https://xtracker.polymarket.com
+  - name: Tesla IR
+    tier: 1
+    url: https://ir.tesla.com
+  - name: SEC EDGAR Tesla
+    tier: 1
+    url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001318605
+  - name: xAI News
+    tier: 1
+    url: https://x.ai/news
+  - name: SpaceX Updates
+    tier: 1
+    url: https://www.spacex.com/updates
+  - name: Hudson Labs – Musk Tesla predictions
+    tier: 3
+    url: https://www.hudson-labs.com/research/elon-musk-predictions-tsla
+  - name: LongTermWiki – Musk predictions
+    tier: 3
+    url: https://www.longtermwiki.com/knowledge-base/people/track-records/elon-musk-predictions
+  - name: Bloomberg "Elon, Inc." podcast
+    tier: 3
+
+investment_trackers:
+  - name: Tracxn NVentures
+    url: https://tracxn.com/d/venture-capital/nventures/__72RT_CJsiqrpcbOFu1VPO7osCvnURipMIhIWwLFtajg
+  - name: valueaddvc NVentures
+    url: https://valueaddvc.com/vc/nvidia-ventures
+  - name: AI Funding Tracker – Nvidia
+    url: https://aifundingtracker.com/nvidia-startup-investments/
+  - name: Bloomberg AI Circular Deals
+    url: https://www.bloomberg.com/graphics/2026-ai-circular-deals/
+
+chinese:
+  - name: 爱范儿 / APPSO
+    url: https://www.ifanr.com/
+    note: 演讲全文编译
+  - name: 虎嗅 Web3天空之城
+    url: https://m.huxiu.com/member/3294533.html
+    note: 长访谈中文整理
+  - name: 华尔街见闻
+    url: https://wallstreetcn.com/
+  - name: 财联社
+    url: https://www.cls.cn/
+
+reusable_repos:
+  - zarazhangrui/follow-builders      # 简报架构模板
+  - DIYgod/RSSHub                    # 抓取层
+  - dgunning/edgartools              # SEC 数据
+  - alchaincyf/nuwa-skill            # 人物思维蒸馏
+  - c7b/CS153-Frontier-Systems-Transcripts
