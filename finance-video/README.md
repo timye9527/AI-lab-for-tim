@@ -29,13 +29,19 @@
 
 上线前过一遍 [05-合规与风险](05-合规与风险.md)（AI 标识、投资免责声明、素材版权）。
 
+参考视频的拆解和 10 秒样片见 [06-参考视频拆解](06-参考视频拆解.md)：主播放在温馨客厅，
+华尔街感和紧张感交给 CRT 质感 B-roll 和黄色故障大字。
+
 ## 快速上手
 
 ```bash
-pip install matplotlib numpy          # 系统里需要 ffmpeg
+pip install matplotlib numpy pillow   # 系统里需要 ffmpeg
 
 # 选题打分：按评分表给候选选题排序
 python3 tools/topic_score.py examples/topics.csv
+
+# 10 秒开头钩子样片（CRT 质感 + 故障大字 + 双语字幕 + 竖排免责声明）
+python3 tools/hook_demo.py --out out/hook_10s.mp4 [--host-image host.png]
 
 # 生成一段华尔街风格的动态折线图（竖屏 9:16，用于 Shorts/抖音）
 python3 tools/wallst_chart.py examples/sample_series.csv \
@@ -43,8 +49,7 @@ python3 tools/wallst_chart.py examples/sample_series.csv \
   --out out/chart.mp4 --vertical
 ```
 
-## 待补
+## 参考视频
 
-原视频（`youtube.com/watch?v=_9vlW3e_icA`）在当前云环境里打不开（网络策略拦截了 youtube.com），
-这套方法是按「年轻女主播 + 扎实信息 + 华尔街画面」这个描述做的。
-把标题、频道名或字幕文本贴过来，可以再逐段对照：开头钩子用了几秒、主播占屏比例、画面切换频率、图表样式，然后调整模板。
+`youtube.com/watch?v=_9vlW3e_icA`（Amber聊財）。云环境的网络策略拦截了 youtube.com，
+拆解是根据截图做的，见 [06-参考视频拆解](06-参考视频拆解.md)。
