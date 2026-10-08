@@ -16,6 +16,9 @@
 | [06-tentacles-and-next-steps.md](06-tentacles-and-next-steps.md) | **10 个延伸研究方向、4 个可做的产品方向、待拍板的问题** |
 | [07-follow-builders-teardown.md](07-follow-builders-teardown.md) | follow-builders 拆解：26 个账号和 6 个播客分别是谁、架构怎么搭、我们要改哪些 |
 | [08-github-investing-sources.md](08-github-investing-sources.md) | GitHub 上的聪明投资者方法论和投研资源（ai-berkshire、serenity-skill、Mira、ai-hedge-fund 等） |
+| [09-five-tools-playbook.md](09-five-tools-playbook.md) | **五件套使用手册**：发现 → 判断 → 对抗 → 记录 → 盯盘，安装和调用方式 |
+| [cases/2026-10-marvell-1t/](cases/2026-10-marvell-1t/README.md) | **案例 #1：迈威尔会是下一个万亿公司吗？**（五件套首次实战） |
+| [claims-ledger.csv](claims-ledger.csv) | 主张台账：黄仁勋、马斯克等人说过的话，以及到期核对 |
 | [sources.yaml](sources.yaml) | 机器可读的信息源清单（给以后的自动抓取用） |
 
 ## 方法论
