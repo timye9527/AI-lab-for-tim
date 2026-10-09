@@ -18,6 +18,8 @@
 | [08-github-investing-sources.md](08-github-investing-sources.md) | GitHub 上的聪明投资者方法论和投研资源（ai-berkshire、serenity-skill、Mira、ai-hedge-fund 等） |
 | [09-five-tools-playbook.md](09-five-tools-playbook.md) | **五件套使用手册**：发现 → 判断 → 对抗 → 记录 → 盯盘，安装和调用方式 |
 | [cases/2026-10-marvell-1t/](cases/2026-10-marvell-1t/README.md) | **案例 #1：迈威尔会是下一个万亿公司吗？**（五件套首次实战） |
+| [cases/2026-10-iwm-futu-pdd/](cases/2026-10-iwm-futu-pdd/README.md) | **案例 #2–4：IWM、富途、拼多多值得入手吗？** |
+| [10-my-strategy-template.md](10-my-strategy-template.md) | **我的投资策略卡**（模板）：风格定位、能力圈、红线、按风格定制流水线、复盘记录 |
 | [claims-ledger.csv](claims-ledger.csv) | 主张台账：黄仁勋、马斯克等人说过的话，以及到期核对 |
 | [sources.yaml](sources.yaml) | 机器可读的信息源清单（给以后的自动抓取用） |
 
