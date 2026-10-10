@@ -14,6 +14,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const icon = (name, size = 200) => tierIcon(name, th.accent, th.gold).replace('width="120" height="120"', `width="${size}" height="${size}"`);
 const tiersDesc = [...test.tiers].sort((a, b) => b.level - a.level);
 const typeEntries = Object.entries(test.types);
+const QN = test.questions.length;
 
 // —— 配图模板 ——
 const CSS = `
@@ -90,7 +91,7 @@ const S = {
     .map(([c, t]) => `<div class="cell"><b>${esc(t.name)}</b><small>${esc(t.alias)} · ${esc(c)}</small></div>`)
     .join('')}</div>`,
   cta: () => `<div class="center"><div class="big" style="font-size:84px">你是哪种韭菜？<br><em>又是哪一位？</em></div>
-    <div class="p" style="margin-top:48px">12 道盘面情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
+    <div class="p" style="margin-top:48px">${QN} 道真实情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
     <div class="cta">${esc(N.cta)}</div><div class="small">纯属娱乐，非专业测评，不构成任何投资建议</div></div>`,
 };
 
@@ -99,7 +100,7 @@ const notes = [];
 notes.push({
   slug: '00-总览',
   title: `${N.series}，你是哪一位？`,
-  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n12 道盘面情境题，测出你的韭菜段位和人格底色。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
+  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n${QN} 道真实情境题，测出你的韭菜段位和人格底色。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
   slides: [S.cover(N.series, '你是哪一位？', '曹操、诸葛亮、司马懿、李白、刘禅……'), S.grid(), S.ladder(0), S.cta()],
 });
 for (const [code, t] of typeEntries) {
@@ -108,7 +109,7 @@ for (const [code, t] of typeEntries) {
   notes.push({
     slug: `人格-${t.name}`,
     title: `测出${t.name}型的人，都${t.hook}`,
-    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n12 道盘面情境题，测测你和哪位历史人物同一种「人格底色」。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
+    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n${QN} 道真实情境题，测测你和哪位历史人物同一种「人格底色」。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
     slides: [S.cover(`测出${t.name}型的人`, `都${t.hook}`, `${t.era} · ${t.alias}`), S.persona(t), S.text(`${t.name}型的盲点`, t.moment), S.rels(t, buddy, rival), S.ladder(0), S.cta()],
   });
 }
@@ -131,10 +132,10 @@ const shopSlides = [
   `<div class="title">怎么使用</div><div class="ladder">${[
     ['1', '下单后自动收到兑换码和使用说明'],
     ['2', '按说明用手机浏览器打开测试页'],
-    ['3', '做完 12 道题，免费领段位卡'],
+    ['3', `做完 ${QN} 道题，免费领段位卡`],
     ['4', '输入兑换码，解锁完整人格报告'],
   ].map(([n, x]) => `<div class="rung"><span class="lv">${n}</span><div><b style="font-size:38px">${esc(x)}</b></div></div>`).join('')}</div>
-    <div class="small">一个兑换码可在 ${SH.maxDevices} 台设备上使用</div>`,
+    <div class="small">${SH.delivery === 'shared' ? '不限次数，换手机也能用' : `一个兑换码可在 ${SH.maxDevices} 台设备上使用`}</div>`,
   `<div class="title">购买须知</div><div class="card p" style="font-size:38px">· 娱乐向人格测试，非专业心理测评<br>· 不构成任何投资建议<br>· 不需要登录，不收集任何个人信息<br>· 虚拟商品，兑换码发出后不支持无理由退款<br>· 遇到问题请私信店铺客服</div>`,
 ];
 const shopCopy = `【商品标题】
@@ -144,37 +145,46 @@ ${SH.title}
 ${SH.price} 元
 
 【商品详情文案】
-12 道盘面情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
+${QN} 道真实情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
 完整报告包含：${perks.join('、')}。
 下单后自动发送兑换码和使用说明，用手机浏览器打开即可，不用登录，不收集个人信息。
 娱乐向人格测试，非专业心理测评，不构成任何投资建议。
 
-【自动发货内容（卡券模板，{卡密} 处由系统填入兑换码）】
+${SH.delivery === 'shared' ? `【自动发货内容（虚拟商品自动发货 / 发货说明，所有买家同一段文字）】
+发货链接：${SH.url}
+发货说明：
+感谢购买🌱
+兑换码：${SH.sharedCode}
+1. 复制上面的网址，用手机浏览器打开（小红书里点不开，要复制出去）
+2. 做完 ${QN} 道题，在结果页底部输入兑换码（注意不要带空格）
+3. 解锁完整人格报告，不限次数，换手机也能用
+打不开或解锁失败，直接私信店铺～
+` : `【自动发货内容（卡券模板，{卡密} 处由系统填入兑换码）】
 感谢购买🌱
 你的兑换码：{卡密}
 
 使用方法：
 1. 复制网址，用手机浏览器打开：${SH.url}
-2. 做完 12 道题，在结果页底部输入兑换码
+2. 做完 ${QN} 道题，在结果页底部输入兑换码
 3. 解锁完整人格报告（一个兑换码可在 ${SH.maxDevices} 台设备上使用）
 
 打不开或兑换失败，直接私信店铺～
-
+`}
 【客服快捷回复】
 Q 兑换码提示无效？
-A 请检查有没有多复制空格，兑换码格式是 ${test.paywall.placeholder.replace(/^.*如 /, '')}。还不行把兑换码发给我，帮你查～
+A ${SH.delivery === 'shared' ? '兑换码在发货说明里，复制时注意别带空格；还不行截图发我，帮你看～' : `请检查有没有多复制空格，兑换码格式是 ${test.paywall.placeholder.replace(/^.*如 /, '')}。还不行把兑换码发给我，帮你查～`}
 
-Q 提示次数用完？
+${SH.delivery === 'shared' ? '' : `Q 提示次数用完？
 A 一个码可在 ${SH.maxDevices} 台设备使用。把兑换码发我，帮你加一次～（后台：mm extend 兑换码）
-
+`}
 Q 网页打不开？
 A 请用手机自带浏览器（Safari / Chrome 等）打开发货消息里的地址；或者切换一下 Wi-Fi / 流量试试。
 
 Q 测得不准？
-A 这是娱乐向的人格测试，结果只反映你这 12 道题的作答风格～换个心情再测一次也可以。
+A 这是娱乐向的人格测试，结果只反映你这 ${QN} 道题的作答风格～换个心情再测一次也可以。
 
 Q 可以退款吗？
-A 虚拟商品兑换码发出后一般不支持无理由退款；如果码还没使用过，可以联系我处理。（后台：mm check 兑换码，看 uses 是否为 0，再用 mm revoke 作废后退款）
+A 虚拟商品发货后一般不支持无理由退款；遇到打不开、解锁失败这类问题，我会先帮你解决～
 `;
 
 // —— 检查文案 ——
@@ -192,6 +202,7 @@ for (const n of notes) {
   const hit = lintText(publicCopy + shopSlides.join(''));
   if (hit.length) (warn++, console.log(`⚠️ 商品素材含高危词：${hit.join('、')}`));
   if (SH.url.includes('你的域名')) (warn++, console.log('⚠️ config.shop.url 还是占位网址，部署后改成真实域名再生成一次'));
+  if (SH.delivery === 'shared' && /统一码/.test(SH.sharedCode)) (warn++, console.log('⚠️ config.shop.sharedCode 还是占位，服务器上 mm add 建好统一码后再填'));
 }
 
 // —— 截图 ——

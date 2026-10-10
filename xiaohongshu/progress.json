@@ -4,10 +4,10 @@
   "target_followers": 1000,
   "duration_days": 21,
   "planned_posts": 9,
-  "status": "E01-v4_handoff_to_codex_for_draft",
+  "status": "paused_by_client",
   "codex_schedule": "paused",
   "active_schedule": null,
-  "updated_at": "2026-10-07",
+  "updated_at": "2026-10-10",
   "current_draft": "E01-v4",
   "drafts_pending_review": [],
   "approved_versions": [
@@ -57,9 +57,10 @@
   },
   "rebuild": "媒体文件（assets/*.mp4|png|jpg、skill/、review/**/图片）不进公开仓库；新会话先把交接包的 assets/ 与 skill/ 放回本目录，再按 review/E01-v3/README.md 的命令重建。",
   "blockers": [],
-  "next_action": "Codex 按 CODEX_TASK.md 第1步把 E01-v4 存入小红书草稿箱（不点发布），记录 xhs_drafts；委托方手机端发布后按第2步记录链接与Day1。",
+  "next_action": "暂停中；恢复时从 CODEX_TASK.md 第1步继续",
   "suggested_publish_time": "确认后的第一个晚上 20:30（首轮试验建议，未经验证）",
   "preferences": "PLAYBOOK.md",
   "xhs_drafts": [],
-  "executor": "Codex（已登录小红书的浏览器会话）；任务提示词见 CODEX_TASK.md"
+  "executor": "Codex（已登录小红书的浏览器会话）；任务提示词见 CODEX_TASK.md",
+  "paused_note": "2026-10-10 委托方决定暂停表达账号内容系列（前两期效果不好），转做「韭菜段位测试」带货，见 docs/LAUNCH-XHS.md"
 }

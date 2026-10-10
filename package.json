@@ -7,7 +7,8 @@
     "preview": "DB_PATH=data/dev.db node --no-warnings server/index.mjs",
     "start": "node --no-warnings server/index.mjs",
     "admin": "node --no-warnings server/admin.mjs",
-    "notes": "node scripts/notes.mjs"
+    "notes": "node scripts/notes.mjs",
+    "screens": "node scripts/screens.mjs"
   },
   "engines": {
     "node": ">=22.13"

@@ -1,6 +1,7 @@
 // 管理工具（在服务器上运行）
 //   node server/admin.mjs gen <测试id> <数量> [--prefix JC] [--max 3]   生成兑换码，写入数据库 + 导出 CSV 给店铺
 //   node server/admin.mjs import <csv文件> <测试id> [--max 3]           把已有的码导入数据库
+//   node server/admin.mjs add <统一码> <测试id> [--max 1000000]        建一个所有买家共用的统一码（配合店铺固定发货文案）
 //   node server/admin.mjs stats [--days 14] [--test jiucai]             每日转化漏斗 + 兑换码库存
 //   node server/admin.mjs check <兑换码>                                客服：查一个码的使用情况
 //   node server/admin.mjs extend <兑换码> [次数]                         客服：给一个码加次数（默认 +1）
@@ -20,7 +21,7 @@ const db = openDb();
 const stamp = () => new Date().toISOString().slice(0, 19).replace(/[-:T]/g, '');
 
 function usage() {
-  console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').slice(1, 8).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+  console.log(readFileSync(new URL(import.meta.url), 'utf8').split('\n').slice(1, 9).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
   process.exit(1);
 }
 
@@ -41,6 +42,14 @@ if (cmd === 'gen') {
   const codes = readFileSync(file, 'utf8').split(/\r?\n/).map((s) => s.trim()).filter((s) => s && s !== 'code');
   const n = insertCodes(db, codes, test, Number(flags.max || 3), `${test}-import-${stamp()}`);
   console.log(`导入 ${n} 个（跳过重复 ${codes.length - n} 个）`);
+} else if (cmd === 'add') {
+  const [code, test] = args;
+  if (!code || !test || !/^[A-Za-z0-9-]{6,32}$/.test(code)) {
+    console.log('统一码要求 6～32 位字母、数字或短横线，如 JC2026');
+    usage();
+  }
+  const n = insertCodes(db, [code], test, Number(flags.max || 1000000), `${test}-shared-${stamp()}`);
+  console.log(n ? `已建统一码 ${code.toUpperCase()}（可用 ${flags.max || 1000000} 次）。泄露了就 revoke 它，再 add 一个新的，并同步改店铺发货文案。` : '这个码已存在');
 } else if (cmd === 'stats') {
   const days = Number(flags.days || 14);
   const where = flags.test ? 'AND test = ?' : '';

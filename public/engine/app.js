@@ -84,14 +84,24 @@ function renderIntro() {
 
 // —— 答题 ——
 let qi = 0;
+// 第 i 题所在章节名（config.chapters 按顺序写每章题数；没配就显示品牌名）
+function chapterOf(i) {
+  let from = 0;
+  for (const c of test.chapters || []) {
+    if (i < from + c.count) return c.title;
+    from += c.count;
+  }
+  return '';
+}
 function renderQuiz() {
   const q = test.questions[qi];
   const n = test.questions.length;
+  const pct = Math.round(((qi + 1) / n) * 100);
   app.innerHTML = `
     <section class="card quiz">
       <div class="quiz-top">
-        <span class="brand">${esc(test.brand)}</span>
-        <span class="count">${qi + 1}/${n}</span>
+        <span class="brand">${esc(chapterOf(qi) || test.brand)}</span>
+        <span class="count">${qi + 1}/${n} · <b>${pct}%</b></span>
       </div>
       <div class="progress"><i style="width:${((qi + 1) / n) * 100}%"></i></div>
       <h2 class="question">${esc(q.q)}</h2>
@@ -232,12 +242,12 @@ function report(r) {
       return `<div class="ab"><span>${esc(a.label)}</span><div class="ab-bar"><i style="width:${v}%"></i></div><b>${v}</b></div>`;
     })
     .join('');
-  const layers = ['第一底色', '隐藏天赋', '长期优势']
+  const layers = test.layerTitles || ['最像 TA 的一点', '你没发现的天赋', '能陪你走远的优势']
     .map((title, i) => {
       const x = r.ranked[i];
       if (!x || !trait(x)) return '';
       const t = trait(x);
-      const tail = i === 0 ? `这也是你与${esc(type.name)}最接近的一层底色。` : '';
+      const tail = i === 0 ? `在这一点上，你和${esc(type.name)}最像。` : '';
       return `<div class="sub-card"><h4>${title} · ${esc(t.name)}</h4><p>${esc(t.desc)}${tail}</p></div>`;
     })
     .join('');

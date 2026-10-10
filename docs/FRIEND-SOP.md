@@ -29,14 +29,13 @@
    node -v
    ```
    用宝塔面板的话，可以在「软件商店 → Node.js 版本管理器」里装 22。
-3. **拉代码**（仓库是私有的）：
+3. **拉代码**（代码在公开仓库 `timye9527/AI-lab-for-tim` 里，不需要 Deploy key）：
    ```bash
    sudo mkdir -p /srv && sudo chown $USER /srv && cd /srv
-   ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519   # 已有就跳过
-   cat ~/.ssh/id_ed25519.pub                          # 把这串发给主理人，加到 GitHub 仓库的 Deploy keys（只读）
-   git clone git@github.com:timye9527/make-money-test.git
+   git clone -b claude/xiaohongshu-e01-production-gd18aa https://github.com/timye9527/AI-lab-for-tim.git make-money-test
    cd make-money-test
    ```
+   分支合并到 main 之后，把 `-b` 后面换成 `main`。
 4. **启动服务**（开机自启、挂了自动重启）：
    ```bash
    sudo mkdir -p data codes backup && sudo chown -R www-data:www-data data codes backup
@@ -57,11 +56,12 @@
    source ~/.bashrc
    mm                       # 显示所有管理命令
    ```
-   **生成第一批兑换码**：
+   **建统一兑换码**（推荐，和店铺固定发货文案配合，所有买家同一个码）：
    ```bash
-   mm gen jiucai 300 --prefix JC --max 3
+   mm add 你自己定的码 jiucai
    ```
-   会在 `codes/` 下生成一个 CSV，一行一个码，下一步上传到店铺。**这个文件不要外传。**
+   码泄露了：`mm revoke 旧码` 再 `mm add 新码 jiucai`，同步改店铺发货说明。
+   如果店铺支持卡密库存、想一人一码：`mm gen jiucai 300 --prefix JC --max 3`，把 `codes/` 下的 CSV 上传到卡券库存（**这个文件不要外传**），并把 `config.js` 里 `shop.delivery` 改成 `'cards'`。
 7. **每天自动备份**：运行 `sudo crontab -e`，加一行：
    ```
    0 4 * * * cd /srv/make-money-test && sudo -u www-data DB_PATH=data/app.db node --no-warnings server/admin.mjs backup

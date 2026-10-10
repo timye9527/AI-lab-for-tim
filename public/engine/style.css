@@ -56,6 +56,7 @@ h1 { font-size: 34px; font-weight: 800; text-align: center; margin: 6px 0 12px; 
 .quiz { margin-top: 8px; }
 .quiz-top { display: flex; justify-content: space-between; color: var(--muted); font-size: 14px; }
 .brand { color: var(--accent); letter-spacing: .15em; }
+.count b { color: var(--accent); font-weight: 600; }
 .progress { height: 6px; background: var(--line); border-radius: 6px; margin: 12px 0 20px; overflow: hidden; }
 .progress i { display: block; height: 100%; background: var(--accent); border-radius: 6px; transition: width .25s; }
 .question { font-size: 19px; line-height: 1.65; font-weight: 700; margin-bottom: 18px; }
