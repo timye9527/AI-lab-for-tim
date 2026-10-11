@@ -40,11 +40,17 @@ const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
 
 const fill = (tpl, map) => String(tpl || '').replace(/\{(\w+)\}/g, (_, k) => map[k] ?? '');
 
-// 有没有兑换服务：正式服务器的 /healthz 返回 ok；静态托管（预览）没有，这时 DEMO 码可用
-const backend = fetch('/healthz', { cache: 'no-store' })
-  .then((r) => (r.ok ? r.text() : ''))
-  .then((t) => t.trim() === 'ok')
-  .catch(() => false);
+// 网络请求一律加超时：有的托管环境请求会一直挂着，不能让页面卡在「验证中」
+const withTimeout = (p, ms, fallback) => Promise.race([p.catch(() => fallback), new Promise((r) => setTimeout(() => r(fallback), ms))]);
+
+// 有没有兑换服务：正式服务器的 /healthz 返回 ok；静态托管（预览）没有
+const backend = withTimeout(
+  fetch('/healthz', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.text() : ''))
+    .then((t) => t.trim() === 'ok'),
+  2500,
+  false,
+);
 
 // 漏斗计数：只发「哪个测试 + 哪一步」，不带任何个人信息；没有后端就不发
 function track(ev) {
@@ -432,12 +438,15 @@ function unlockBox() {
 let codesPromise;
 async function verifyStatic(code) {
   if (!test.paywall.codesFile) return null;
-  codesPromise ||= fetch(new URL(`../tests/${id}/${test.paywall.codesFile}`, import.meta.url), { cache: 'no-store' })
-    .then((r) => (r.ok ? r.json() : null))
-    .then((d) => (d?.hashes ? new Set(d.hashes) : null))
-    .catch(() => null);
+  codesPromise ||= withTimeout(
+    fetch(new URL(`../tests/${id}/${test.paywall.codesFile}`, import.meta.url), { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => (Array.isArray(d?.hashes) ? new Set(d.hashes) : null)),
+    4000,
+    null,
+  );
   const set = await codesPromise;
-  if (!set) return null;
+  if (!set || !crypto?.subtle) return null;
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${test.id}:${code}`));
   const hex = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
   return set.has(hex.slice(0, 12));

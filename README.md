@@ -105,7 +105,7 @@ npm run codes:static -- jiucai 500 --prefix JC   # 生成兑换码 + 静态码�
 
 ### 线上预览
 
-运行 `npm run build:preview`（`-- jiucai --mode report` 可以切换付费方式），把 `out/preview/` 当静态网站发布即可。预览包里不带码表，输入 `DEMO` 就能体验。
+运行 `npm run build:preview -- jiucai --codes 9999,8888,6666,1688`，把 `out/preview/` 当静态网站发布即可（加 `--mode report` 可以切换付费方式）。`--codes` 里的测试码只写进预览包，不会进仓库，正式部署不受影响；不带 `--codes` 时输入 `DEMO` 体验。
 
 ## 出一套新测试（资产化的关键）
 
