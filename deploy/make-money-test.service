@@ -1,0 +1,19 @@
+# systemd 服务：开机自启、挂了自动重启
+# 安装：sudo cp deploy/make-money-test.service /etc/systemd/system/ && sudo systemctl enable --now make-money-test
+[Unit]
+Description=make-money-test
+After=network.target
+
+[Service]
+# 改成你的实际目录和运行用户
+WorkingDirectory=/srv/make-money-test
+User=www-data
+Environment=PORT=8788
+Environment=HOST=127.0.0.1
+Environment=DB_PATH=/srv/make-money-test/data/app.db
+ExecStart=/usr/bin/env node --no-warnings server/index.mjs
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

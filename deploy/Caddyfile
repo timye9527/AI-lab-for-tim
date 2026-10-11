@@ -1,0 +1,6 @@
+# Caddy：自动申请和续期 HTTPS 证书，最省事
+# 把 test.example.com 换成你的域名，放到 /etc/caddy/Caddyfile，然后 sudo systemctl reload caddy
+test.example.com {
+	encode gzip
+	reverse_proxy 127.0.0.1:8788
+}
