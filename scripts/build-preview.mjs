@@ -1,6 +1,8 @@
 // 打包一个静态预览版到 out/preview/（样式内联，页面不带 html/head/body，适合 claude.ai 等托管）
-// 用法：npm run build:preview -- [测试id] [--mode start|report|none] [--out 目录]
+// 用法：npm run build:preview -- [测试id] [--mode start|report|none] [--out 目录] [--codes 9999,8888]
+//   --codes：只写进预览包的测试兑换码（不进仓库，正式部署不受影响）
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const args = process.argv.slice(2);
 const flag = (k) => (args.includes(k) ? args[args.indexOf(k) + 1] : null);
@@ -21,6 +23,12 @@ if (mode) {
 } else {
   cpSync(`public/tests/${id}/config.js`, `${out}/tests/${id}/config.js`);
 }
+// 测试码：和 codes-static.mjs 同一种哈希
+const testCodes = (flag('--codes') || '').split(',').map((c) => c.trim().toUpperCase()).filter(Boolean);
+if (testCodes.length) {
+  const hashes = testCodes.map((c) => createHash('sha256').update(`${id}:${c}`).digest('hex').slice(0, 12));
+  writeFileSync(`${out}/tests/${id}/codes.json`, JSON.stringify({ hashes }) + '\n');
+}
 const css = readFileSync('public/engine/style.css', 'utf8');
 writeFileSync(
   `${out}/index.html`,
@@ -32,4 +40,4 @@ ${css}
 <script type="module" src="engine/app.js"></script>
 `,
 );
-console.log(`预览包已生成：${out}/${mode ? `（付费方式：${mode}）` : ''}`);
+console.log(`预览包已生成：${out}/${mode ? `（付费方式：${mode}）` : ''}${testCodes.length ? ` 测试码：${testCodes.join(' / ')}` : ''}`);
