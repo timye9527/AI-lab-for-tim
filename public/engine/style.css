@@ -208,3 +208,6 @@ h1 { font-size: 34px; font-weight: 800; text-align: center; margin: 6px 0 12px; 
 /* 预览提示 + 复制框 */
 .unlock-preview { color: var(--accent); font-size: 13px; }
 #copy-text { width: 100%; min-height: 120px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 12px; font: inherit; font-size: 14px; }
+
+/* 先付费模式：开场兑换框标题 */
+.start-title { font-size: 16px; font-weight: 700; margin: 4px 0 -4px; }

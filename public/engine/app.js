@@ -112,12 +112,20 @@ function renderIntro() {
       <div class="intro-icons">
         ${[1, 2, 4, 6].map((lv) => `<span class="icon-ring sm">${tierIcon(test.tiers.find((t) => t.level === lv)?.icon, test.theme.accent, test.theme.gold)}</span>`).join('')}
       </div>
-      ${needCodeFirst ? unlockBox() : `<button class="btn primary" data-act="start">${esc(test.intro.cta)}</button>`}
+      ${needCodeFirst ? `<p class="start-title">${esc(test.paywall.startTitle || test.paywall.title)}</p>${unlockBox()}` : `<button class="btn primary" data-act="start">${esc(test.intro.cta)}</button>`}
       <p class="meta">${esc(test.intro.meta)}</p>
       ${hasResult ? '<button class="btn ghost" data-act="last">查看上次结果</button>' : ''}
       <p class="disclaimer">${esc(test.disclaimer)}</p>
     </section>`;
-  bindUnlock(() => go('intro'));
+  // 先付费模式：输对码直接开始答题，少点一次
+  bindUnlock(startQuiz);
+}
+
+function startQuiz() {
+  track('start');
+  state.answers = [];
+  qi = 0;
+  go('quiz');
 }
 
 // —— 答题 ——
@@ -419,11 +427,28 @@ function unlockBox() {
     </form>`;
 }
 
+// 静态验码：codesFile 里存的是「测试id:兑换码」SHA-256 的前 12 位，没有服务器也能校验
+// 返回 true / false；文件不存在（还没生成码，比如预览）返回 null
+let codesPromise;
+async function verifyStatic(code) {
+  if (!test.paywall.codesFile) return null;
+  codesPromise ||= fetch(new URL(`../tests/${id}/${test.paywall.codesFile}`, import.meta.url), { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => (d?.hashes ? new Set(d.hashes) : null))
+    .catch(() => null);
+  const set = await codesPromise;
+  if (!set) return null;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${test.id}:${code}`));
+  const hex = [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  return set.has(hex.slice(0, 12));
+}
+
 function bindUnlock(onDone) {
   const form = app.querySelector('[data-unlock]');
   if (!form) return;
-  backend.then((live) => {
-    if (!live || isLocal) form.querySelector('[data-preview]').hidden = false;
+  // 既没有服务器也没有码表，才是预览环境
+  Promise.all([backend, verifyStatic('')]).then(([live, table]) => {
+    if (isLocal || (!live && table === null)) form.querySelector('[data-preview]').hidden = false;
   });
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -432,11 +457,12 @@ function bindUnlock(onDone) {
     if (!code) return;
     msg.textContent = '验证中…';
     try {
-      // DEMO 码只在本地和没有兑换服务的预览环境有效
+      // 校验顺序：服务器接口 → 静态码表 → 预览环境的 DEMO
       const live = await backend;
-      let ok = code === 'DEMO' && (isLocal || !live);
+      const table = live ? null : await verifyStatic(code);
+      let ok = (code === 'DEMO' && (isLocal || (!live && table === null))) || table === true;
       if (!ok && !live) {
-        msg.textContent = '预览版没有连接兑换服务，输入 DEMO 体验完整报告';
+        msg.textContent = table === false ? '兑换码无效，请检查后再试' : '预览版没有连接兑换服务，输入 DEMO 体验完整报告';
         return;
       }
       if (!ok) {
@@ -482,12 +508,8 @@ app.addEventListener('click', (e) => {
     return;
   }
   const act = e.target.closest('[data-act]')?.dataset.act;
-  if (act === 'start') {
-    track('start');
-    state.answers = [];
-    qi = 0;
-    go('quiz');
-  } else if (act === 'prev') {
+  if (act === 'start') startQuiz();
+  else if (act === 'prev') {
     qi = Math.max(0, qi - 1);
     renderQuiz();
   } else if (act === 'last') go('result');
