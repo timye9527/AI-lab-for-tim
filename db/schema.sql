@@ -17,7 +17,7 @@ CREATE INDEX IF NOT EXISTS idx_codes_test ON codes (test);
 CREATE TABLE IF NOT EXISTS events (
   day TEXT NOT NULL,                    -- 北京时间日期 YYYY-MM-DD
   test TEXT NOT NULL,
-  ev TEXT NOT NULL,                     -- view / start / finish / poster / unlock
+  ev TEXT NOT NULL,                     -- view / start / finish / poster / invite / unlock
   n INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, test, ev)
 );

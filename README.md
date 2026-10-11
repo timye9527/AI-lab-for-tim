@@ -33,6 +33,7 @@ deploy/                     ← 服务器部署：systemd、Caddy、nginx / 宝�
 scripts/
   check.mjs                 ← 校验配置、模拟作答看分布、扫描高危词
   notes.mjs                 ← 生成小红书笔记配图 + 文案、商品图 + 上架文案
+  build-preview.mjs         ← 打包静态预览版
   lint-words.mjs            ← 高危词表（导流 / 金融 / 迷信 / 夸大）
 ```
 
@@ -45,6 +46,7 @@ npm run preview                 # 本地预览 http://localhost:8788/jiucai/（�
 npm run check                   # 改完内容必跑：缺字段、人格 / 段位分布、高危词
 npm install && npm run notes    # 生成笔记和商品素材到 out/notes/<id>/（需要本机装有 Chrome）
 npm run admin                   # 查看管理命令
+npm run build:preview           # 打包静态预览版到 out/preview/（没有后端时输入 DEMO 解锁）
 ```
 
 ## 计分规则
@@ -61,6 +63,9 @@ npm run admin                   # 查看管理命令
 
 ## 部署
 
+**线上预览**（不需要服务器）：运行 `npm run build:preview`，把 `out/preview/` 当静态网站发布即可。页面会自动发现没有兑换服务，这时输入 `DEMO` 就能看完整报告；正式服务器上 DEMO 无效。
+
+**正式部署**：
 香港服务器 + 自己的域名，不需要 ICP 备案，大陆可以访问。完整步骤见 [`docs/FRIEND-SOP.md`](docs/FRIEND-SOP.md) 的 B 节。
 不要用 Cloudflare 的 `*.pages.dev`：它在大陆多地打不开，原因见 [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md)。
 

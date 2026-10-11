@@ -1,5 +1,6 @@
 /* 测试引擎通用样式，颜色由 config.theme 注入 */
 :root {
+  color-scheme: dark;
   --bg: #0e1512;
   --bg2: #141d18;
   --card: #18211c;
@@ -178,3 +179,32 @@ h1 { font-size: 34px; font-weight: 800; text-align: center; margin: 6px 0 12px; 
 .modal-body { width: 100%; max-width: 420px; max-height: 100%; overflow-y: auto; text-align: center; }
 .modal-tip { color: #fff; font-size: 15px; margin-bottom: 10px; }
 .modal img { width: 100%; border-radius: 16px; display: block; }
+
+/* 好友邀请横幅 */
+.invite-banner {
+  margin: 0 auto 16px; padding: 10px 14px; max-width: 360px; border-radius: 14px; font-size: 14px; line-height: 1.6;
+  color: var(--gold); background: color-mix(in srgb, var(--gold) 12%, transparent); border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+}
+/* 邀请按钮 */
+.btn.invite { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+.btn.invite small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+/* 好友对比 */
+.compare { margin-top: 24px; text-align: center; border-color: color-mix(in srgb, var(--gold) 45%, transparent); }
+.compare h3 { font-size: 17px; margin-bottom: 14px; }
+.vs-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
+.vs-who { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vs-name { font-size: 20px; font-weight: 800; }
+.vs-code { font-size: 12px; color: var(--accent); letter-spacing: .1em; }
+.vs-mid span { display: inline-block; padding: 6px 12px; border-radius: 999px; background: var(--gold); color: #1a1408; font-weight: 800; font-size: 14px; }
+.vs-line { color: #d4dbd6; font-size: 14px; line-height: 1.75; margin-top: 12px; text-align: left; }
+.vs-line.gold { color: var(--gold); margin-top: 6px; }
+/* 悬念页 */
+.loading { min-height: 70vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+.loading .icon-ring { animation: pulse 1s ease-in-out infinite alternate; }
+.loading-line { margin: 18px 0 14px; color: var(--text); font-size: 16px; min-height: 1.6em; }
+.loading .progress { width: 220px; }
+.loading .progress i { transition: width 1.8s linear; }
+@keyframes pulse { from { transform: scale(.94); } to { transform: scale(1.04); } }
+/* 预览提示 + 复制框 */
+.unlock-preview { color: var(--accent); font-size: 13px; }
+#copy-text { width: 100%; min-height: 120px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 12px; font: inherit; font-size: 14px; }

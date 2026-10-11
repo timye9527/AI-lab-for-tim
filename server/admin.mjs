@@ -50,7 +50,7 @@ if (cmd === 'gen') {
   for (const r of rows) (byDay[r.day] ||= {})[r.ev] = r.n;
   const redeemed = db.prepare(`SELECT date(first_used_at, '+8 hours') AS day, COUNT(*) AS n FROM codes WHERE first_used_at IS NOT NULL ${where} GROUP BY day`).all(...params);
   const red = Object.fromEntries(redeemed.map((r) => [r.day, r.n]));
-  const label = { view: '打开', start: '开测', finish: '测完', poster: '存卡', unlock: '解锁' };
+  const label = { view: '打开', start: '开测', finish: '测完', poster: '存卡', invite: '邀请', unlock: '解锁' };
   console.log(['日期      ', ...EVENTS.map((e) => label[e]), '新码使用', '测完率', '解锁率'].join('\t'));
   const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '-');
   for (const day of Object.keys({ ...byDay, ...red }).sort()) {

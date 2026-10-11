@@ -3,7 +3,8 @@ import { score, flip } from './score.js';
 import { tierIcon } from './icons.js';
 import { drawPoster } from './poster.js';
 
-const id = document.body.dataset.test;
+// 测试 id 写在页面任意元素的 data-test 上（一般是 body）
+const id = document.querySelector('[data-test]')?.dataset.test;
 const test = (await import(`../tests/${id}/config.js`)).default;
 const app = document.getElementById('app');
 
@@ -37,13 +38,23 @@ const store = {
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname);
 
-// 漏斗计数：只发「哪个测试 + 哪一步」，不带任何个人信息；失败就算了
+const fill = (tpl, map) => String(tpl || '').replace(/\{(\w+)\}/g, (_, k) => map[k] ?? '');
+
+// 有没有兑换服务：正式服务器的 /healthz 返回 ok；静态托管（预览）没有，这时 DEMO 码可用
+const backend = fetch('/healthz', { cache: 'no-store' })
+  .then((r) => (r.ok ? r.text() : ''))
+  .then((t) => t.trim() === 'ok')
+  .catch(() => false);
+
+// 漏斗计数：只发「哪个测试 + 哪一步」，不带任何个人信息；没有后端就不发
 function track(ev) {
-  try {
-    navigator.sendBeacon?.('/api/event', JSON.stringify({ test: test.id, ev }));
-  } catch {
-    /* 忽略 */
-  }
+  backend.then((ok) => {
+    try {
+      if (ok) navigator.sendBeacon?.('/api/event', JSON.stringify({ test: test.id, ev }));
+    } catch {
+      /* 忽略 */
+    }
+  });
 }
 
 // 主题色写进 CSS 变量
@@ -53,6 +64,32 @@ document.title = test.title;
 const state = {
   answers: store.get('answers', []),
   unlocked: test.paywall.mode === 'none' || !!store.get('unlock'),
+};
+
+// 好友邀请：链接带 ?vs=<人格序号(36进制)><段位等级>&n=花名，例如 ?vs=a2，保持链接短
+const typeCodes = Object.keys(test.types);
+const vsParam = (code, level) => `${typeCodes.indexOf(code).toString(36)}${level}`;
+const vs = (() => {
+  try {
+    const params = new URLSearchParams(location.search);
+    // 也接受 #vs51 这种锚点（有的托管环境不传查询参数）
+    const raw = String(params.get('vs') || (location.hash.match(/^#vs([0-9a-z]{2,3})$/) || [])[1] || '');
+    const code = typeCodes[parseInt(raw.slice(0, 1), 36)];
+    const lv = raw.slice(1);
+    if (raw && code) {
+      const v = { code, level: Number(lv) || 0, nick: (params.get('n') || '').trim().slice(0, 12) || (params.get('vs') ? test.result.anonymous : '你的好友') };
+      store.set('vs', v);
+      return v;
+    }
+  } catch {
+    /* 参数坏了就当没有 */
+  }
+  return store.get('vs');
+})();
+const tierOf = (level) => test.tiers.find((t) => t.level === level);
+const vsMap = () => {
+  const t = test.types[vs.code];
+  return { nick: vs.nick, tier: tierOf(vs.level)?.name || '', name: t.name, alias: t.alias };
 };
 
 function go(screen) {
@@ -70,6 +107,7 @@ function renderIntro() {
     <section class="intro">
       <p class="kicker">${esc(test.intro.kicker)}</p>
       <h1>${esc(test.intro.headline)}</h1>
+      ${vs && test.compare ? `<p class="invite-banner">${esc(fill(test.compare.banner, vsMap()))}</p>` : ''}
       <p class="sub">${esc(test.intro.sub).replace(/\n/g, '<br>')}</p>
       <div class="intro-icons">
         ${[1, 2, 4, 6].map((lv) => `<span class="icon-ring sm">${tierIcon(test.tiers.find((t) => t.level === lv)?.icon, test.theme.accent, test.theme.gold)}</span>`).join('')}
@@ -134,7 +172,7 @@ function renderResult() {
         <p class="tc-sub">「${esc(tier.sub)}」</p>
         <p class="tc-desc">${esc(tier.desc)}</p>
         <div class="persona">
-          <p class="persona-meta">人格底色 · 匹配度 <b>${r.match}%</b></p>
+          <p class="persona-meta">人格底色 ${esc(r.code)} · 匹配度 <b>${r.match}%</b></p>
           <p class="persona-name">${esc(type.name)} · ${esc(type.alias)}</p>
           <p class="persona-era">${esc(type.era)}</p>
           <div class="tags">${type.tags.map((t) => `<span>${esc(t)}</span>`).join('')}</div>
@@ -158,8 +196,10 @@ function renderResult() {
 
       <p class="tip">${esc(test.result.saveTip)}</p>
       <button class="btn primary" data-act="poster">保存段位卡</button>
+      ${test.compare ? `<button class="btn invite" data-act="invite">${esc(test.compare.inviteTitle)}<small>${esc(test.compare.inviteSub)}</small></button>` : ''}
 
-      ${state.unlocked ? report(r) : locked()}
+      ${compareBlock(r)}
+      ${reportHtml(r)}
 
       <button class="btn ghost" data-act="retry">重新测一次</button>
       <p class="disclaimer">${esc(test.disclaimer)}</p>
@@ -171,7 +211,22 @@ function renderResult() {
         <a class="btn primary" id="poster-dl" download="${esc(test.id)}-段位卡.png">下载图片</a>
         <button class="btn ghost" data-act="close">关闭</button>
       </div>
+    </div>
+    <div class="modal" id="copy-modal" hidden>
+      <div class="modal-body">
+        <p class="modal-tip" id="copy-tip">长按全选复制，发给微信好友或群</p>
+        <textarea id="copy-text" readonly></textarea>
+        <button class="btn ghost" data-act="close">关闭</button>
+      </div>
     </div>`;
+
+  app.querySelector('[data-act="invite"]')?.addEventListener('click', () => {
+    const nickNow = store.get('nick', '') || test.result.anonymous;
+    const link = `${location.origin}${location.pathname}?vs=${vsParam(r.code, tier.level)}&n=${encodeURIComponent(nickNow)}`;
+    const text = fill(test.compare.inviteText, { nick: nickNow, tier: tier.name, name: type.name, alias: type.alias, link });
+    shareText(text);
+    track('invite');
+  });
 
   const nickInput = document.getElementById('nick');
   const setNick = (v) => {
@@ -207,8 +262,8 @@ function renderResult() {
   bindUnlock(() => go('result'));
 }
 
-// 完整报告（付费内容）
-function report(r) {
+// 完整报告：拆成板块，paywall.free 里的免费展示，其余解锁后可见
+function sections(r) {
   const { type } = r;
   const trait = (x) => (x.isPos ? x.dim.posTrait : x.dim.negTrait);
   const dims = test.dims
@@ -247,22 +302,100 @@ function report(r) {
       return `<div class="rel"><p class="rel-label">${esc(rl.label)}</p><p class="rel-name">${esc(t.name)} · ${esc(t.alias)}</p><p class="rel-why">${esc(rl.why)}</p></div>`;
     })
     .join('');
-  return `
-    <section class="report">
-      <div class="card sec">
-        <h3>00 · 四维人格图谱 <span class="code">${esc(r.code)}</span></h3>
-        ${dims}
-      </div>
-      <div class="card sec"><h3>01 · 人物自画像</h3><p>${esc(type.portrait)}</p></div>
-      ${abilities ? `<div class="card sec"><h3>02 · 财商六维</h3><div class="abs">${abilities}</div></div>` : ''}
-      <div class="card sec"><h3>03 · 你与 TA 的共同底色</h3>${layers}</div>
-      <div class="card sec"><h3>04 · TA 的真实故事</h3><p class="fact">${esc(type.fact)}</p></div>
-      <div class="card sec"><h3>05 · 盲点与反割建议</h3>
+  return [
+    { id: 'dims', html: `<div class="card sec"><h3>00 · 四维人格图谱 <span class="code">${esc(r.code)}</span></h3>${dims}</div>` },
+    { id: 'portrait', html: `<div class="card sec"><h3>01 · 人物自画像</h3><p>${esc(type.portrait)}</p></div>` },
+    abilities && { id: 'abilities', html: `<div class="card sec"><h3>02 · 财商六维</h3><div class="abs">${abilities}</div></div>` },
+    { id: 'layers', html: `<div class="card sec"><h3>03 · 你与 TA 的共同底色</h3>${layers}</div>` },
+    { id: 'fact', html: `<div class="card sec"><h3>04 · TA 的真实故事</h3><p class="fact">${esc(type.fact)}</p></div>` },
+    {
+      id: 'blind',
+      html: `<div class="card sec"><h3>05 · 盲点与反割建议</h3>
         <div class="sub-card"><h4>可能的盲点</h4><p>${esc(type.moment)}</p></div>
-        <div class="sub-card"><h4>反割三条</h4><ol>${type.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ol></div>
+        <div class="sub-card"><h4>反割三条</h4><ol>${type.tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ol></div></div>`,
+    },
+    { id: 'relations', html: `<div class="card sec"><h3>06 · 搭子与天敌</h3><div class="rels">${rel}</div><p class="hint">点上面「${esc(test.compare?.inviteTitle || '邀请好友来测')}」，看看谁是你的搭子。</p></div>` },
+  ].filter(Boolean);
+}
+
+function reportHtml(r) {
+  const free = test.paywall.free || [];
+  const all = sections(r);
+  const shown = state.unlocked ? all : all.filter((x) => free.includes(x.id));
+  return `${shown.length ? `<section class="report">${shown.map((x) => x.html).join('')}</section>` : ''}${state.unlocked ? '' : locked()}`;
+}
+
+// 好友对比（免费，裂变用）
+function compareBlock(r) {
+  if (!vs || !test.compare) return '';
+  const C = test.compare;
+  const other = test.types[vs.code];
+  const mine = [...r.code];
+  const same = [...vs.code].filter((ch, i) => ch === mine[i]).length;
+  const buddy = test.relations?.buddy && flip(test, r.code, test.relations.buddy.flip) === vs.code;
+  const lv = C.bySame[test.dims.length - same] || C.bySame[C.bySame.length - 1];
+  const label = buddy ? test.relations.buddy.label : lv.label;
+  const line = buddy ? C.buddyLine : lv.line;
+  const diff = vs.level ? r.tier.level - vs.level : null;
+  const tierLine = diff === null ? '' : diff > 0 ? fill(C.tierHigher, { n: diff }) : diff < 0 ? fill(C.tierLower, { n: -diff }) : C.tierSame;
+  return `
+    <section class="card compare">
+      <h3>${esc(fill(C.title, { nick: vs.nick }))}</h3>
+      <div class="vs-row">
+        <div><p class="vs-who">你</p><p class="vs-name">${esc(r.type.name)}</p><p class="vs-code">${esc(r.code)}</p></div>
+        <div class="vs-mid"><span>${esc(label)}</span></div>
+        <div><p class="vs-who">${esc(vs.nick)}</p><p class="vs-name">${esc(other.name)}</p><p class="vs-code">${esc(vs.code)}</p></div>
       </div>
-      <div class="card sec"><h3>06 · 搭子与天敌</h3><div class="rels">${rel}</div><p class="hint">把测试发给朋友，看看谁是你的搭子。</p></div>
+      <p class="vs-line">${esc(line)}</p>
+      ${tierLine ? `<p class="vs-line gold">${esc(tierLine)}</p>` : ''}
     </section>`;
+}
+
+// 悬念页：逐条滚动几句梗，再揭晓结果
+function renderLoading(done) {
+  const lines = test.result.loading || [];
+  if (!lines.length) return done();
+  window.scrollTo(0, 0);
+  app.innerHTML = `
+    <section class="loading">
+      <div class="icon-ring">${tierIcon('spark', test.theme.accent, test.theme.gold)}</div>
+      <p class="loading-line" id="loading-line">${esc(lines[0])}</p>
+      <div class="progress"><i id="loading-bar" style="width:0"></i></div>
+    </section>`;
+  const bar = document.getElementById('loading-bar');
+  const text = document.getElementById('loading-line');
+  requestAnimationFrame(() => (bar.style.width = '100%'));
+  let i = 0;
+  const timer = setInterval(() => {
+    i++;
+    if (i >= lines.length) {
+      clearInterval(timer);
+      done();
+      return;
+    }
+    text.textContent = lines[i];
+  }, 450);
+}
+
+// 分享文字：优先系统分享，其次复制，都不行就弹出文本框让用户手动复制
+async function shareText(text) {
+  try {
+    if (navigator.share) {
+      await navigator.share({ text });
+      return;
+    }
+  } catch (err) {
+    if (err?.name === 'AbortError') return;
+  }
+  const modal = document.getElementById('copy-modal');
+  document.getElementById('copy-text').value = text;
+  try {
+    await navigator.clipboard.writeText(text);
+    document.getElementById('copy-tip').textContent = '已复制，去微信粘贴给好友或群吧';
+  } catch {
+    document.getElementById('copy-tip').textContent = '长按全选复制，发给微信好友或群';
+  }
+  modal.hidden = false;
 }
 
 function locked() {
@@ -282,12 +415,16 @@ function unlockBox() {
       <button class="btn primary" type="submit">解锁</button>
       <p class="unlock-msg" data-msg></p>
       <p class="unlock-hint">${esc(test.paywall.hint)}</p>
+      <p class="unlock-preview" data-preview hidden>预览版：输入 DEMO 即可体验完整报告</p>
     </form>`;
 }
 
 function bindUnlock(onDone) {
   const form = app.querySelector('[data-unlock]');
   if (!form) return;
+  backend.then((live) => {
+    if (!live || isLocal) form.querySelector('[data-preview]').hidden = false;
+  });
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const code = form.code.value.trim().toUpperCase();
@@ -295,8 +432,13 @@ function bindUnlock(onDone) {
     if (!code) return;
     msg.textContent = '验证中…';
     try {
-      // 本地预览用 DEMO 码，线上无效
-      let ok = isLocal && code === 'DEMO';
+      // DEMO 码只在本地和没有兑换服务的预览环境有效
+      const live = await backend;
+      let ok = code === 'DEMO' && (isLocal || !live);
+      if (!ok && !live) {
+        msg.textContent = '预览版没有连接兑换服务，输入 DEMO 体验完整报告';
+        return;
+      }
       if (!ok) {
         const res = await fetch('/api/redeem', {
           method: 'POST',
@@ -334,7 +476,7 @@ app.addEventListener('click', (e) => {
         state.answers = state.answers.slice(0, test.questions.length);
         store.set('answers', state.answers);
         track('finish');
-        go('result');
+        renderLoading(() => go('result'));
       }
     }, 180);
     return;
@@ -353,8 +495,9 @@ app.addEventListener('click', (e) => {
     store.del('answers');
     state.answers = [];
     go('intro');
-  } else if (act === 'close') document.getElementById('modal').hidden = true;
+  } else if (act === 'close') e.target.closest('.modal').hidden = true;
 });
 
 track('view');
-go(state.answers.length === test.questions.length && location.hash !== '#intro' ? 'result' : 'intro');
+// 带着好友邀请来的人先看开场页的邀请横幅
+go(state.answers.length === test.questions.length && location.hash !== '#intro' && !/^#vs/.test(location.hash) ? 'result' : 'intro');

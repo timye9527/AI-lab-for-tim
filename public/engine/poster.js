@@ -132,7 +132,7 @@ export async function drawPoster(test, result, nickname, dateText) {
   ctx.stroke();
   ctx.fillStyle = '#b9b2a2';
   ctx.font = `500 28px ${FONT}`;
-  ctx.fillText(`人格底色 · 匹配度 ${match}%`, W / 2, y + 50);
+  ctx.fillText(`人格底色 ${result.code} · 匹配度 ${match}%`, W / 2, y + 50);
   ctx.fillStyle = '#ffffff';
   ctx.font = `800 52px ${FONT}`;
   ctx.fillText(`${type.name} · ${type.alias}`, W / 2, y + 116);
