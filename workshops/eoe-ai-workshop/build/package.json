@@ -1,0 +1,17 @@
+{
+  "name": "eoe-ai-workshop-deck",
+  "version": "1.0.0",
+  "description": "《动动嘴，让 AI 把活干了！》工作坊 PPT 生成脚本（独立工具，不影响网站零依赖）",
+  "scripts": {
+    "assets": "python3 -I prepare_assets.py ../materials ../assets && node illustrations.js ../assets",
+    "deck": "node build_deck.js && node export_notes.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-icons": "^5.7.0",
+    "sharp": "^0.35.5"
+  },
+  "private": true
+}

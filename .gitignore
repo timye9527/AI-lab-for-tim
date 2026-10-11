@@ -12,3 +12,7 @@ data/
 out/
 backup/
 *.zip
+# 工作坊：真实照片/截图与成品含他人肖像和姓名，公开仓库不提交
+workshops/*/materials/
+workshops/*/assets/
+workshops/*/output/
