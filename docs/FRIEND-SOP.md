@@ -34,7 +34,7 @@
    sudo mkdir -p /srv && sudo chown $USER /srv && cd /srv
    ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_ed25519   # 已有就跳过
    cat ~/.ssh/id_ed25519.pub                          # 把这串发给主理人，加到 GitHub 仓库的 Deploy keys（只读）
-   git clone git@github.com:timye9527/make-money-test.git
+   git clone git@github.com:timye9527/AI-lab-for-tim.git make-money-test
    cd make-money-test
    ```
 4. **启动服务**（开机自启、挂了自动重启）：
