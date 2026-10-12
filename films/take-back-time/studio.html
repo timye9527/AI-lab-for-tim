@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>把時間拿回來．工作台</title>
+<link rel="stylesheet" href="src/fonts.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#07090f; color:#eef2f8; font-family: system-ui, sans-serif; }
+  main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+  canvas { width:100%; height:auto; display:block; background:#000; border-radius:8px; }
+  .bar { display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; }
+  input[type=range] { flex:1; min-width:200px; }
+  button { background:#141925; color:#eef2f8; border:1px solid #232a3a; border-radius:8px; padding:8px 12px; cursor:pointer; }
+  .t { font-variant-numeric: tabular-nums; min-width: 70px; }
+  p { color:#8a93a6; font-size:13px; }
+</style>
+</head>
+<body>
+<main>
+  <canvas id="c" width="1920" height="1080"></canvas>
+  <div class="bar">
+    <button id="play">播放</button>
+    <input id="seek" type="range" min="0" max="32" step="0.0333" value="0">
+    <span class="t" id="t">0.00s</span>
+  </div>
+  <p>即時渲染（與成片同一份程式碼）。改了 src/ 之後重新整理即可預覽；效能不夠時畫面會掉格，但時間與聲音保持同步。聲音來自 dist/audio.wav（npm run audio 產生）。</p>
+</main>
+<script type="module">
+  import { createFilm } from './src/film.js';
+  import { DURATION } from './src/timeline.js';
+  const film = await createFilm(document.getElementById('c'));
+  const audio = new Audio('dist/audio.wav');
+  const seek = document.getElementById('seek');
+  const tEl = document.getElementById('t');
+  const btn = document.getElementById('play');
+  let t = 0;
+  let dragging = false;
+  btn.onclick = () => (audio.paused ? audio.play() : audio.pause());
+  audio.onplay = () => (btn.textContent = '暫停');
+  audio.onpause = () => (btn.textContent = '播放');
+  seek.oninput = () => { dragging = true; t = Number(seek.value); audio.currentTime = t; };
+  seek.onchange = () => (dragging = false);
+  addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); btn.click(); } });
+  function frame() {
+    if (!audio.paused) t = audio.currentTime;
+    if (t >= DURATION) { audio.pause(); t = DURATION - 0.001; }
+    film.render(t);
+    if (!dragging) seek.value = t;
+    tEl.textContent = t.toFixed(2) + 's';
+    requestAnimationFrame(frame);
+  }
+  frame();
+</script>
+</body>
+</html>

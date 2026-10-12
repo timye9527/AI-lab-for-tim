@@ -1,0 +1,19 @@
+{
+  "name": "take-back-time",
+  "private": true,
+  "type": "module",
+  "description": "原創短片《把時間拿回來》：程式生成畫面與聲音",
+  "scripts": {
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "audio": "node scripts/build-audio.mjs",
+    "frames": "node scripts/render-frames.mjs",
+    "encode": "node scripts/encode.mjs",
+    "build": "npm run audio && npm run frames && npm run encode",
+    "studio": "node scripts/serve.mjs",
+    "stills": "node scripts/stills.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

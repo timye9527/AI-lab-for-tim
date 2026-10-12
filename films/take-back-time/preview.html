@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>把時間拿回來</title>
+<style>
+  :root { --bg:#07090f; --fg:#eef2f8; --dim:#8a93a6; --line:#ffd28a; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family: "PingFang TC","Noto Sans TC",system-ui,sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 40px; }
+  h1 { font-weight: 500; font-size: 22px; letter-spacing: .12em; margin: 0 0 4px; }
+  p.sub { color: var(--dim); margin: 0 0 18px; font-size: 14px; }
+  .stage { position: relative; background:#000; border-radius: 10px; overflow: hidden; aspect-ratio: 16/9; }
+  video { width:100%; height:100%; display:block; }
+  .big { position:absolute; inset:0; display:grid; place-items:center; background:transparent; border:0; cursor:pointer; }
+  .big span { width:78px; height:78px; border-radius:50%; background:rgba(255,255,255,.12); backdrop-filter: blur(6px); display:grid; place-items:center; transition:opacity .25s; }
+  .big svg { width:30px; height:30px; fill:#fff; margin-left:4px; }
+  .playing .big span { opacity:0; }
+  .bar { display:flex; align-items:center; gap:10px; margin-top:12px; }
+  button.ctl { background:#141925; color:var(--fg); border:1px solid #232a3a; border-radius:8px; padding:8px 12px; font-size:14px; cursor:pointer; min-width:44px; }
+  button.ctl:hover { border-color:#3a4560; }
+  .track { position:relative; flex:1; height:28px; cursor:pointer; touch-action:none; }
+  .rail { position:absolute; left:0; right:0; top:13px; height:2px; background:#232a3a; }
+  .fill { position:absolute; left:0; top:13px; height:2px; background:var(--line); width:0; }
+  .mark { position:absolute; top:8px; width:1px; height:12px; background:#4a5470; }
+  .time { font-variant-numeric: tabular-nums; color:var(--dim); font-size:13px; min-width:86px; text-align:right; }
+  .chapters { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  .chapters button { background:none; border:1px solid #232a3a; color:var(--dim); border-radius:999px; padding:6px 12px; font-size:13px; cursor:pointer; }
+  .chapters button.on { color:var(--fg); border-color:var(--line); }
+  footer { color:#5d6578; font-size:12px; margin-top:22px; line-height:1.7; }
+  @media (max-width: 520px) { h1 { font-size:18px; } .time { min-width:70px; font-size:12px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>把時間拿回來</h1>
+  <p class="sub">約 32 秒原創短片．畫面與聲音全部由程式生成</p>
+  <div class="stage" id="stage">
+    <video id="v" src="dist/take-back-time.mp4" poster="dist/poster.jpg" playsinline preload="auto"></video>
+    <button class="big" id="big" aria-label="播放"><span><svg viewBox="0 0 24 24"><path d="M6 4l15 8-15 8z"/></svg></span></button>
+  </div>
+  <div class="bar">
+    <button class="ctl" id="play" aria-label="播放或暫停">播放</button>
+    <button class="ctl" id="replay" aria-label="重播">重播</button>
+    <div class="track" id="track"><div class="rail"></div><div class="fill" id="fill"></div></div>
+    <div class="time" id="time">0.0 / 32.0</div>
+  </div>
+  <div class="chapters" id="chapters"></div>
+  <footer>空白鍵：播放／暫停．← →：前後 1 秒．, .：逐格．R：重播<br>開發用即時工作台：studio.html（需執行 npm run studio）</footer>
+</main>
+<script>
+  const v = document.getElementById('v');
+  const stage = document.getElementById('stage');
+  const fill = document.getElementById('fill');
+  const time = document.getElementById('time');
+  const track = document.getElementById('track');
+  const playBtn = document.getElementById('play');
+  const CH = [
+    [0, '加速'], [4, '組裝'], [8, '擁擠'], [11, '停頓'], [12.25, '撥弦'], [14, '弦→海平線'], [18, '取景框'], [20.3, '一束光'], [23, '串起'], [27.4, 'Tim'],
+  ];
+  const D = 32;
+  const chWrap = document.getElementById('chapters');
+  CH.forEach(([t, name]) => {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.onclick = () => { v.currentTime = t; v.play(); };
+    chWrap.appendChild(b);
+    const m = document.createElement('div');
+    m.className = 'mark';
+    m.style.left = (t / D * 100) + '%';
+    track.appendChild(m);
+  });
+  const toggle = () => (v.paused ? v.play() : v.pause());
+  document.getElementById('big').onclick = toggle;
+  playBtn.onclick = toggle;
+  document.getElementById('replay').onclick = () => { v.currentTime = 0; v.play(); };
+  v.addEventListener('play', () => { stage.classList.add('playing'); playBtn.textContent = '暫停'; });
+  v.addEventListener('pause', () => { stage.classList.remove('playing'); playBtn.textContent = '播放'; });
+  v.addEventListener('ended', () => { playBtn.textContent = '重播'; });
+  function tick() {
+    const t = v.currentTime || 0;
+    const dur = v.duration || D;
+    fill.style.width = (t / dur * 100) + '%';
+    time.textContent = t.toFixed(1) + ' / ' + dur.toFixed(1);
+    let cur = 0;
+    CH.forEach(([ct], i) => { if (t >= ct) cur = i; });
+    [...chWrap.children].forEach((b, i) => b.classList.toggle('on', i === cur));
+    requestAnimationFrame(tick);
+  }
+  tick();
+  function seek(e) {
+    const r = track.getBoundingClientRect();
+    v.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (v.duration || D);
+  }
+  track.addEventListener('pointerdown', (e) => { track.setPointerCapture(e.pointerId); seek(e); });
+  track.addEventListener('pointermove', (e) => { if (e.buttons) seek(e); });
+  addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); toggle(); }
+    if (e.key === 'ArrowRight') v.currentTime += 1;
+    if (e.key === 'ArrowLeft') v.currentTime -= 1;
+    if (e.key === '.') { v.pause(); v.currentTime += 1 / 30; }
+    if (e.key === ',') { v.pause(); v.currentTime -= 1 / 30; }
+    if (e.key === 'r' || e.key === 'R') { v.currentTime = 0; v.play(); }
+  });
+</script>
+</body>
+</html>
