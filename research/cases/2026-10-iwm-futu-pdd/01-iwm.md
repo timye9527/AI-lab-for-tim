@@ -50,4 +50,5 @@
   2. 10 年期美债收益率明显回落；
   3. 高收益债利差收窄；
   4. 罗素 2000 的盈利增速连续两个季度超过标普 500。
+- **新加坡身份的额外成本**：IWM 是美国注册的 ETF，派息预扣 30%（新加坡和美国没有税收协定），并且属于美国遗产税范围（非居民免税额 $6 万）。长期配置可以研究爱尔兰注册的 UCITS 同类 ETF。
 - **替代方案（仅供研究）**：带盈利门槛的小盘指数，例如标普 600（编制时要求盈利）。有文章统计这类“筛选型小盘基金”今年以来、近 1 年、近 5 年都跑赢了 IWM（[24/7 Wall St.](https://247wallst.com/investing/etf/2026/10/01/forget-iwm-this-screened-small-cap-fund-beat-it-year-to-date-over-one-year-and-over-five-years/)）。
