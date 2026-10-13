@@ -1,0 +1,437 @@
+<title>成果中台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 布局：一本登记簿。顶部是总账，下面按类型分册，每条成果一行 */
+:root {
+  --bg: #f3f4f1;
+  --sheet: #fbfbf9;
+  --ink: #1a2129;
+  --muted: #5e6873;
+  --rule: #d9ddd8;
+  --accent: #23517a;
+  --accent-soft: #e2eaf1;
+  --ok: #2f7a4f;
+  --ok-soft: #e1efe6;
+  --warn: #9a6512;
+  --warn-soft: #f5ead6;
+  --c-invest: #23517a;
+  --c-report: #6a4c93;
+  --c-product: #2f7a4f;
+  --c-content: #a14a2a;
+  --c-media: #7a6a1f;
+  --display: "Noto Serif SC", "Songti SC", "STSong", serif;
+  --body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
+    --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
+    --warn: #e0b064; --warn-soft: #2e2618;
+    --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
+  --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
+  --warn: #e0b064; --warn-soft: #2e2618;
+  --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 28px; }
+a { color: var(--accent); }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 抬头 */
+header.top { display: grid; gap: 18px; }
+.mast { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.mast h1 { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.mast p { margin: 6px 0 0; color: var(--muted); max-width: 46em; }
+.mast .side { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+
+/* 总账：每类数量 */
+.ledger { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-block: 2px solid var(--ink); }
+.ledger button { all: unset; cursor: pointer; padding: 12px 14px; display: grid; gap: 2px; border-left: 1px solid var(--rule); }
+.ledger button:first-child { border-left: 0; }
+.ledger button:hover { background: var(--sheet); }
+.ledger button[aria-pressed="true"] { background: var(--sheet); box-shadow: inset 0 -3px 0 var(--cat, var(--ink)); }
+.ledger button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ledger .n { font-family: var(--mono); font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--cat, var(--ink)); }
+.ledger .k { font-size: 13px; color: var(--muted); }
+@media (max-width: 720px) {
+  .ledger { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ledger button:nth-child(4) { border-left: 0; }
+  .ledger button:nth-child(n+4) { border-top: 1px solid var(--rule); }
+}
+
+/* 工具条 */
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tools input[type=search] { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; }
+.tools select { padding: 9px 10px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: 6px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn.danger { background: transparent; color: var(--warn); border-color: var(--warn); }
+.btn:hover { filter: brightness(1.08); }
+
+/* 分册 */
+section.book { display: grid; gap: 0; }
+.book-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
+.book-h h2 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0; color: var(--ink); }
+.book-h h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--cat); margin-right: 10px; vertical-align: 2px; }
+.book-h .d { color: var(--muted); font-size: 13px; }
+.book-h .c { margin-left: auto; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+/* 条目行 */
+.row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 6px 20px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: start; }
+.row .date { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 3px; }
+.row .main { min-width: 0; display: grid; gap: 6px; }
+.row h3 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; text-wrap: balance; }
+.row .sum { margin: 0; color: var(--muted); max-width: 62ch; }
+.row .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
+.row .tag { border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; }
+.row .src { font-family: var(--mono); font-size: 11.5px; overflow-wrap: anywhere; }
+.row .links { display: flex; flex-wrap: wrap; gap: 6px; }
+.row .links a { text-decoration: none; font-size: 13px; padding: 3px 10px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
+.row .links a:hover { text-decoration: underline; }
+.row .right { display: grid; justify-items: end; gap: 8px; }
+.pill { font-size: 12px; padding: 1px 8px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
+.pill.s-run { background: var(--ok-soft); color: var(--ok); }
+.pill.s-live { background: var(--accent-soft); color: var(--accent); }
+.pill.s-done { border-color: var(--rule); color: var(--muted); }
+.pill.s-todo { background: var(--warn-soft); color: var(--warn); }
+.edit { all: unset; cursor: pointer; font-size: 12px; color: var(--muted); text-decoration: underline; }
+.edit:focus-visible { outline: 2px solid var(--accent); }
+@media (max-width: 720px) {
+  .row { grid-template-columns: minmax(0, 1fr) auto; }
+  .row .date { grid-column: 1 / -1; padding: 0; }
+  .row .right { grid-column: 2; grid-row: 2; }
+}
+
+.empty { padding: 28px 0; color: var(--muted); border-bottom: 1px solid var(--rule); }
+
+/* 收录规则 */
+details.rules { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 0 16px; }
+details.rules summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
+.rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; padding-bottom: 16px; }
+.rules-grid h4 { margin: 0 0 4px; font-size: 13px; letter-spacing: .06em; color: var(--muted); }
+.rules-grid ul { margin: 0; padding-left: 1.2em; }
+.rules-grid code { font-family: var(--mono); font-size: 12.5px; background: var(--bg); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
+
+/* 编辑抽屉 */
+dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); color: var(--ink); padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog::backdrop { background: rgba(10, 14, 18, .45); }
+dialog form { display: grid; gap: 12px; padding: 20px; }
+dialog h2 { margin: 0; font-family: var(--display); font-size: 20px; }
+dialog label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+dialog input, dialog select, dialog textarea { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+dialog textarea { resize: vertical; min-height: 64px; }
+dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+dialog .acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+dialog .acts .btn.danger { margin-right: auto; }
+dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
+.hint { font-size: 12px; color: var(--muted); }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 6px; font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) { .row { transition: background .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mast">
+      <div>
+        <h1>成果中台</h1>
+        <p>做出来、能打开、能复用的东西都登记在这里。过程类的检索和没有交付物的对话不收。</p>
+      </div>
+      <div class="side">
+        <span class="stamp" id="stamp">正在读取登记簿…</span>
+        <button class="btn" id="addBtn" type="button" hidden>登记新成果</button>
+      </div>
+    </div>
+    <nav class="ledger" id="ledger" aria-label="按类型筛选"></nav>
+    <div class="tools">
+      <label for="q" class="hint" style="position:absolute;left:-9999px">搜索成果</label>
+      <input id="q" type="search" placeholder="搜标题、简介、标签、仓库">
+      <label for="statusSel" class="hint" style="position:absolute;left:-9999px">按状态筛选</label>
+      <select id="statusSel">
+        <option value="">全部状态</option>
+        <option>运行中</option>
+        <option>已上线</option>
+        <option>已交付</option>
+        <option>待完善</option>
+      </select>
+    </div>
+  </header>
+
+  <main id="books"></main>
+
+  <details class="rules">
+    <summary>收录规则和登记方法</summary>
+    <div class="rules-grid">
+      <div>
+        <h4>收录</h4>
+        <ul>
+          <li>能打开的页面、看板、网站</li>
+          <li>成型的研究报告、案例库</li>
+          <li>能用的产品、工具、游戏</li>
+          <li>可直接发布的内容素材、出图模板</li>
+          <li>视频、短片、PPT 讲稿</li>
+        </ul>
+      </div>
+      <div>
+        <h4>不收</h4>
+        <ul>
+          <li>只做了搜索和资料整理、没有落成文件的对话</li>
+          <li>中间过程、草稿片段、调试记录</li>
+          <li>空仓库、没开工的会话</li>
+          <li>已经并入其他成果的旧版本（在新条目里写一句来源即可）</li>
+        </ul>
+      </div>
+      <div>
+        <h4>五种类型</h4>
+        <ul id="catList"></ul>
+      </div>
+      <div>
+        <h4>以后怎么登记</h4>
+        <ul>
+          <li>项目交付后，让 Claude 往本页数据集 <code>items</code> 写一条，文档 id 用英文短名</li>
+          <li>字段：<code>title</code> <code>cat</code> <code>status</code> <code>date</code> <code>summary</code> <code>tags</code> <code>source</code> <code>links</code></li>
+          <li>也可以自己点右上角「登记新成果」</li>
+          <li>备份在仓库 <code>AI-lab-for-tim/hub/items.json</code></li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<dialog id="dlg">
+  <form id="form" method="dialog" novalidate>
+    <h2 id="dlgTitle">登记新成果</h2>
+    <label>标题<input id="f-title" required maxlength="60"></label>
+    <div class="two">
+      <label>类型<select id="f-cat"></select></label>
+      <label>状态<select id="f-status"><option>运行中</option><option>已上线</option><option>已交付</option><option>待完善</option></select></label>
+    </div>
+    <div class="two">
+      <label>日期<input id="f-date" type="date" required></label>
+      <label>来源（仓库 / 分支）<input id="f-source" maxlength="120"></label>
+    </div>
+    <label>一句话简介<textarea id="f-summary" maxlength="200"></textarea></label>
+    <label>标签（用逗号分开）<input id="f-tags" maxlength="80"></label>
+    <label>入口链接（每行一个：名称 | 网址）<textarea id="f-links" rows="3" placeholder="打开页面 | https://claude.ai/artifact/…"></textarea></label>
+    <p class="err" id="f-err"></p>
+    <div class="acts">
+      <button class="btn danger" type="button" id="delBtn" hidden>移出中台</button>
+      <button class="btn ghost" type="button" id="cancelBtn">取消</button>
+      <button class="btn" type="submit" id="saveBtn">保存</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+// 类型定义：新增类型只改这里
+const CATS = [
+  { id: "invest",  name: "投研系统",   desc: "持续更新的看板和投研工具", color: "--c-invest" },
+  { id: "report",  name: "研究报告",   desc: "一次成型的报告和案例",     color: "--c-report" },
+  { id: "product", name: "产品与工具", desc: "能用、能卖、能玩的东西",   color: "--c-product" },
+  { id: "content", name: "内容运营",   desc: "账号、周报、笔记素材",     color: "--c-content" },
+  { id: "media",   name: "影像与演示", desc: "短片、视频流程、PPT",      color: "--c-media" },
+];
+const STATUS_CLASS = { "运行中": "s-run", "已上线": "s-live", "已交付": "s-done", "待完善": "s-todo" };
+
+const state = { items: [], cat: "", q: "", status: "", loaded: false, canWrite: false, editing: null };
+try { state.cat = localStorage.getItem("hub.cat") || ""; } catch (e) {}
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+const safeUrl = (u) => { try { const x = new URL(u); return x.protocol === "https:" || x.protocol === "http:" ? x.href : null; } catch (e) { return null; } };
+
+function matches(it) {
+  if (state.cat && it.cat !== state.cat) return false;
+  if (state.status && it.status !== state.status) return false;
+  if (state.q) {
+    const hay = [it.title, it.summary, it.source, ...(it.tags || [])].join(" ").toLowerCase();
+    if (!hay.includes(state.q.toLowerCase())) return false;
+  }
+  return true;
+}
+
+function renderLedger() {
+  const nav = $("ledger"); nav.textContent = "";
+  const all = [{ id: "", name: "全部", color: null }, ...CATS];
+  for (const c of all) {
+    const b = el("button");
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(state.cat === c.id));
+    if (c.color) b.style.setProperty("--cat", `var(${c.color})`);
+    const n = c.id ? state.items.filter(i => i.cat === c.id).length : state.items.length;
+    b.append(el("span", "n", state.loaded ? String(n) : "–"), el("span", "k", c.name));
+    b.addEventListener("click", () => {
+      state.cat = state.cat === c.id ? "" : c.id;
+      try { localStorage.setItem("hub.cat", state.cat); } catch (e) {}
+      render();
+    });
+    nav.append(b);
+  }
+}
+
+function renderRow(it) {
+  const row = el("article", "row");
+  row.append(el("div", "date", it.date || ""));
+  const main = el("div", "main");
+  main.append(el("h3", null, it.title || "未命名"));
+  if (it.summary) main.append(el("p", "sum", it.summary));
+  const meta = el("div", "meta");
+  for (const t of it.tags || []) meta.append(el("span", "tag", t));
+  if (it.source) meta.append(el("span", "src", it.source));
+  if (meta.childNodes.length) main.append(meta);
+  const links = el("div", "links");
+  for (const l of it.links || []) {
+    const href = safeUrl(l.url); if (!href) continue;
+    const a = el("a", null, l.label || "打开");
+    a.href = href; a.target = "_blank"; a.rel = "noopener";
+    links.append(a);
+  }
+  if (links.childNodes.length) main.append(links);
+  row.append(main);
+  const right = el("div", "right");
+  right.append(el("span", "pill " + (STATUS_CLASS[it.status] || "s-done"), it.status || "已交付"));
+  if (state.canWrite) {
+    const e = el("button", "edit", "编辑"); e.type = "button";
+    e.addEventListener("click", () => openForm(it));
+    right.append(e);
+  }
+  row.append(right);
+  return row;
+}
+
+function renderBooks() {
+  const root = $("books"); root.textContent = "";
+  if (!state.loaded) { root.append(el("div", "empty", "正在读取登记簿…")); return; }
+  if (!state.items.length) {
+    root.append(el("div", "empty", "登记簿还是空的。让 Claude 往数据集 items 写入成果，或点右上角「登记新成果」。"));
+    return;
+  }
+  let shown = 0;
+  for (const c of CATS) {
+    if (state.cat && state.cat !== c.id) continue;
+    const list = state.items.filter(i => i.cat === c.id && matches(i))
+      .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    if (!list.length) continue;
+    shown += list.length;
+    const sec = el("section", "book");
+    sec.style.setProperty("--cat", `var(${c.color})`);
+    const h = el("div", "book-h");
+    h.append(el("h2", null, c.name), el("span", "d", c.desc), el("span", "c", list.length + " 项"));
+    sec.append(h);
+    for (const it of list) sec.append(renderRow(it));
+    root.append(sec);
+  }
+  // 类型不在列表里的条目放到最后，避免丢失
+  const orphan = state.items.filter(i => !CATS.some(c => c.id === i.cat) && !state.cat && matches(i));
+  if (orphan.length) {
+    const sec = el("section", "book");
+    const h = el("div", "book-h"); h.append(el("h2", null, "未分类"), el("span", "c", orphan.length + " 项"));
+    sec.append(h); orphan.forEach(it => sec.append(renderRow(it))); root.append(sec);
+    shown += orphan.length;
+  }
+  if (!shown) root.append(el("div", "empty", "没有符合条件的成果。换个关键词或清掉筛选试试。"));
+}
+
+function render() {
+  renderLedger();
+  renderBooks();
+  const newest = state.items.map(i => i.date).filter(Boolean).sort().pop();
+  $("stamp").textContent = state.loaded ? `共 ${state.items.length} 项 · 最近一次 ${newest || "—"}` : "正在读取登记簿…";
+  $("addBtn").hidden = !state.canWrite;
+}
+
+// 规则面板里的类型说明
+for (const c of CATS) { const li = el("li"); const b = el("strong", null, c.name); li.append(b, document.createTextNode("：" + c.desc)); $("catList").append(li); }
+for (const c of CATS) { const o = el("option", null, c.name); o.value = c.id; $("f-cat").append(o); }
+
+$("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); renderBooks(); });
+$("statusSel").addEventListener("change", (e) => { state.status = e.target.value; renderBooks(); });
+
+// 编辑表单
+let db = null;
+function toast(msg) { const t = el("div", "toast", msg); document.body.append(t); setTimeout(() => t.remove(), 2200); }
+function slug(s) {
+  const base = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return (base || "item") + "-" + Date.now().toString(36);
+}
+function openForm(it) {
+  state.editing = it || null;
+  $("dlgTitle").textContent = it ? "编辑成果" : "登记新成果";
+  $("f-title").value = it?.title || "";
+  $("f-cat").value = it?.cat || state.cat || CATS[0].id;
+  $("f-status").value = it?.status || "已交付";
+  $("f-date").value = it?.date || new Date().toISOString().slice(0, 10);
+  $("f-source").value = it?.source || "";
+  $("f-summary").value = it?.summary || "";
+  $("f-tags").value = (it?.tags || []).join("，");
+  $("f-links").value = (it?.links || []).map(l => `${l.label} | ${l.url}`).join("\n");
+  $("f-err").textContent = "";
+  $("delBtn").hidden = !it;
+  $("dlg").showModal();
+}
+$("addBtn").addEventListener("click", () => openForm(null));
+$("cancelBtn").addEventListener("click", () => $("dlg").close());
+$("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const title = $("f-title").value.trim();
+  if (!title) { $("f-err").textContent = "标题不能为空。"; return; }
+  const links = [];
+  for (const line of $("f-links").value.split("\n")) {
+    if (!line.trim()) continue;
+    const [label, url] = line.includes("|") ? line.split("|").map(s => s.trim()) : ["打开", line.trim()];
+    if (!safeUrl(url)) { $("f-err").textContent = `这一行的网址打不开：${line.trim()}`; return; }
+    links.push({ label: label || "打开", url });
+  }
+  const body = {
+    title, cat: $("f-cat").value, status: $("f-status").value, date: $("f-date").value,
+    source: $("f-source").value.trim(), summary: $("f-summary").value.trim(),
+    tags: $("f-tags").value.split(/[,，、]/).map(s => s.trim()).filter(Boolean), links,
+  };
+  const id = state.editing?.id || slug(title);
+  $("saveBtn").disabled = true;
+  try {
+    await db.collection("items").doc(id).set(body);
+    $("dlg").close(); toast("已保存");
+  } catch (err) {
+    $("f-err").textContent = err?.code === "invalid_argument" ? "你没有这个登记簿的写入权限。" : "保存失败，稍后再试。";
+  } finally { $("saveBtn").disabled = false; }
+});
+$("delBtn").addEventListener("click", async () => {
+  const b = $("delBtn");
+  if (b.dataset.armed !== "1") { b.dataset.armed = "1"; b.textContent = "再点一次确认移出"; return; }
+  b.dataset.armed = ""; b.textContent = "移出中台";
+  try { await db.collection("items").doc(state.editing.id).delete(); $("dlg").close(); toast("已移出"); }
+  catch (err) { $("f-err").textContent = "移出失败，稍后再试。"; }
+});
+$("dlg").addEventListener("close", () => { const b = $("delBtn"); b.dataset.armed = ""; b.textContent = "移出中台"; });
+
+render();
+
+// 读取登记簿
+(async () => {
+  db = window.claude ? await window.claude.use("db") : null;
+  if (!db) {
+    state.loaded = true; render();
+    $("stamp").textContent = "登录 claude.ai 后可查看登记簿";
+    return;
+  }
+  const user = await window.claude.use("user");
+  state.canWrite = user ? !!(user.isOwner && await user.isOwner()) : false;
+  db.collection("items").onSnapshot((snap) => {
+    state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    state.loaded = true;
+    render();
+  }, () => { state.loaded = true; render(); $("stamp").textContent = "登记簿暂时读不到，刷新试试"; });
+})();
+</script>

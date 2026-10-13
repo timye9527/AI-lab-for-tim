@@ -17,6 +17,7 @@
 | [`docs/FRIEND-SOP.md`](docs/FRIEND-SOP.md) | 大陆伙伴 | 部署服务器、开店上架、每天运营、客服命令，一步步照做 |
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | 主理人 | 笔记打法、定价、冷启动两周、看什么数据 |
 | [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
+| [`hub/README.md`](hub/README.md) | 主理人 / AI 助手 | 成果中台：所有项目成果的登记规则和分类 |
 
 ## 目录
 
