@@ -32,7 +32,7 @@ for y in range(h):
     t = max(0, (y - h * 0.52) / (h * 0.48))
     grad.putpixel((0, y), int(225 * t ** 1.4))
 grad = grad.resize((w, h))
-dark = Image.new("RGB", (w, h), (20, 18, 32))
+dark = Image.new("RGB", (w, h), (38, 24, 20))
 save(Image.composite(dark, photo, grad), "group_photo_fade.jpg", 88)
 
 # 2. 合照中真实举着的手举牌（与设计稿对照）
@@ -111,3 +111,37 @@ save(so.crop(box(s, 0, 55, 1400, 540)), "soxl_page.jpg", 88)
 dc = load("SOXL-Discord推送.jpg")
 s = 1400 / 2622
 save(dc.crop(box(s, 0, 0, 644, 760)), "soxl_discord.jpg")
+
+# ===================== V2 新增素材 =====================
+V2 = M / "v2"
+
+# 13. 三种真实辣条：只裁切，不改包装
+lt = {
+    "latiao_weilong.jpg": ("辣条-卫龙大面筋.png", (20, 80, 420, 420)),
+    "latiao_feiwang.jpg": ("辣条-袋装B.png", (25, 22, 172, 208)),
+    "latiao_mala.jpg": ("辣条-麻辣王子.png", (62, 0, 163, 225)),
+}
+for out, (src, b) in lt.items():
+    c = Image.open(V2 / src).convert("RGB").crop(b)
+    c = c.resize((c.width * 3, c.height * 3), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=2, percent=50, threshold=2))
+    save(c, out)
+
+# 14. EOE logo 色块（取自会员闪光录封面）
+logo = Image.open(V2 / "参考-EOE会员闪光录封面.png").convert("RGB").crop((5, 5, 217, 212))
+save(logo.resize((logo.width * 2, logo.height * 2), Image.LANCZOS), "eoe_logo_block.jpg")
+
+# 15. 个人照片（取自会员风采页；有高清原图时放 v2/个人照片.jpg 会优先使用）
+hi = sorted(V2.glob("个人照片.*"))
+if hi:
+    save(Image.open(hi[0]).convert("RGB"), "profile_photo.jpg")
+else:
+    save(Image.open(V2 / "个人介绍-会员风采页.webp").convert("RGB").crop((110, 110, 590, 750)), "profile_photo.jpg")
+
+# 16. 成果展示中台截图（文件名含「中台」即自动接入）
+dash = sorted(V2.glob("*中台*"))
+for old in A.glob("dashboard.jpg"):
+    old.unlink()
+if dash:
+    save(Image.open(dash[0]).convert("RGB"), "dashboard.jpg")
+else:
+    print("dashboard: 未找到，PPT 里保留占位框")
