@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Tim 角色设定</title>
+<link rel="stylesheet" href="fonts.css">
+<style>html,body{margin:0;background:#1a1d26}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1200"></canvas>
+<script type="module">
+  // 角色设定图：转面 + 表情 + 配色，全部来自 tim.js
+  import { drawTimFront, drawTimSide, drawHeadFront, drawHandCU, pose, PAL } from './tim.js';
+  await document.fonts.load('40px "Noto Sans SC"');
+  await document.fonts.load('40px "ZCOOL KuaiLe"');
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  const g = ctx.createLinearGradient(0, 0, 0, 1200);
+  g.addColorStop(0, '#F6F1E7'); g.addColorStop(1, '#E9E1D2');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1200);
+  ctx.fillStyle = '#2B2B33';
+  ctx.font = '64px "ZCOOL KuaiLe"';
+  ctx.fillText('Tim · 角色设定', 70, 110);
+  ctx.font = '26px "Noto Sans SC"';
+  ctx.fillStyle = '#6B6660';
+  ctx.fillText('28–30 岁 · 170cm · 偏瘦 · 黑色短发 · 芥末黄外套 + 白 T + 深蓝牛仔裤 + 双肩包 · 呆毛是情绪指示器', 72, 158);
+  // 地面阴影
+  const shadow = (x, y, w) => { ctx.fillStyle = 'rgba(0,0,0,0.12)'; ctx.beginPath(); ctx.ellipse(x, y, w, 14, 0, 0, Math.PI * 2); ctx.fill(); };
+  const label = (t, x, y) => { ctx.fillStyle = '#6B6660'; ctx.font = '24px "Noto Sans SC"'; ctx.textAlign = 'center'; ctx.fillText(t, x, y); ctx.textAlign = 'left'; };
+  const Y = 760;
+  shadow(200, Y, 80); drawTimFront(ctx, pose({ x: 200, y: Y, s: 1.15 })); label('正面 · 早期（驼背、躲闪）', 200, Y + 60);
+  shadow(480, Y, 80); drawTimFront(ctx, pose({ x: 480, y: Y, s: 1.15, hunch: 0, smile: 1, mouth: 'smile', worry: 0, cowlick: 0.6, lookX: 0, armL: { a: 0.35, b: 1.9, hand: 'relax' } })); label('正面 · 后期（松弛）', 480, Y + 60);
+  shadow(760, Y, 70); drawTimSide(ctx, pose({ x: 760, y: Y, s: 1.15 })); label('侧面 · 站立', 760, Y + 60);
+  shadow(1030, Y, 70); drawTimSide(ctx, pose({ x: 1030, y: Y, s: 1.15, stride: 1, phase: 0.9 })); label('侧面 · 走路', 1030, Y + 60);
+  shadow(1290, Y, 70); drawTimSide(ctx, pose({ x: 1290, y: Y, s: 1.15, point: 1, worry: 0.9, sweat: 1, tremble: 1 })); label('侧面 · 伸手按密码', 1290, Y + 60);
+  // 表情
+  const ex = [
+    ['紧张', { worry: 0.9, lookX: -0.8, pupil: 0.65, sweat: 1, mouth: 'gulp' }],
+    ['惊恐', { open: 1.5, pupil: 0.35, browY: 1, worry: 1, mouth: 'scream', mouthOpen: 1, spike: 1, cowlick: 1 }],
+    ['尴尬笑', { smile: 0.8, wobble: 1, worry: 0.8, sweat: 1, sweatSlide: 0.4, blush: 0.8, lookX: 0.6 }],
+    ['开心', { smile: 1.2, mouthOpen: 0.7, worry: -0.2, cowlick: 0.8, blush: 0.4, open: 0.9 }],
+    ['发呆', { open: 0.6, pupil: 0.9, worry: 0.3, lookY: -0.8, cowlick: -1 }],
+  ];
+  ex.forEach(([name, o], i) => {
+    const x = 1530 + (i % 2) * 190;
+    const y = 290 + Math.floor(i / 2) * 260;
+    ctx.save(); ctx.translate(x, y); ctx.scale(1.15, 1.15);
+    drawHeadFront(ctx, pose({ t: 0.3, ...o }));
+    ctx.restore();
+    label(name, x, y + 110);
+  });
+  // 手部特写
+  ctx.save(); ctx.beginPath(); ctx.roundRect(70, 880, 620, 270, 20); ctx.clip();
+  ctx.fillStyle = '#DCD3C3'; ctx.fillRect(70, 880, 620, 270);
+  drawHandCU(ctx, { x: 360, y: 1020, s: 0.95, rot: -0.05 });
+  ctx.restore(); label('手部特写（开场密码锁镜头）', 380, 1180);
+  // 色板
+  const sw = [['皮肤', PAL.skin], ['头发', PAL.hair], ['外套', PAL.jacket], ['白 T', PAL.tee], ['牛仔裤', PAL.jeans], ['背包', PAL.pack], ['拉链头', PAL.zip]];
+  sw.forEach(([n, col], i) => {
+    const x = 790 + i * 150;
+    ctx.fillStyle = col; ctx.beginPath(); ctx.roundRect(x, 930, 110, 110, 18); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 2; ctx.stroke();
+    label(n, x + 55, 1075); ctx.fillStyle = '#9A948C'; ctx.font = '18px "Noto Sans SC"'; ctx.textAlign = 'center'; ctx.fillText(col, x + 55, 1102); ctx.textAlign = 'left';
+  });
+  window.ready = true;
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+node_modules/
+.frames/
+.frames-nosub/
+review/
+dist/audio.wav

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>样片工作台</title>
+<link rel="stylesheet" href="src/fonts.css">
+<style>
+  body { margin: 0; background: #111; color: #ddd; font: 14px "Noto Sans SC", sans-serif; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 12px; }
+  canvas { height: min(78vh, 160vw); aspect-ratio: 9 / 16; background: #000; }
+  .bar { display: flex; gap: 10px; align-items: center; width: min(560px, 92vw); }
+  input[type=range] { flex: 1; }
+  button { background: #2a2a2a; color: #eee; border: 1px solid #444; padding: 6px 14px; border-radius: 6px; }
+  .shots { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 92vw; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<div class="bar"><button id="play">播放</button><input id="seek" type="range" min="0" step="0.001"><span id="time">0.00</span></div>
+<div class="shots" id="shots"></div>
+<audio id="a" src="dist/audio.wav" preload="auto"></audio>
+<script type="module">
+  // 实时工作台：和成片同一份代码渲染，可拖动、按镜头跳转（先跑 npm run audio）
+  import { createFilm } from './src/film.js';
+  import { DURATION, SHOTS } from './src/timeline.js';
+  const film = await createFilm(document.getElementById('c'));
+  const seek = document.getElementById('seek');
+  const audio = document.getElementById('a');
+  const label = document.getElementById('time');
+  seek.max = DURATION;
+  let t = 0;
+  let playing = false;
+  let t0 = 0;
+  let wall = 0;
+  const draw = () => { film.render(t); seek.value = t; label.textContent = t.toFixed(2); };
+  const loop = (now) => {
+    if (!playing) return;
+    t = t0 + (now - wall) / 1000;
+    if (t >= DURATION) { t = DURATION - 0.001; playing = false; audio.pause(); }
+    draw();
+    requestAnimationFrame(loop);
+  };
+  const play = () => { playing = true; t0 = t; wall = performance.now(); audio.currentTime = t; audio.play().catch(() => {}); requestAnimationFrame(loop); };
+  const stop = () => { playing = false; audio.pause(); };
+  document.getElementById('play').onclick = () => (playing ? stop() : play());
+  seek.oninput = () => { stop(); t = Number(seek.value); draw(); };
+  for (const s of SHOTS) {
+    const b = document.createElement('button');
+    b.textContent = `${s.id} ${s.start.toFixed(2)}`;
+    b.onclick = () => { stop(); t = s.start; draw(); };
+    document.getElementById('shots').append(b);
+  }
+  addEventListener('keydown', (e) => {
+    if (e.key === ' ') { e.preventDefault(); playing ? stop() : play(); }
+    if (e.key === ',' || e.key === '.') { stop(); t = Math.max(0, t + (e.key === '.' ? 1 : -1) / 30); draw(); }
+  });
+  draw();
+</script>
+</body>
+</html>
