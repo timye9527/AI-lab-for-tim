@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><canvas id="c" width="1800" height="800"></canvas>
+<script type="module">
+import { drawTimFront, pose, expr } from './tim2.js';
+const ctx = document.getElementById('c').getContext('2d');
+ctx.fillStyle = '#FAF3D7'; ctx.fillRect(0, 0, 1800, 800);
+const list = [
+  pose({ e: expr({ mouth: 'grin' }), armL: { a: 0.3, b: 1.6, hand: 'open' } }),
+  pose({ head: 'q', headFlip: -1, e: expr({ mouth: 'flat', brows: 'worry', sweat: 1, look: [0.6, 0] }), armR: { a: 1.45, b: 0.05, hand: 'point' }, hunch: 1 }),
+  pose({ jump: 0.6, tuck: 0.6, e: expr({ eyes: 'shock', mouth: 'scream', brows: 'up' }), armL: { a: 2.6, b: 0.3, hand: 'open' }, armR: { a: 2.6, b: 0.3, hand: 'open' } }),
+  pose({ jacket: false, e: expr({ mouth: 'smile', eyes: 'happy', blush: 0.6 }), armR: { a: 0.25, b: 0.4, hand: 'fist' } }),
+  pose({ jacket: false, pack: false, head: 'q', e: expr({ mouth: 'awk', blush: 1, sweat: 1 }), armL: { a: 0.6, b: 2.2, hand: 'relax' } }),
+];
+list.forEach((p, i) => { p.x = 180 + i * 360; p.y = 760; p.s = 0.55; drawTimFront(ctx, p); });
+window.ready = true;
+</script>
