@@ -131,7 +131,7 @@ BUILD[1] = (R, s) => {
   const axis = svg(R, 1680, 120, '<line x1="0" y1="60" x2="1680" y2="60" stroke="#3A3F47" stroke-width="3"/>', { left: '120px', top: '130px' });
   const ms = [['9/9', '高盛：最坏的时候可能已过去', '9 月 9 号'], ['9 月', '美光 +17% · 海力士 +16%', '接下来一个月'], ['9/30', '美光单季收入 $542亿', '9 月 30 号'], ['10/5', '美光市值 $1.2万亿', '10 月 5 号'], ['10/8', '三星单季营业利润 107万亿韩元', '10 月 8 号，三星']]
     .map(([d, txt, nd], i) => [el(R, `<div class="mono amber" style="font-size:26px">${d}</div><div style="font-size:24px;margin-top:6px;width:320px">${txt}</div>`, { left: `${120 + i * 345}px`, top: '160px' }), cue(1, nd)]);
-  const P = [['订单', '2027–28 更紧', '2027 和 2028'], ['价格', '合约价仍在涨', '更关键的是'], ['利润', '107万亿韩元', '10 月 8 号，三星'], ['长约', '美光 26 份 · 锁定 75%+\n三星约 80% · 海力士 5 年', '美光签了 26 份']];
+  const P = [['订单', '2027–28 更紧', '更关键的是'], ['价格', '合约价仍在涨', '据报道，三星'], ['利润', '107万亿韩元', '10 月 8 号，三星'], ['长约', '美光 26 份 · 锁定 75%+\n三星约 80% · 海力士 5 年', '美光签了 26 份']];
   const pil = P.map(([n, sub, nd], i) => {
     const x = 260 + i * 380;
     const b = el(R, '', { left: `${x}px`, bottom: '330px', width: '220px', height: '0px', background: 'linear-gradient(180deg, rgba(229,72,77,.9), rgba(229,72,77,.35))', borderRadius: '8px 8px 0 0' });
@@ -139,11 +139,19 @@ BUILD[1] = (R, s) => {
     return [b, lab, cue(1, nd)];
   });
   const full = cue(1, '四根柱子'), crack = cue(1, '第一道裂缝');
+  // 柱子出现前，中间用大数字卡撑住画面
+  const hero = [
+    ['<div style="font-size:88px;font-weight:900">倒回一个月</div><div class="muted" style="font-size:40px;margin-top:10px">七月暴跌之后，存储股一直在找底</div>', '先倒回', '9 月 9 号'],
+    ['<div class="tag">高盛 · 9/9 对客户</div><div style="font-size:64px;font-weight:900;margin-top:12px">「最坏的时候，可能已经过去了」</div>', '9 月 9 号', '接下来一个月'],
+    ['<div class="tag">一个月涨幅</div><div style="margin-top:8px"><span style="font-size:40px;font-weight:700">美光 </span><span class="mono up" style="font-size:130px;font-weight:800">+17%</span><span style="font-size:40px;font-weight:700;margin-left:60px">海力士 </span><span class="mono up" style="font-size:130px;font-weight:800">+16%</span></div>', '接下来一个月', '9 月 30 号'],
+    ['<div class="tag">美光 FQ4 · 9/30</div><div style="margin-top:8px"><span style="font-size:40px;font-weight:700">单季收入 </span><span class="mono amber" style="font-size:150px;font-weight:800">$542亿</span></div><div style="font-size:40px;font-weight:700">2027、2028 年 <span class="up">比今年更紧</span></div>', '9 月 30 号', '更关键的是'],
+  ].map(([h, a, b]) => [el(R, h, { left: '120px', top: '400px', width: '1680px' }), cue(1, a), cue(1, b)]);
   const crk = svg(R, 1560, 420, '<path d="M0 210 L210 170 L330 250 L520 150 L700 260 L880 160 L1060 240 L1240 140 L1400 230 L1560 190" fill="none" stroke="#FFB224" stroke-width="7"/>', { left: '180px', top: '330px' });
   const crLab = el(R, '10/8 · 第一道裂缝', { right: '140px', top: '300px', fontSize: '34px', fontWeight: 900, color: 'var(--amber)' });
   return t => {
     show(axis, t, s, Infinity, 0.4, 0);
     ms.forEach(([e, t0]) => show(e, t, t0));
+    hero.forEach(([e, a, b]) => show(e, t, a + 0.2, b - 0.35));
     pil.forEach(([b, lab, t0]) => { grow(b, t, t0, 'height', 340); show(lab, t, t0); b.style.boxShadow = t > full ? '0 0 40px rgba(229,72,77,.45)' : 'none'; });
     show(crk, t, crack, Infinity, 0.2, 0); draw(crk.querySelector('path'), t, crack, 0.7); show(crLab, t, crack + 0.4);
   };
