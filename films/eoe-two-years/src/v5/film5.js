@@ -1,7 +1,7 @@
 // 完整版合成：第一幕用正式样片，其余各幕来自 acts.js；字幕、暗角、淡出统一在这里处理
 import { ACTS, actAt, VO_ALL, DURATION, W, H } from './timeline5.js';
 import { createSample } from '../v4/sample4.js';
-import { initActs, act2, act3, act4, act5, act6, act7 } from './acts.js';
+import { initActs, act2, act3, act4, actT, act5, act6, act7 } from './acts.js';
 import { subtitle } from '../v2/frames.js';
 
 // 字幕太长时在标点处断成两行（找最靠近中间的标点）
@@ -23,15 +23,15 @@ function subtitleWrap(ctx, text, y) {
 }
 import { clamp, noise } from './u5.js';
 
-const FN = { a2: act2, a3: act3, a4: act4, a5: act5, a6: act6, a7: act7 };
+const FN = { a2: act2, a3: act3, a4: act4, at: actT, a5: act5, a6: act6, a7: act7 };
 
 export async function createFilm5(canvas, { subtitles = true } = {}) {
   const ctx = canvas.getContext('2d');
   const a1 = await createSample(canvas, { subtitles: false, fadeOut: false });
   await Promise.all([
-    document.fonts.load('900 120px "Noto Sans SC"', '当场入会！第 2 3 次工作没了。人生 GAP 3 个月这个你来！？？？还单身？（偷瞄）EOE 两周年来啦！中文演讲俱乐部自由开放趣味奇葩第三年继续一起玩'),
+    document.fonts.load('900 120px "Noto Sans SC"', '当场入会！第 2 3 次工作没了。人生 GAP 3 个月这个你来！？？？还单身？（偷瞄）EOE 两周年来啦！中文演讲俱乐部自由开放趣味奇葩第三年继续一起玩第一次周四每周螺蛳粉火锅撸串真香我也笑学到了开场先自嘲停顿比说话难别背稿讲人话魔术脱口秀演讲抽奖中了哈%0123456789'),
     document.fonts.load('700 54px "Noto Sans SC"', VO_ALL.map((v) => v.text).join('') + '周四来不来？缺个主持！活动谁来搞？'),
-    document.fonts.load('96px "ZCOOL KuaiLe"', '几天后嘘——嘀噗…咚！叮！…'),
+    document.fonts.load('96px "ZCOOL KuaiLe"', '几天后嘘——嘀噗…咚！叮！…真香哇哈'),
   ]);
   let durs = {};
   try {

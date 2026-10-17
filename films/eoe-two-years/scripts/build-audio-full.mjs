@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { SR, Bus, reverb, limit, toWav, Biquad } from '../src/audio/synth.js';
 import { buildScore } from '../src/audio/score.js';
 import * as A1 from '../src/v4/timeline4.js';
-import { ACTS, DURATION, VO_ALL, VODIR, ACT2, ACT3, ACT4, ACT5, ACT6, ACT7 } from '../src/v5/timeline5.js';
+import { ACTS, DURATION, VO_ALL, VODIR, ACT2, ACT3, ACT4, ACTT, ACT5, ACT6, ACT7 } from '../src/v5/timeline5.js';
 import * as k from '../src/audio/kit.js';
 
 const at = (id) => ACTS.find((a) => a.id === id).start;
@@ -54,6 +54,10 @@ for (let i = 0; i < a1.n && i < sfx.n; i++) {
     music.add(k.keys(c[0], 1.6, 1), tt, 0.25, -0.2);
     music.add(k.keys(c[(i % 3) + 1], 1.2, 1), tt + b / 2, 0.18, 0.2);
   }
+  for (let n = 0; n < 4; n++) {
+    sfx.add(k.boing(0.5), t0 + B.everyone + n * 0.3, 0.12, n % 2 ? 0.4 : -0.4);
+    sfx.add(k.rustle(0.6, 1), t0 + B.everyone + n * 0.3, 0.04, n % 2 ? 0.4 : -0.4);
+  }
   for (const s of [B.second, B.third]) {
     sfx.add(k.swish(0.3, 500, 3000, 0.9, 12), t0 + s - 0.12, 0.35);
     sfx.add(k.bell('A5', 0.8, 1), t0 + s + 0.05, 0.1);
@@ -72,6 +76,38 @@ for (let i = 0; i < a1.n && i < sfx.n; i++) {
   sfx.add(k.swish(0.3, 300, 1500, 1, 14), t0 + B.hand - 0.25, 0.5);
   sfx.add(k.slide(0.5, 400, 1800, 1), t0 + B.hand, 0.3);
   sfx.add(k.swish(0.4, 600, 4000, 1, 15), t0 + B.hand + 0.05, 0.5, 0.4);
+}
+
+// ---------- 新增：周四（轻快的拨弦律动；翻日历、笑声、嗦粉、滋滋声、电量充满） ----------
+{
+  const t0 = at('at');
+  const B = ACTT.beats;
+  const beat = 60 / 104;
+  const ch = [['G3', 'B3', 'D4'], ['E3', 'G3', 'B3'], ['C3', 'E3', 'G3'], ['D3', 'F#3', 'A3']];
+  for (let i = 0; i * beat < B.energy; i++) {
+    const tt = t0 + i * beat;
+    music.add(k.kick(0.7), tt, 0.4);
+    music.add(k.shaker(i, 1), tt + beat / 2, 0.08, 0.3);
+    ch[Math.floor(i / 2) % 4].forEach((n, j) => music.add(k.pick(n, 0.7, i * 3 + j + 200, 0.6, 0.6), tt + beat / 2 + j * 0.02, 0.2, j - 1));
+    music.add(k.bass(['G1', 'G1', 'E1', 'E1', 'C2', 'C2', 'D2', 'D2'][i % 8], beat * 0.9, 1), tt, 0.32);
+  }
+  for (const d of [0, 0.45, 0.9]) sfx.add(k.swish(0.18, 2500, 6000, 0.7, 210 + d * 10), t0 + d + 0.3, 0.25);
+  sfx.add(k.crowd(1.0, 1, 211), t0 + B.meet + 0.2, 0.2);
+  sfx.add(k.swish(0.5, 400, 160, 0.9, 212), t0 + B.fen + 0.2, 0.35);
+  sfx.add(k.rustle(0.9, 1), t0 + B.pot, 0.05);
+  sfx.add(k.rustle(0.9, 1), t0 + B.bbq, 0.07);
+  sfx.add(k.crowd(1.8, 1, 213), t0 + B.tease + 0.1, 0.22);
+  sfx.add(k.bell('E6', 0.8, 1), t0 + B.learn + 0.5, 0.1);
+  // 能量场：电量往上冲 + 通关音 + 节奏加满
+  sfx.add(k.slide(1.6, 300, 1500, 1), t0 + B.energy + 0.3, 0.18);
+  sfx.add(k.levelUp(1), t0 + B.energy + 1.9, 0.22);
+  for (let i = 0; i * 0.5 < ACTT.dur - B.energy; i++) {
+    const tt = t0 + B.energy + i * 0.5;
+    music.add(k.kick(1), tt, 0.6);
+    if (i % 2) music.add(k.clap(i + 300, 1), tt, 0.3);
+    music.add(k.hat(i + 300, 1), tt + 0.25, 0.12);
+  }
+  music.add(k.pad(['G3', 'D4', 'G4', 'B4'], ACTT.dur - B.energy, 1, 0.3, 0.5, 2200), t0 + B.energy, 0.3);
 }
 
 // ---------- 第五幕：120 BPM 律动；皇冠、蒙太奇、唱跳 ----------
@@ -106,13 +142,29 @@ for (let i = 0; i < a1.n && i < sfx.n; i++) {
 {
   const t0 = at('a6');
   const B = ACT6.beats;
-  for (let i = 0; i < 22; i++) music.add(k.shaker(i, 1), t0 + i * 0.125, 0.1, i % 2 ? 0.3 : -0.3);
-  for (let i = 0; i < 6; i++) music.add(k.kick(0.8), t0 + i * 0.5, 0.45);
-  ['D3', 'D3', 'B2', 'B2', 'G2', 'A2'].forEach((n, i) => music.add(k.bass(n, 0.45, 1), t0 + i * 0.5, 0.35));
-  sfx.add(k.thud(0.8, 100), t0 + B.show, 0.4);
-  music.add(k.pad(['D3', 'A3', 'D4', 'F#4'], B.aside - B.show + 0.5, 1, 0.2, 0.8, 2000), t0 + B.show, 0.35);
-  sfx.add(k.applause(B.aside - B.show, 1, 61), t0 + B.show + 0.1, 0.3);
-  sfx.add(k.crowd(1.4, 1, 62), t0 + B.show + 0.05, 0.15);
+  for (let i = 0; i * 0.125 < B.aside; i++) music.add(k.shaker(i, 1), t0 + i * 0.125, 0.1, i % 2 ? 0.3 : -0.3);
+  for (let i = 0; i * 0.5 < B.aside; i++) {
+    music.add(k.kick(0.8), t0 + i * 0.5, 0.45);
+    music.add(k.bass(['D2', 'D2', 'B1', 'B1', 'G1', 'G1', 'A1', 'A1'][i % 8], 0.45, 1), t0 + i * 0.5, 0.35);
+  }
+  // 魔术：一声「噗」+ 闪光
+  sfx.add(k.swish(0.35, 300, 3000, 1, 61), t0 + B.magic, 0.4);
+  ['C6', 'E6', 'G6', 'C7'].forEach((n, i) => sfx.add(k.bell(n, 0.8, 1), t0 + B.magic + 0.1 + i * 0.05, 0.08));
+  sfx.add(k.crowd(0.8, 1, 62), t0 + B.magic + 0.3, 0.18);
+  // 脱口秀：笑声 + 「咚哒嚓」
+  sfx.add(k.crowd(1.0, 1, 63), t0 + B.standup + 0.1, 0.3);
+  sfx.add(k.thud(0.8, 140), t0 + B.standup + 0.6, 0.3);
+  sfx.add(k.thud(0.8, 110), t0 + B.standup + 0.72, 0.3);
+  sfx.add(k.hat(64, 1, 0.12), t0 + B.standup + 0.84, 0.3);
+  // 演讲：掌声
+  sfx.add(k.applause(1.0, 1, 65), t0 + B.speech + 0.2, 0.25);
+  // 抽奖：鼓点滚奏 → 叮 → 欢呼
+  for (let i = 0; i < 14; i++) sfx.add(k.hat(70 + i, 1, 0.02), t0 + B.lottery + i * 0.032, 0.2 + i * 0.01);
+  sfx.add(k.ding(1), t0 + B.lottery + 0.45, 0.3);
+  sfx.add(k.crowd(1.2, 1, 66), t0 + B.lottery + 0.5, 0.3);
+  // 让出中央：长和弦 + 掌声
+  music.add(k.pad(['D3', 'A3', 'D4', 'F#4'], 2.5, 1, 0.2, 1.2, 2000), t0 + B.aside, 0.3);
+  sfx.add(k.applause(2.4, 1, 67), t0 + B.aside + 0.1, 0.26);
   // 温暖的吉他分解：D - Bm - G - A
   const prog = [['D3', 'A3', 'D4', 'F#4', 'A4'], ['B2', 'F#3', 'B3', 'D4', 'F#4'], ['G2', 'D3', 'G3', 'B3', 'D4'], ['A2', 'E3', 'A3', 'C#4', 'E4']];
   const pat = [0, 2, 3, 4, 3, 2, 1, 3];

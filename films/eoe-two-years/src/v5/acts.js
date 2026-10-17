@@ -3,7 +3,7 @@ import { drawStick, tim, pal, stick, INK } from '../v3/stick.js';
 import { stageBG, showroomBG, audience, shakeMarks, notes } from '../v3/frames3.js';
 import { K, sparkle, outline, rect, glow, eoeLogo, frameDoor, frameWarm } from '../v2/frames.js';
 import { W, H, SANS, FUN, clamp, lerp, ease, easeOut, easeIn, kf, cam, layer, pop, bubble, shadow, stringLights, noise } from './u5.js';
-import { ACT2, ACT3, ACT4, ACT5, ACT6, ACT7 } from './timeline5.js';
+import { ACT2, ACT3, ACT4, ACTT, ACT5, ACT6, ACT7 } from './timeline5.js';
 
 // ---------------- 背景 ----------------
 let BG = null;
@@ -231,6 +231,10 @@ export function act2(ctx, lt) {
 // ======================= 第三幕：颤抖的第一次 =======================
 export function act3(ctx, lt) {
   const B = ACT3.beats;
+  if (lt >= B.everyone && lt < B.second) {
+    everyoneShakes(ctx, lt - B.everyone, lt);
+    return { vig: 0.35 };
+  }
   if (lt < B.second) {
     const calm = clamp((lt - B.clap - 0.4) / 1.4);
     cam(ctx, 1 + 0.1 * ease(lt / B.second), 540, 1060, () => {
@@ -262,7 +266,7 @@ export function act3(ctx, lt) {
     });
     return { vig: 0.45 };
   }
-  // 第二次、第三次：站得越来越直
+  // 第二次、第三次：站得越来越直（抖着抖着，也就不抖了）
   const third = lt > B.third;
   const k = third ? lt - B.third : lt - B.second;
   cam(ctx, 1.05, 540, 1060, () => {
@@ -274,6 +278,42 @@ export function act3(ctx, lt) {
     pop(ctx, third ? '第 3 次' : '第 2 次', 820, 360, clamp(k / 0.15), { size: 72, rot: 0.08, fill: K.yellow, stroke: K.navyDeep, font: SANS });
   });
   return { vig: 0.4 };
+}
+
+// 四格：每个伙伴的「第一次」都在抖
+function everyoneShakes(ctx, k, t) {
+  ctx.fillStyle = K.redDeep;
+  ctx.fillRect(0, 0, W, H);
+  const cells = [[0, 70, 150], [1, 560, 150], [2, 70, 830], [4, 560, 830]];
+  cells.forEach(([i, x, y], n) => {
+    const show = clamp((k - n * 0.3) / 0.2);
+    if (show <= 0) return;
+    ctx.save();
+    ctx.translate(x + 225, y + 330);
+    ctx.scale((0.85 + 0.15 * show) * 0.92, (0.85 + 0.15 * show) * 0.92);
+    ctx.translate(-245, -360);
+    outline(ctx, rect(0, 0, 490, 720, 22), K.red, 7);
+    const g = ctx.createLinearGradient(0, 0, 0, 720);
+    g.addColorStop(0, 'rgba(250,243,215,0.35)');
+    g.addColorStop(1, 'rgba(250,243,215,0.1)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(200, 0);
+    ctx.lineTo(290, 0);
+    ctx.lineTo(400, 640);
+    ctx.lineTo(90, 640);
+    ctx.fill();
+    drawStick(ctx, pal(i, {
+      x: 245, y: 640, s: 0.9, t: t + n, tremble: 1, sweat: 1, eyes: 'shock', brows: 'worry', mouth: 'wobble',
+      armL: { to: [20, -330], bend: 1 }, armR: { to: [-24, -322], bend: -1 }, prop: { type: 'paper', hand: 'L', shake: 1 },
+      legL: { a: 6, b: -22 + Math.sin((t + n) * 22) * 8 }, legR: { a: -6, b: 22 - Math.sin((t + n) * 22) * 8 },
+    }));
+    ctx.fillStyle = K.cream;
+    ctx.font = `900 46px ${SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('第一次', 245, 70);
+    ctx.restore();
+  });
 }
 
 // ======================= 第四幕：人生按下暂停键 =======================
@@ -343,6 +383,190 @@ export function act4(ctx, lt) {
     });
   }
   return { vig: 0.35, desat: grey * 0.85 };
+}
+
+// ======================= 新增：周四 =======================
+function foodPanel(ctx, color) {
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, W, H);
+  outline(ctx, rect(-20, 1240, W + 40, 700), '#B98B57', 6);
+  outline(ctx, rect(60, 1180, 960, 80, 18), '#FAF3D7', 6);
+}
+function eater(ctx, i, x, face, t, extra = {}) {
+  const o = { x, y: 1260, s: 0.95, face, t, eyes: 'happy', mouth: 'grin', armL: { a: 120 * face, b: 40 * face }, armR: { a: -30, b: -30 }, ...extra };
+  drawStick(ctx, i === 'tim' ? tim('president', o) : pal(i, o));
+}
+function steam(ctx, x, y, t, color = 'rgba(255,255,255,0.8)', n = 3) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 8;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < n; i++) {
+    const ox = x + (i - 1) * 60;
+    ctx.beginPath();
+    for (let k = 0; k <= 20; k++) {
+      const yy = y - k * 14 - ((t * 120) % 40);
+      const xx = ox + Math.sin(k * 0.6 + t * 6 + i) * 16;
+      if (k === 0) ctx.moveTo(xx, yy);
+      else ctx.lineTo(xx, yy);
+    }
+    ctx.stroke();
+  }
+}
+
+export function actT(ctx, lt) {
+  const B = ACTT.beats;
+  if (lt < B.meet) {
+    // 日历：一页页翻过去，每页都是周四
+    ctx.fillStyle = K.cream;
+    ctx.fillRect(0, 0, W, H);
+    for (const [x, y, r] of [[140, 360, 34], [940, 300, 26], [900, 1500, 40], [160, 1450, 24]]) sparkle(ctx, x, y, r, K.red, 0);
+    const page = Math.min(2, Math.floor(lt / 0.45));
+    const flip = (lt % 0.45) / 0.45;
+    const days = ['7', '14', '21'];
+    outline(ctx, rect(240, 560, 600, 720, 30), '#FFFFFF', 8);
+    outline(ctx, rect(240, 560, 600, 170, 30), K.red, 8);
+    ctx.fillStyle = K.cream;
+    ctx.font = `900 96px ${SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('周四', 540, 680);
+    ctx.save();
+    ctx.translate(540, 1000);
+    ctx.scale(1, page < 2 && flip > 0.75 ? 1 - (flip - 0.75) * 4 : 1);
+    ctx.fillStyle = INK;
+    ctx.font = `900 300px ${SANS}`;
+    ctx.fillText(days[page], 0, 100);
+    ctx.restore();
+    for (const x of [330, 750]) outline(ctx, rect(x - 14, 520, 28, 80, 14), '#C9CFDD', 5);
+    pop(ctx, '每周', 540, 1420, clamp(lt / 0.15), { size: 80, fill: K.navy, stroke: K.cream, font: SANS });
+    return { vig: 0.25 };
+  }
+  if (lt < B.fen) {
+    // 开会：围成一圈，有人在台上讲，下面笑成一片
+    cam(ctx, 1.0, 540, 1000, () => {
+      ctx.drawImage(BG.club, 0, 0);
+      drawStick(ctx, pal(5, { x: 860, y: 1330, s: 0.95, face: -1, t: lt, mouth: 'grin', armL: { a: 120, b: 30 }, prop: { type: 'paper', hand: 'R' } }));
+      const seats = [['tim', 160], [0, 330], [2, 500], [3, 670]];
+      for (const [i, x] of seats) {
+        const o = { x, y: 1600, s: 0.85, face: 1, t: lt, eyes: 'happy', mouth: 'grin', legL: { a: 85, b: -85 }, legR: { a: 80, b: -80 }, bob: -Math.abs(Math.sin(lt * 9 + x)) * 6 };
+        outline(ctx, rect(x - 60, 1580, 120, 26, 8), '#B98B57', 5);
+        drawStick(ctx, i === 'tim' ? tim('president', o) : pal(i, o));
+      }
+      pop(ctx, '哈哈哈', 420, 900, clamp((lt - B.meet - 0.2) / 0.12), { size: 70, rot: -0.08, fill: K.yellow, stroke: INK });
+    });
+    return { vig: 0.3 };
+  }
+  if (lt < B.tease) {
+    const kind = lt < B.pot ? 'fen' : lt < B.bbq ? 'pot' : 'bbq';
+    const k = lt - { fen: B.fen, pot: B.pot, bbq: B.bbq }[kind];
+    cam(ctx, 1.0 + k * 0.06, 540, 1000, () => {
+      if (kind === 'fen') {
+        foodPanel(ctx, '#E8F0D2');
+        eater(ctx, 'tim', 300, 1, lt, { armL: { to: [70, -500], bend: 1 }, eyes: 'line', mouth: 'flat' });
+        eater(ctx, 1, 780, -1, lt, { armL: { to: [-70, -500], bend: -1 }, eyes: 'line', mouth: 'flat' });
+        outline(ctx, new Path2D('M 400,1150 Q 540,1320 680,1150 Z'), '#FFFFFF', 6);
+        ctx.fillStyle = '#E8A33D';
+        ctx.fillRect(420, 1140, 240, 18);
+        steam(ctx, 540, 1100, lt, 'rgba(122,170,60,0.85)');
+        pop(ctx, '螺蛳粉', 540, 560, clamp(k / 0.12), { size: 96, fill: K.yellow, stroke: INK, font: SANS });
+        pop(ctx, '真香！', 540, 760, clamp((k - 0.4) / 0.12), { size: 70, rot: -0.1 });
+      } else if (kind === 'pot') {
+        foodPanel(ctx, '#F7D9C9');
+        eater(ctx, 'tim', 260, 1, lt);
+        eater(ctx, 0, 820, -1, lt);
+        eater(ctx, 4, 540, 0, lt, { y: 1180, s: 0.75, armL: { a: 150, b: 10 } });
+        outline(ctx, new Path2D('M 360,1170 Q 540,1330 720,1170 Z'), '#4A4F5C', 6);
+        outline(ctx, new Path2D('M 380,1172 m -0,0 a 160,26 0 1,0 320,0 a 160,26 0 1,0 -320,0'), '#D6452F', 5);
+        steam(ctx, 540, 1130, lt);
+        pop(ctx, '火锅', 540, 560, clamp(k / 0.12), { size: 96, fill: K.yellow, stroke: K.red, font: SANS });
+      } else {
+        foodPanel(ctx, '#F2E2C2');
+        eater(ctx, 'tim', 300, 1, lt, { armL: { a: 150, b: 0 }, mouth: 'grin' });
+        eater(ctx, 2, 780, -1, lt, { armL: { a: -150, b: 0 } });
+        outline(ctx, rect(380, 1130, 320, 50, 8), '#3A3F4D', 6);
+        for (let i = 0; i < 5; i++) {
+          const x = 410 + i * 64;
+          ctx.strokeStyle = '#8E6B3E';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(x, 1130);
+          ctx.lineTo(x + 30, 960);
+          ctx.stroke();
+          for (let j = 0; j < 3; j++) outline(ctx, rect(x + 6 + j * 7, 1080 - j * 40, 24, 30, 8), j % 2 ? '#B5552B' : '#D98A3D', 3);
+        }
+        steam(ctx, 540, 940, lt, 'rgba(160,160,160,0.7)');
+        pop(ctx, '撸串', 540, 560, clamp(k / 0.12), { size: 96, fill: K.yellow, stroke: INK, font: SANS });
+      }
+    });
+    return { vig: 0.3, shake: k < 0.06 ? 6 : 0 };
+  }
+  if (lt < B.energy) {
+    const learn = lt > B.learn;
+    const k = learn ? lt - B.learn : lt - B.tease;
+    cam(ctx, 1.02, 540, 1000, () => {
+      ctx.drawImage(BG.club, 0, 0);
+      if (!learn) {
+        // 互相损：大家指着 Tim 笑（他脸上一道红油），他指着自己也笑
+        const laugh = Math.abs(Math.sin(lt * 10));
+        drawStick(ctx, pal(0, { x: 180, y: 1600, s: 1.0, face: 1, t: lt, eyes: 'happy', mouth: 'grin', bob: -laugh * 8, armL: { a: 95, b: 0 } }));
+        drawStick(ctx, pal(3, { x: 900, y: 1600, s: 1.0, face: -1, t: lt, eyes: 'happy', mouth: 'grin', bob: -laugh * 8, armL: { a: -95, b: 0 }, armR: { a: 40, b: 80 } }));
+        drawStick(ctx, tim('president', { x: 540, y: 1640, s: 1.2, face: 0, t: lt, eyes: k > 0.8 ? 'happy' : 'dot', mouth: k > 0.8 ? 'grin' : 'o', blush: 0.6, armL: k > 0.8 ? { to: [10, -500], bend: 1 } : { a: 20, b: 20 }, armR: { a: -20, b: -20 } }));
+        ctx.strokeStyle = '#D6452F';
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(500, 950);
+        ctx.quadraticCurveTo(540, 980, 590, 950);
+        ctx.stroke();
+        pop(ctx, '哈哈哈哈', 300, 800, clamp(k / 0.12), { size: 70, rot: -0.1, fill: K.yellow, stroke: INK });
+        if (k > 0.8) pop(ctx, '我也笑', 780, 760, clamp((k - 0.8) / 0.12), { size: 64, rot: 0.1, fill: K.cream, stroke: K.navyDeep, font: SANS });
+      } else {
+        // 互相学：你教我控场，我教你讲故事
+        outline(ctx, rect(140, 620, 800, 460, 20), '#FFFFFF', 8);
+        ctx.fillStyle = INK;
+        ctx.font = `900 54px ${SANS}`;
+        ctx.textAlign = 'left';
+        ctx.fillText('· 开场先自嘲', 200, 740);
+        ctx.fillText('· 停顿比说话难', 200, 840);
+        ctx.fillText('· 别背稿，讲人话', 200, 940);
+        drawStick(ctx, pal(5, { x: 250, y: 1600, s: 1.0, face: 1, t: lt, mouth: 'grin', armL: { to: [180, -620], bend: 1 } }));
+        drawStick(ctx, tim('president', { x: 760, y: 1640, s: 1.1, face: -1, t: lt, mouth: 'smile', eyes: 'dot', bob: -Math.abs(Math.sin(lt * 4)) * 8, prop: { type: 'clipboard', hand: 'L' }, armL: { a: -100, b: -30 } }));
+        pop(ctx, '学到了', 760, 1260, clamp((k - 0.5) / 0.12), { size: 64, rot: 0.08, fill: K.yellow, stroke: INK, font: SANS });
+      }
+    });
+    return { vig: 0.3 };
+  }
+  // 周四 = 能量场：大字、闪电、电量充满，大家一起蹦
+  const k = lt - B.energy;
+  ctx.fillStyle = K.navy;
+  ctx.fillRect(0, 0, W, H);
+  glow(ctx, 540, 760, 700, '253,184,19', 0.35 + 0.1 * Math.sin(lt * 6));
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2 + lt * 0.5;
+    ctx.strokeStyle = 'rgba(253,184,19,0.35)';
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(540 + Math.cos(a) * 330, 760 + Math.sin(a) * 330);
+    ctx.lineTo(540 + Math.cos(a) * 620, 760 + Math.sin(a) * 620);
+    ctx.stroke();
+  }
+  pop(ctx, '周四', 540, 760, clamp(k / 0.2), { size: 260, fill: K.yellow, stroke: INK, font: SANS });
+  // 电量条
+  const charge = clamp((k - 0.3) / 1.6);
+  outline(ctx, rect(330, 980, 400, 120, 20), '#FFFFFF', 7);
+  outline(ctx, rect(730, 1015, 24, 50, 6), '#FFFFFF', 5);
+  ctx.fillStyle = charge > 0.99 ? '#7FD36A' : K.yellow;
+  ctx.fillRect(345, 995, 370 * charge, 90);
+  ctx.fillStyle = INK;
+  ctx.font = `900 56px ${SANS}`;
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(charge * 100)}%`, 530, 1060);
+  const jump = Math.abs(Math.sin(lt * 6));
+  const crew = [[0, 150], [1, 320], ['tim', 540], [3, 760], [4, 930]];
+  for (const [i, x] of crew) {
+    const o = { x, y: 1700, s: i === 'tim' ? 1.05 : 0.9, face: 0, t: lt, jump: jump * 0.35, eyes: 'happy', mouth: 'grin', armL: { a: 150, b: 10 }, armR: { a: -150, b: -10 } };
+    drawStick(ctx, i === 'tim' ? tim('president', o) : pal(i, o));
+  }
+  for (const [x, y, r] of [[140, 300, 40], [940, 360, 50], [900, 1260, 30], [170, 1240, 34]]) sparkle(ctx, x, y, r * (0.7 + 0.3 * Math.sin(lt * 8 + x)), K.yellow, 5);
+  return { vig: 0.3 };
 }
 
 // ======================= 第五幕：不太靠谱的会长 =======================
@@ -464,12 +688,18 @@ function dance(ctx, dt, t) {
 // ======================= 第六幕：一起搞了场大的 =======================
 export function act6(ctx, lt) {
   const B = ACT6.beats;
-  if (lt < B.show) {
+  if (lt >= B.magic && lt < B.aside) {
+    const kind = lt < B.standup ? 'magic' : lt < B.speech ? 'standup' : lt < B.lottery ? 'speech' : 'lottery';
+    const k = lt - { magic: B.magic, standup: B.standup, speech: B.speech, lottery: B.lottery }[kind];
+    showAct(ctx, kind, k, lt);
+    return { vig: 0.35, shake: k < 0.06 ? 6 : 0 };
+  }
+  if (lt < B.magic) {
     // 筹备：做海报、搬物料、搭舞台、调音响，Tim 跑来跑去
     cam(ctx, 1.0, 540, 980, () => {
       ctx.drawImage(BG.party, 0, 0);
       drawStick(ctx, pal(4, { x: 170, y: 1450, s: 0.85, face: 1, t: lt, mouth: 'smile', prop: { type: 'poster', hand: 'L' }, armL: { a: 120, b: 40 } }));
-      const carry = kf(lt, [[0, 1100], [2.8, 760]], (u) => u);
+      const carry = kf(lt, [[0, 1100], [B.magic, 860]], (u) => u);
       drawStick(ctx, pal(3, { x: carry, y: 1440, s: 0.85, face: -1, t: lt, mouth: 'smile', prop: { type: 'box', hand: 'R' }, armR: { to: [-40, -300], bend: -1 }, armL: { to: [40, -300], bend: 1 }, legL: { a: Math.sin(lt * 10) * 25 }, legR: { a: -Math.sin(lt * 10) * 25 } }));
       drawStick(ctx, pal(5, { x: 330, y: 1380, s: 0.78, face: 1, t: lt, mouth: 'smile', prop: { type: 'speaker', hand: 'L' }, armL: { a: 60, b: 30 } }));
       const tx = 540 + Math.sin(lt * 2.4) * 260;
@@ -481,8 +711,8 @@ export function act6(ctx, lt) {
   }
   if (lt < B.dinner) {
     // 舞台灯亮起；然后 Tim 从聚光灯中央让开，把伙伴们拉进光里
-    const aside = lt > B.aside;
-    const at = lt - B.aside;
+    const aside = lt > B.aside + 1.0;
+    const at = lt - B.aside - 1.0;
     cam(ctx, 1.0, 540, 980, () => {
       ctx.drawImage(BG.party, 0, 0);
       ctx.fillStyle = 'rgba(20,16,30,0.45)';
@@ -529,8 +759,8 @@ export function act6(ctx, lt) {
   }
   // 聚餐举杯，镜头慢慢推近 Tim 的脸
   const dt = lt - B.dinner;
-  const z = lerp(1.0, 1.9, ease((dt - 0.8) / 3.2));
-  cam(ctx, z, 540, lerp(1100, 820, ease((dt - 0.8) / 3.2)), () => {
+  const z = lerp(1.0, 1.9, ease((dt - 1.2) / 4.4));
+  cam(ctx, z, 540, lerp(1100, 820, ease((dt - 1.2) / 4.4)), () => {
     ctx.drawImage(BG.dinner, 0, 0);
     const up = dt > 0.6 && dt < 2.4;
     const seats = [[1, 180, -1], [4, 360, -1], [2, 720, 1], [5, 900, 1]];
@@ -543,6 +773,110 @@ export function act6(ctx, lt) {
     if (up && dt < 1.2) pop(ctx, '叮！', 540, 720, clamp((dt - 0.6) / 0.1), { size: 70, fill: K.yellow, stroke: INK });
   });
   return { vig: 0.35 + ease((dt - 1) / 3) * 0.15 };
+}
+
+// 两周年的节目：魔术、脱口秀、演讲、抽奖
+function showAct(ctx, kind, k, t) {
+  cam(ctx, 1.0 + k * 0.05, 540, 1000, () => {
+    ctx.drawImage(BG.party, 0, 0);
+    ctx.fillStyle = 'rgba(20,16,30,0.4)';
+    ctx.fillRect(0, 0, W, H);
+    const g = ctx.createLinearGradient(0, 0, 0, 1700);
+    g.addColorStop(0, 'rgba(255,240,200,0.5)');
+    g.addColorStop(1, 'rgba(255,240,200,0.18)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(470, 0);
+    ctx.lineTo(610, 0);
+    ctx.lineTo(820, 1700);
+    ctx.lineTo(260, 1700);
+    ctx.fill();
+    const label = { magic: '魔术', standup: '脱口秀', speech: '演讲', lottery: '抽奖' }[kind];
+    if (kind === 'magic') {
+      drawStick(ctx, pal(1, { x: 540, y: 1640, s: 1.25, t, eyes: 'dot', mouth: 'grin', cap: '#1E1A22', armL: { a: 130, b: 20 }, armR: { a: -60, b: -40 } }));
+      // 魔术棒 + 飞出来的扑克牌
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(760, 820);
+      ctx.lineTo(860, 700);
+      ctx.stroke();
+      for (let i = 0; i < 6; i++) {
+        const a = -1.2 + i * 0.35;
+        const r = 120 + k * 600;
+        ctx.save();
+        ctx.translate(860 + Math.cos(a) * r * 0.6, 700 + Math.sin(a) * r * 0.5);
+        ctx.rotate(a + k * 4);
+        outline(ctx, rect(-30, -42, 60, 84, 8), '#FFFFFF', 4);
+        ctx.fillStyle = i % 2 ? K.red : INK;
+        ctx.font = `900 34px ${SANS}`;
+        ctx.textAlign = 'center';
+        ctx.fillText(i % 2 ? '♥' : '♠', 0, 12);
+        ctx.restore();
+      }
+      pop(ctx, '哇——', 250, 800, clamp(k / 0.15), { size: 72, rot: -0.1 });
+    } else if (kind === 'standup') {
+      // 立麦 + 台下笑翻
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.moveTo(620, 1640);
+      ctx.lineTo(620, 1080);
+      ctx.stroke();
+      outline(ctx, rect(598, 1030, 44, 70, 18), '#3A3F4D', 5);
+      drawStick(ctx, pal(3, { x: 520, y: 1640, s: 1.25, face: 1, t, eyes: 'dot', mouth: 'grin', armL: { a: 70, b: 70 }, armR: { a: -50, b: -90 } }));
+      pop(ctx, '哈哈哈哈', 300, 760, clamp(k / 0.12), { size: 80, rot: -0.12, fill: K.yellow, stroke: INK });
+      pop(ctx, '哈哈', 840, 900, clamp((k - 0.2) / 0.12), { size: 64, rot: 0.15, fill: K.yellow, stroke: INK });
+    } else if (kind === 'speech') {
+      outline(ctx, new Path2D('M 400,1640 L 680,1640 L 650,1300 L 430,1300 Z'), '#B98B57', 6);
+      drawStick(ctx, tim('now', { x: 540, y: 1600, s: 1.25, t, eyes: 'dot', mouth: 'grin', armL: { a: 130, b: 30 }, armR: { a: -40, b: -60 } }));
+      outline(ctx, new Path2D('M 400,1640 L 680,1640 L 650,1300 L 430,1300 Z'), '#B98B57', 6);
+      ctx.fillStyle = K.cream;
+      ctx.font = `900 54px ${SANS}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('EOE', 540, 1420);
+    } else {
+      // 抽奖箱 + 中奖的人跳起来
+      outline(ctx, rect(330, 1250, 300, 260, 18), K.red, 7);
+      outline(ctx, new Path2D('M 420,1260 m -40,0 a 40,14 0 1,0 80,0 a 40,14 0 1,0 -80,0'), INK, 4);
+      ctx.fillStyle = K.cream;
+      ctx.font = `900 64px ${SANS}`;
+      ctx.textAlign = 'center';
+      ctx.fillText('抽奖', 480, 1410);
+      const win = k > 0.45;
+      drawStick(ctx, pal(4, { x: 760, y: 1640, s: 1.15, face: -1, t, jump: win ? Math.abs(Math.sin(k * 9)) * 0.5 : 0, eyes: win ? 'happy' : 'dot', mouth: win ? 'scream' : 'o', armL: win ? { a: 160, b: 0 } : { a: 40, b: 60 }, armR: win ? { a: -160, b: 0 } : { a: -40, b: -60 } }));
+      if (win) {
+        pop(ctx, '中了！', 760, 760, clamp((k - 0.45) / 0.12), { size: 96, rot: 0.08, fill: K.yellow, stroke: K.red, font: SANS });
+        for (let i = 0; i < 26; i++) {
+          const x = (i * 97) % W;
+          const y = ((k - 0.45) * 700 + i * 131) % 1500;
+          ctx.fillStyle = [K.yellow, K.red, K.peri, K.orange, K.cream][i % 5];
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(i + k * 6);
+          ctx.fillRect(-10, -5, 20, 10);
+          ctx.restore();
+        }
+      }
+    }
+    // 节目名
+    outline(ctx, rect(330, 470, 420, 120, 60), K.navy, 6);
+    ctx.fillStyle = K.yellow;
+    ctx.font = `900 64px ${SANS}`;
+    ctx.textAlign = 'center';
+    ctx.fillText(label, 540, 552);
+    for (let i = 0; i < 6; i++) {
+      const x = 90 + i * 180;
+      const y = 1830 + (i % 2) * 30 + Math.sin(t * 8 + i) * 4;
+      ctx.fillStyle = K.cream;
+      ctx.strokeStyle = INK;
+      ctx.lineWidth = 9;
+      ctx.beginPath();
+      ctx.arc(x, y, 64, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    }
+  });
 }
 
 // ======================= 第七幕：那扇门，终于不再陌生 =======================
