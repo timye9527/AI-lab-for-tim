@@ -6,7 +6,8 @@ const seen = new Set(), rows = [];
 for (const l of tl.lines) {
   if (seen.has(l.sec)) continue; seen.add(l.sec);
   const s = l.sec === 0 ? 0 : Math.floor(l.start - 0.5);
-  const name = l.title.replace(/^\[[^\]]*\]\s*/, '');
+  // 给观众看的章节名：去掉「冷开场」这类内部叫法
+  const name = l.title.replace(/^\[[^\]]*\]\s*/, '').replace(/^(冷开场|收尾)：/, '').trim();
   rows.push(`${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')} ${name}`);
 }
 const block = '<!-- CHAPTERS -->\n```\n' + rows.join('\n') + '\n```\n<!-- /CHAPTERS -->';
