@@ -2,6 +2,7 @@
 # tier: 1 = 一手 / 2 = 完整访谈或转录 / 3 = 分析 / 4 = 二手报道（只当线索）
 # rsshub 路由需要自建 RSSHub 实例（X 路由需要配置 cookie 或 token），见 https://docs.rsshub.app
 updated: 2026-10-17
+# 2026-10-17 晚：补充本周存储暴跌相关人物源
 # 2026-10-17：新增存储 / AI 产业链（memory_*），blocked 表示当前云环境网络策略拦截
 
 nvidia_jensen:
@@ -163,7 +164,11 @@ memory_voices:   # 观点人物，权重规则见 video/memory-wallst/01-信源�
     - 三星存储业务高管（电话会）
     - SK 海力士 CEO 郭鲁正（电话会、发布会）
     - 黄仁勋（GTC、Computex、财报会）
+    - Counterpoint 黄敏成（MS Hwang，常接受彭博 / Benzinga 采访）
   bear:
+    - 博通 CEO 陈福阳（Hock Tan：「资本才是最大瓶颈」，客户侧视角，权重高）
+    - 长鑫存储管理层（曹堪宇等，上海行业会议；第一财经报道）
+    - 韩国《每日经济》等本土媒体的产业专栏（会直接引发韩股波动）
     - Michael Burry（Substack，看持仓变化而不是标题）
     - 13F 里减持 / 清仓的基金（德鲁肯米勒、泰珀等）
   neutral:
