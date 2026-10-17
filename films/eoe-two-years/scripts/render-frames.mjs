@@ -7,13 +7,16 @@ import { launch } from './browser.mjs';
 import { FPS as BASE_FPS, DURATION } from '../src/timeline.js';
 
 const FPS = Number(process.env.FPS || BASE_FPS);
+// PAGE：要渲染的页面；DUR：总时长；FRAMES_DIR：输出目录（第三版动作测试等用）
+const PAGE = process.env.PAGE || 'src/render.html';
+const DUR = Number(process.env.DUR || DURATION);
 const nosub = process.env.SUBS === '0';
 const from = Number(process.env.FROM || 0);
-const to = Number(process.env.TO || DURATION);
-const total = Math.round(DURATION * FPS);
+const to = Number(process.env.TO || DUR);
+const total = Math.round(DUR * FPS);
 const frames = [];
 for (let i = 0; i < total; i++) if (i / FPS >= from && i / FPS < to) frames.push(i);
-const out = new URL(nosub ? '../.frames-nosub/' : '../.frames/', import.meta.url);
+const out = new URL(process.env.FRAMES_DIR ? `../${process.env.FRAMES_DIR}/` : nosub ? '../.frames-nosub/' : '../.frames/', import.meta.url);
 if (!process.env.FROM && !process.env.TO) await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 
@@ -27,7 +30,7 @@ async function worker() {
   const ctx = await browser.newContext({ viewport: { width: 1080, height: 1920 } });
   const page = await ctx.newPage();
   page.on('pageerror', (e) => console.log('[error]', e.message));
-  await page.goto(`http://localhost:5175/src/render.html${nosub ? '?subs=0' : ''}`);
+  await page.goto(`http://localhost:5175/${PAGE}${nosub ? (PAGE.includes('?') ? '&' : '?') + 'subs=0' : ''}`);
   await page.waitForFunction('window.ready === true', null, { timeout: 60000 });
   while (next < frames.length) {
     const i = frames[next++];

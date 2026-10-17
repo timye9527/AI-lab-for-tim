@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><canvas id="c" width="1800" height="760"></canvas>
+<script type="module">
+import { drawStick, tim, pal } from './stick.js';
+const ctx = document.getElementById('c').getContext('2d');
+ctx.fillStyle = '#FAF3D7'; ctx.fillRect(0, 0, 1800, 760);
+const list = [
+  tim('before', { face: -1, armR: { to: [-170, -330], bend: -1 } }),
+  tim('first', { prop: { type: 'paper', hand: 'L', shake: 1 }, armL: { a: 150, b: -60 }, legL: { a: 14, b: -10 }, legR: { a: -14, b: 10 } }),
+  tim('president', { crown: 1 }),
+  tim('now', { glasses: 'sun', face: 1, prop: { type: 'mic', hand: 'R', angle: 10 }, armR: { a: -140, b: -40 }, armL: { a: 150, b: 20 }, mouth: 'sing', legL: { a: 30, b: -40 }, legR: { a: -10, b: 0 }, lean: -6 }),
+  pal(0, { mouth: 'grin' }), pal(1, { face: 1 }), pal(2, { eyes: 'happy', armL: { a: 160, b: 10 } }), pal(3), pal(4, { mouth: 'grin', face: -1 }), pal(5, { eyes: 'happy' }),
+];
+list.forEach((p, i) => { p.x = 110 + i * 175; p.y = 700; p.s = i < 4 ? 0.95 : 0.85; p.t = 0.31; drawStick(ctx, p); });
+window.ready = true;
+</script>

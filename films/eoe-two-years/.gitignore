@@ -3,3 +3,5 @@ node_modules/
 .frames-nosub/
 review/
 dist/audio.wav
+.frames-v3/
+dist/v3/motion.wav

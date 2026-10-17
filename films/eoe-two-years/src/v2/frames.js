@@ -10,7 +10,7 @@ const W = 1080;
 const H = 1920;
 const SANS = '"Noto Sans SC", sans-serif';
 
-function outline(ctx, path, fill, lw = 5) {
+export function outline(ctx, path, fill, lw = 5) {
   if (fill) {
     ctx.fillStyle = fill;
     ctx.fill(path);
@@ -20,7 +20,7 @@ function outline(ctx, path, fill, lw = 5) {
   ctx.lineJoin = 'round';
   ctx.stroke(path);
 }
-function rect(x, y, w, h, r = 0) {
+export function rect(x, y, w, h, r = 0) {
   const p = new Path2D();
   p.roundRect(x, y, w, h, r);
   return p;
@@ -41,7 +41,7 @@ export function sparkle(ctx, x, y, r, color, lw = 0) {
     ctx.stroke(p);
   }
 }
-function glow(ctx, x, y, r, rgb, a) {
+export function glow(ctx, x, y, r, rgb, a) {
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, `rgba(${rgb},${a})`);
   g.addColorStop(1, `rgba(${rgb},0)`);
@@ -73,7 +73,7 @@ export function eoeLogo(ctx, x, y, s) {
   e(58, K.logoRed);
   ctx.restore();
 }
-function subtitle(ctx, text, y = 1580) {
+export function subtitle(ctx, text, y = 1580) {
   ctx.save();
   ctx.font = `700 54px ${SANS}`;
   ctx.textAlign = 'center';
@@ -86,7 +86,7 @@ function subtitle(ctx, text, y = 1580) {
   ctx.fillText(text, W / 2, y);
   ctx.restore();
 }
-function crow(ctx, x, y, s, flip = 1) {
+export function crow(ctx, x, y, s, flip = 1) {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(s * flip, s);
@@ -109,7 +109,7 @@ function crow(ctx, x, y, s, flip = 1) {
   ctx.stroke();
   ctx.restore();
 }
-function grain(ctx, amt = 0.05) {
+export function grain(ctx, amt = 0.05) {
   const c = document.createElement('canvas');
   c.width = 270;
   c.height = 480;
@@ -131,7 +131,7 @@ function grain(ctx, amt = 0.05) {
 }
 
 // ---------------- 关键帧 1：密码门前（夜，藏青） ----------------
-export function frameDoor(ctx) {
+export function frameDoor(ctx, cast) {
   const sky = ctx.createLinearGradient(0, 0, 0, 560);
   sky.addColorStop(0, K.navyDeep);
   sky.addColorStop(1, K.navy);
@@ -231,6 +231,8 @@ export function frameDoor(ctx) {
   outline(ctx, rect(820, 320, 110, 30, 12), '#0E1A33', 5);
   glow(ctx, 875, 360, 200, '250,243,215', 0.35);
   crow(ctx, 870, 322, 1.1, -1);
+  if (cast) cast(ctx);
+  else {
   // Tim：转头看密码锁，伸出手指
   const p = pose({
     x: 760, y: 1590, s: 0.72, head: 'q', headFlip: -1, hunch: 1,
@@ -243,12 +245,13 @@ export function frameDoor(ctx) {
   ctx.ellipse(760, 1590, 150, 22, 0, 0, Math.PI * 2);
   ctx.fill();
   drawTimFront(ctx, p);
+  }
   // 蓝光照到 Tim 身上的一侧
   ctx.save();
   ctx.globalCompositeOperation = 'soft-light';
   glow(ctx, 470, 940, 520, '30,155,233', 0.55);
   ctx.restore();
-  subtitle(ctx, '两年前，Tim 第一次来到 EOE。');
+  if (!cast) subtitle(ctx, '两年前，Tim 第一次来到 EOE。');
   grain(ctx);
 }
 
@@ -341,7 +344,7 @@ export function frameAlarm(ctx) {
 }
 
 // ---------------- 关键帧 3：门开了，大家都在（暖，奶油 + 砖红） ----------------
-export function frameWarm(ctx) {
+export function frameWarm(ctx, cast) {
   ctx.fillStyle = K.cream;
   ctx.fillRect(0, 0, W, H);
   // 顶部砖红块：片尾字幕
@@ -374,6 +377,8 @@ export function frameWarm(ctx) {
   // 暖光
   glow(ctx, 540, 1000, 700, '232,118,58', 0.3);
   for (const [x, y, r] of [[110, 760, 40], [980, 820, 54], [960, 1500, 34], [90, 1420, 28]]) sparkle(ctx, x, y, r, K.ink);
+  if (cast) cast(ctx);
+  else {
   // 伙伴们：围着 Tim
   const fr = [
     friendPose(0, { x: 170, y: 1660, s: 0.58, lean: -0.06, tilt: -0.1, e: expr({ mouth: 'grin', eyes: 'happy' }), armL: { a: 2.5, b: 0.4, hand: 'open' }, armR: { a: 0.2, b: 0.2, hand: 'relax' } }),
@@ -392,6 +397,7 @@ export function frameWarm(ctx) {
   ctx.ellipse(545, 1765, 190, 26, 0, 0, Math.PI * 2);
   ctx.fill();
   drawTimFront(ctx, p);
+  }
   subtitle(ctx, '这里，已经有了他舍不得的人。', 1840);
   grain(ctx, 0.04);
 }

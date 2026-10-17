@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><link rel="stylesheet" href="../fonts.css">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script type="module">
+  // 第三版关键帧：?f=door|stage|showroom|warm|growth
+  import { FRAMES3 as FRAMES } from './frames3.js';
+  const f = new URLSearchParams(location.search).get('f') || 'door';
+  const c = document.getElementById('c');
+  [c.width, c.height] = f === 'growth' ? [1920, 1080] : [1080, 1920];
+  await Promise.all([document.fonts.load('900 76px "Noto Sans SC"', 'EOE中文演讲俱乐部非法闯入？！'), document.fonts.load('700 54px "Noto Sans SC"', '两年前第一次来到这里已经有了他舍不得的人上台稿子抖得比声音还响但开始学着承担也放松的变化同一个火柴人靠姿态动作和打扮看出驼背背包一直冒汗腿软当会长头发打理站直领带墨镜话筒越享受舞台现在自由开放趣味奇葩第三年继续一起玩角色设定伙伴们同一套画法换发型和衣服开头紧张后来松弛'), document.fonts.load('500 26px "Noto Sans SC"', 'eloquence of the elites按本人照片设计俱乐部插画风粗描边平涂一层暗部')]);
+  FRAMES[f](c.getContext('2d'));
+  window.ready = true;
+</script></body></html>

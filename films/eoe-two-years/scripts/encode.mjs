@@ -10,8 +10,8 @@ const root = fileURLToPath(new URL('../', import.meta.url));
 const outName = process.env.OUT || (nosub ? 'dist/opening-sample-nosub.mp4' : 'dist/opening-sample.mp4');
 const args = [
   '-y', '-loglevel', 'error',
-  '-framerate', String(FPS), '-i', nosub ? '.frames-nosub/f%05d.png' : '.frames/f%05d.png',
-  '-i', 'dist/audio.wav',
+  '-framerate', String(FPS), '-i', process.env.FRAMES_DIR ? `${process.env.FRAMES_DIR}/f%05d.png` : nosub ? '.frames-nosub/f%05d.png' : '.frames/f%05d.png',
+  '-i', process.env.AUDIO || 'dist/audio.wav',
   '-c:v', 'libx264', '-preset', 'slow', '-crf', process.env.CRF || '18', '-tune', 'animation', '-pix_fmt', 'yuv420p',
   '-profile:v', 'high', '-level', '4.2',
   '-color_primaries', 'bt709', '-color_trc', 'bt709', '-colorspace', 'bt709',
@@ -23,5 +23,5 @@ const args = [
 const r = spawnSync('ffmpeg', args, { cwd: root, stdio: 'inherit' });
 if (r.status !== 0) process.exit(r.status);
 // 封面候选：警报那一帧最抓眼
-if (!nosub) spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', process.env.POSTER_AT || '6.3', '-i', outName, '-frames:v', '1', '-q:v', '2', 'dist/poster.jpg'], { cwd: root, stdio: 'inherit' });
+if (!nosub && !process.env.FRAMES_DIR) spawnSync('ffmpeg', ['-y', '-loglevel', 'error', '-ss', process.env.POSTER_AT || '6.3', '-i', outName, '-frames:v', '1', '-q:v', '2', 'dist/poster.jpg'], { cwd: root, stdio: 'inherit' });
 console.log('输出', outName);
