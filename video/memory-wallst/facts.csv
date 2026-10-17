@@ -1,0 +1,36 @@
+id,fact,number,as_of,tier,verify,source,url,stale_after,refresh_on
+F01,"美光 FQ4'26（6–8 月）营收，同比大增；调整后毛利率 87%","营收 542.3 亿美元，同比 +379%，调整后 EPS 33.42 美元，毛利率 87.0%",2026-09-30,T1,待核一手,"美光 8-K 新闻稿（SEC），转引 aiweekly / Google Finance",https://www.sec.gov/Archives/edgar/data/0000723125/000072312526000018/a2026q4ex991-pressrelease.htm,2026-12-20,2026-12-17
+F02,"美光 FQ1'27 营收指引","615 亿美元",2026-09-30,T1,待核一手,"美光 8-K 新闻稿",https://aiweekly.co/alerts/micron-q4-revenue-jumps-379-to-542b-on-ai-memory-demand-guides-fiscal-2027-q1,2026-12-20,2026-12-17
+F03,"美光云存储事业部（以 HBM 为主）营收","162.8 亿美元，同比 3.6 倍",2026-09-30,T3,待核一手,"The Next Platform 解读",https://www.nextplatform.com/a/5300701,2026-12-20,2026-12-17
+F04,"美光 CEO：2027、2028 年需求都超过供给；看不到供需何时平衡；2027 产出已锁定 75% 以上；爱达荷 ID2 新厂 2028 年底才出晶圆","75%+；2028 年底",2026-09-30,T2,待核一手,"FQ4 电话会，Computerworld / The Register 报道（需对照电话会文字稿）",https://www.computerworld.com/?p=4229635,2026-12-20,2026-12-17
+F05,"三星 3Q26 初步业绩：营业利润创纪录，公布后股价下跌","营业利润约 107.4 万亿韩元（约 800 亿美元），同比约 +783%；营收约 195 万亿韩元；股价 -2.42%",2026-10-08,T1,待核一手,"三星初步业绩公告，多家媒体转引",https://cryptobriefing.com/samsung-80-billion-q3-profit-ai-memory/,2026-10-29,2026-10-29
+F06,"三星 2Q26 创纪录利润，公布当天股价大跌","营业利润约 89.4 万亿韩元；股价收跌 6.9%，KOSPI 跌 4.9%，SK 海力士跌 6%",2026-07-07,T4,待核一手,"investinglive / Herald 报道",https://images.investinglive.com/stocks/more-samsungs-record-profit-fails-to-stop-shares-plunging-dragging-kospi-down-6-20260707/,2027-01-31,
+F07,"SK 海力士 2Q26：营业利润率 76%，但低于预期，次日股价大跌","营收 79.32 万亿韩元，营业利润 60.54 万亿韩元，低于一致预期 4.7%；次日 -9.61%",2026-07-29,T4,待核一手,"韩国中央日报等",https://www.koreajoongangdaily.com/business/sk-hynix-posts-record-q2-profit-on-ai-demand-but-shares-slide-on-growth-doubts/12796737,2026-10-29,2026-10-29
+F08,"通用 DRAM 1Q26 合约价单季涨幅（实际）","+93%~98%",2026-06-01,T1,待核一手,"TrendForce 新闻稿（上一版视频已用，仍未上官网核对）",https://www.trendforce.com/presscenter/news/20260601-13070.html,2027-06-30,
+F09,"通用 DRAM 2Q26 合约价预计涨幅","+58%~63%",2026-06,T1,冲突,"TrendForce（搜索摘要，口径待确认：预测值还是实际值）",https://www.trendforce.com/research/download/RP260603TD3,2026-12-31,
+F10,"4Q26 合约价预测：通用 DRAM 放缓到 +10%~15%；PC DRAM +13%~18%；手机 DRAM 0~5%；NAND +15%~20%","见左",2026-09-30,T1,待核一手,"TrendForce 2026-09-30 新闻稿，高盛 9/30 存储价格追踪转引",https://www.trendforce.com/presscenter/news/20260930-13258.html,2026-12-31,2026-12-31
+F11,"同样位元，HBM3E 吃的晶圆约为 DDR5 的 3 倍，HBM4 更高，HBM4E 超过 4:1","3:1",2025-03,T2,待核一手,"美光 CEO 2025-03 财报电话会（Blocks and Files）",https://www.blocksandfiles.com/ai-ml/2025/03/21/micron-warns-of-inventory-drag-outside-datacenters/1607342,2026-12-20,2026-12-17
+F12,"黄仁勋：3 月说「你们扩多少，英伟达都用掉」；6 月说短缺「可能还会持续好几年」，在海力士展台的 HBM4E 晶圆上写「Please Make More」","—",2026-06,T4,待核一手,"摩根士丹利会议（3 月）、首尔 / Computex（6 月）二手报道",https://www.idnfinancials.com/news/64513/bos-nvidia-ramal-krisis-chip-memori-akan-berlangsung-lama,2027-03-31,2026-11-18
+F13,"三星存储高管：2028 年前不太可能有显著新增供给，2027 年比 2026 更紧；会控制资本开支防止过剩；建厂到出晶圆超过 3 年","3 年以上",2026-07-30,T2,待核一手,"三星 2Q26 电话会，The Register / PC Gamer 报道",https://assets.theregister.com/2026/07/30/202614/,2026-10-29,2026-10-29
+F14,"阿申布伦纳的 Situational Awareness：7 月加约 4 倍杠杆，单月亏约 67%，7/30 把公开市场持仓整体卖给城堡；持仓含美光、海力士、闪迪","上半年 +439%，7 月 -67%（口径不一）",2026-07-30,T4,冲突,"TNW / TechCrunch / the-decoder 等，规模数字各家不一，需对照 FT/WSJ",https://thenextweb.com/news/situational-awareness-aschenbrenner-citadel-ai-losses,2027-03-31,
+F15,"美光 2026 年 7 月单月跌 28.7%，2015 年以来最差月份；此前上半年涨超 300%","-28.7%",2026-08,T4,待核一手,"转引美银报告的二手报道",https://www.webull.com/news/15345127321134080,2027-03-31,
+F16,"美银分析师 Vivek Arya：价格终会回落，但美光悲观情景 EPS 仍约 100 美元，2018 年周期高点约 12 美元","约 8 倍",2026-08,T3,待核一手,"美银报告，二手转引",https://www.webull.com/news/15345127321134080,2026-12-31,2026-12-17
+F17,"伯里：7 月公开做空美光并称泡沫；10 月改为买入美光看跌期权，行权价约 500 美元，2027 年 6 月到期；质疑 AI 需求里有循环融资","行权价约 500 美元",2026-10,T4,待核一手,"伯里 Substack，Motley Fool 等转引",https://fool.com/investing/2026/10/04/michael-burry-thinks-the-ai-bubble-will-burst-soon,2026-11-30,
+F18,"美光股价与市值（口播只说「一千美元出头」，上屏前当天再查）","约 1062.54 美元，市值约 1.2 万亿美元",2026-10-05,T3,待核一手,"Google Finance",https://www.google.com/finance/labs/quote/MU:NASDAQ,2026-10-12,
+F19,"13F（2Q26）：德鲁肯米勒清仓美光；泰珀减持美光约 41% 但仍是第二大持仓，清仓闪迪；Coatue、Altimeter 加仓美光","见左",2026-06-30,T1,待核一手,"13F 申报，二手整理（cryptobriefing / tipranks / insidermonkey）",https://cryptobriefing.com/david-tepper-sells-micron-shares/,2026-11-14,2026-11-14
+F20,"长鑫：全球 DRAM 份额约 8%（第四）；7 月上市募资约 579 亿元；路透称其 64GB DDR5 服务器内存条报价高于三星","约 8%；约 579 亿元",2026-07,T4,冲突,"Counterpoint、TrendForce、路透（均为转引，份额 7.7%~8% 不等，募资额有 295 亿与 579 亿两种说法）",https://www.guru3d.com/story/chinese-memory-makers-gain-pricing-power-as-cxmt-and-ymtc-expand/,2026-12-31,
+F21,"云巨头资本开支：机构预计 2027 年合计逼近或超过 1 万亿美元；谷歌 CFO 称 2027 年将「显著增加」；微软、Meta 把上调部分归因于零部件 / 内存涨价","约 1 万亿美元",2026-08,T4,冲突,"穆迪、美银预测与各家财报二手整理，2026 年各家数字口径冲突",https://datacenterdynamics.com/en/news/moodys-hyperscaler-capex-forecasts-marked-up-by-85bn-to-close-in-on-1trn-by-2027/,2026-10-31,2026-10-28
+F22,"消费端：IDC 预计 2026 年手机出货至少 -2%、PC 至少 -4.9%；三星手机部门被内存成本拖累（据报道）","-2%；-4.9%",2026,T4,待核一手,"IDC / Counterpoint 转引；三星手机部门亏损为单一来源传闻，不上数字",https://in.marketscreener.com/news/surging-memory-chip-prices-dim-outlook-for-consumer-electronics-makers-ce7e58d2dd8bf221,2026-12-31,2026-10-29
+F23,"Gartner：2026 年 PC 均价 +17%，手机 +13%","+17%；+13%",2026-02-26,T1,过期,"Gartner 新闻稿（发布早于下半年涨价，已不代表现状，本版不用）",https://www.gartner.com/en/newsroom/press-releases/2026-02-26-gartner-says-surging-memory-costs-will-reduce-global-pc-and-smartphone-shipments-in-2026,2026-08-31,
+F24,"美银：全球 DRAM 产业规模 2026 年 5730 亿、2027 年 8470 亿、2028 年约 9170 亿美元","见左",2026-08,T3,待核一手,"美银报告，搜索摘要转引，原链接待补",,2026-12-31,
+F25,"摩根士丹利 2024 年 9 月报告《寒冬将至》，把 SK 海力士评级直接下调两档，海力士当天大跌","—",2024-09-19,T4,待核一手,"KED Global 等",https://www.kedglobal.com/us/korean-chipmakers/newsView/ked202409190005,2099-12-31,
+F26,"上一轮下行：美光 FY2023 净亏约 58 亿美元；三星半导体部门 2023 年全年营业亏损约 15 万亿韩元","约 58 亿美元；约 15 万亿韩元",2023-12-31,T1,待核一手,"美光 FY23 10-K、三星 2023 年报（数字来自已有知识，需上原文核对）",,2099-12-31,
+F27,"OpenAI「星际之门」与三星、SK 海力士签意向书，需求最高每月 90 万片 DRAM 晶圆，报道称约为全球 DRAM 产能的四成","90 万片 / 月；约 40%",2025-10-01,T1,待核一手,"三星 / SK 海力士 / OpenAI 2025-10-01 公告（来自已有知识）",,2099-12-31,
+F28,"三大厂 2026 年初收紧订单审核，要求客户披露终端客户和用量，防止囤货","—",2026-01,T3,待核一手,"TrendForce News",https://www.trendforce.com/news/?p=52614,2026-12-31,
+F29,"三星平泽 P5 新厂预计 2028 年前后量产","2028",2026,T4,待核一手,"Sourceability、博客整理，需对照三星电话会",https://info.sourceability.com/hubfs/Q%26A_Downloadable.pdf?hsLang=en,2026-10-29,2026-10-29
+F30,"茅台毛利率约 91%~92%（对比用）","约 91%",2025-12-31,T1,待核一手,"贵州茅台 2025 年报（来自已有知识，需核对）",,2027-04-30,2027-04-30
+F31,"SK 海力士拿下英伟达 Rubin 平台 HBM4 约 60%~70% 的量","60%~70%",2026-08,T4,不上屏,"多个二手估计，互相冲突",https://semi-connect.net/hbm4-2026-market-war-skhynix-samsung-micron/,2026-12-31,
+F32,"摩根士丹利（日期不明）：DRAM 价格可能在 4Q26 见顶，2027 年同比再加速","—",,T4,不上屏,"日期和原文都找不到，只当线索",https://longportapp.cn/news/281169925,2026-10-31,
+F33,"上一轮周期：DRAM 价格 2018 年见顶后，2019 年合约价大幅下跌（约五成）","约 -50%",2019-12-31,T3,待核一手,"TrendForce / DRAMeXchange 历史数据（来自已有知识，需核对）",,2099-12-31,
+F34,"美光等厂商与大客户签预付款 / 照付不议式长约","—",2026-09-30,T4,待核一手,"The Stack 报道 FQ4 电话会",https://www.thestack.technology/micron-warns-on-supply-boasts-monster-profits-take-or-pay-memory-deals/,2026-12-20,2026-12-17
+F35,"韩国每月 1 日公布上月出口数据（含半导体），月中另有前 10 天、前 20 天数据，是存储景气的高频信号","—",2026-10-17,T1,已核,"韩国产业通商资源部 / 关税厅（方法类事实）",,2099-12-31,

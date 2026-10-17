@@ -1,0 +1,72 @@
+# 存储 / AI 产业链信息源（待并入 research/sources.yaml）
+# tier 沿用中台：1 = 一手 / 2 = 完整访谈或转录 / 3 = 分析 / 4 = 二手报道（只当线索）
+# blocked: 当前云环境网络策略拦截，需在环境设置里放行
+updated: 2026-10-17
+
+memory_primary:
+  - name: Micron Investor Relations（财报、电话会）
+    tier: 1
+    url: https://investors.micron.com/
+    blocked: true
+    cadence: 季度（3、6、9、12 月下旬）
+  - name: SEC EDGAR Micron（8-K / 10-K / 10-Q）
+    tier: 1
+    url: https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000723125
+    blocked: true
+  - name: Samsung Electronics IR（初步业绩 + 正式财报）
+    tier: 1
+    url: https://www.samsung.com/global/ir/
+    cadence: 季度初步业绩（季后第 1 周）、正式财报（季后第 4 周）
+  - name: SK hynix IR
+    tier: 1
+    url: https://www.skhynix.com/ir/
+    cadence: 季度（季后第 4 周）
+  - name: Kioxia / Sandisk IR（NAND）
+    tier: 1
+  - name: 长鑫存储招股书与定期报告（上交所）
+    tier: 1
+    url: https://www.sse.com.cn/
+  - name: 韩国月度出口数据（半导体）
+    tier: 1
+    note: 每月 1 日公布上月数据，另有 10 日、20 日的旬度数据；比财报早 1–2 个月
+  - name: SEC 13F（大基金持仓）
+    tier: 1
+    cadence: 季后 45 天（2、5、8、11 月中旬）
+
+memory_price:
+  - name: TrendForce 新闻稿（合约价预测）
+    tier: 1
+    url: https://www.trendforce.com/presscenter/news
+    cadence: 每季度末发布下季度预测
+  - name: DRAMeXchange（现货 / 合约价）
+    tier: 1
+    url: https://www.dramexchange.com/
+    paywall: partial
+
+memory_analysis:
+  - name: The Next Platform
+    tier: 3
+    url: https://www.nextplatform.com/
+  - name: Blocks and Files
+    tier: 3
+    url: https://www.blocksandfiles.com/
+    blocked: true
+  - name: SemiAnalysis
+    tier: 3
+    paywall: partial
+  - name: 卖方（美银 Vivek Arya、高盛存储价格追踪、摩根士丹利存储组）
+    tier: 3
+    note: 只能拿到二手转述，引用时说「某机构认为」
+
+memory_voices:   # 观点人物，权重规则见 video/memory-wallst/01-信源与观点权重.md
+  bull:
+    - 美光 CEO Sanjay Mehrotra（电话会）
+    - 三星存储业务高管（电话会）
+    - SK 海力士 CEO 郭鲁正（电话会、发布会）
+    - 黄仁勋（GTC、Computex、财报会）
+  bear:
+    - Michael Burry（Substack，看持仓变化而不是标题）
+    - 13F 里减持 / 清仓的基金（德鲁肯米勒、泰珀等）
+  neutral:
+    - TrendForce 存储分析师
+    - Counterpoint、IDC（终端需求）
