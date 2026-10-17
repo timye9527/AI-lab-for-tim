@@ -10,3 +10,6 @@ assets/vo-tim/
 dist/v4/
 .frames-v4/
 .frames-v4n/
+dist/full/
+.frames-full/
+.frames-fulln/

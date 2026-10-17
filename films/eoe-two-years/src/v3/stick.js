@@ -423,6 +423,53 @@ function drawProp(ctx, prop, hand, p) {
     ctx.fill();
     ctx.fillStyle = '#8FD3FF';
     ctx.fillRect(-9, -40, 18, 34);
+  } else if (prop.type === 'box') {
+    // 纸箱：两只手托着
+    ctx.fillStyle = '#C9A06A';
+    ctx.beginPath();
+    ctx.rect(-70, -20, 140, 100);
+    ctx.fill();
+    ctx.stroke();
+    seg(ctx, [[-70, 10], [70, 10]], 4, '#8E6B3E');
+    ctx.fillStyle = '#E9E1CF';
+    ctx.fillRect(-40, -40, 20, 22);
+    ctx.fillStyle = '#7FB069';
+    ctx.beginPath();
+    ctx.arc(30, -32, 16, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (prop.type === 'clipboard') {
+    ctx.rotate(rad(-10));
+    ctx.fillStyle = '#B98B57';
+    ctx.beginPath();
+    ctx.roundRect(-10, -86, 70, 96, 6);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(-2, -74, 54, 78);
+    for (let i = 0; i < 4; i++) seg(ctx, [[6, -60 + i * 16], [44, -60 + i * 16]], 3, '#9A948C');
+    seg(ctx, [[14, -90], [36, -90]], 7);
+  } else if (prop.type === 'poster') {
+    ctx.fillStyle = '#FAF3D7';
+    ctx.beginPath();
+    ctx.rect(-20, -150, 130, 160);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#C15145';
+    ctx.fillRect(-8, -138, 106, 46);
+    ctx.fillStyle = '#1B355C';
+    ctx.font = '900 30px "Noto Sans SC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('2', 45, -40);
+  } else if (prop.type === 'speaker') {
+    ctx.fillStyle = '#2B2F3A';
+    ctx.beginPath();
+    ctx.roundRect(-40, -20, 80, 110, 10);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#6B7280';
+    ctx.beginPath();
+    ctx.arc(0, 50, 22, 0, Math.PI * 2);
+    ctx.fill();
   } else if (prop.type === 'camera') {
     ctx.fillStyle = '#3A3F4D';
     ctx.beginPath();

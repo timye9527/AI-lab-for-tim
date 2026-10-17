@@ -290,14 +290,14 @@ function faceTim(t, extra) {
 function shotFace(ctx, t) {
   const lt = t - 4.15;
   const p = heart(t);
-  const z = lerp(1.0, 1.22, easeIn(lt / 1.6)) * (1 + p * 0.012);
+  const z = lerp(1.0, 1.22, easeIn(lt / 2.15)) * (1 + p * 0.012);
   const darts = t < T.gulp ? (Math.floor(lt / 0.2) % 2 ? 1 : -1) : 0;
   const gulp = t > T.gulp && t < T.gulp + 0.35;
-  cam(ctx, z, 540, lerp(1000, 880, ease(lt / 1.6)), () => {
+  cam(ctx, z, 540, lerp(1000, 880, ease(lt / 2.15)), () => {
     ctx.drawImage(BG.face, 0, 0);
     drawStick(ctx, faceTim(t, {
       tremble: 0.5, look: [darts, gulp ? -0.5 : 0], eyes: t > T.gulp + 0.3 ? 'shock' : 'dot', brows: 'worry',
-      mouth: gulp ? 'o' : 'flat', sweat: 1, sweatY: clamp(lt / 1.6), bob: gulp ? Math.sin(((t - T.gulp) / 0.35) * Math.PI) * 6 : 0,
+      mouth: gulp ? 'o' : 'flat', sweat: 1, sweatY: clamp(lt / 2.15), bob: gulp ? Math.sin(((t - T.gulp) / 0.35) * Math.PI) * 6 : 0,
     }));
     if (gulp) {
       ctx.fillStyle = K.cream;
@@ -314,7 +314,7 @@ function shotAlarm(ctx, t0) {
   const lt = t - T.alarm;
   const impact = T.sign + 0.24;
   const shake = (t > impact ? 26 * Math.exp(-(t - impact) / 0.25) : 0) + 5;
-  const jump = t < T.scream ? 0 : t < T.scream + 0.2 ? easeOut((t - T.scream) / 0.2) : t < 7.25 ? 1 + Math.sin((t - T.scream) * 6) * 0.05 : t < 7.42 ? 1 - easeIn((t - 7.25) / 0.17) : 0;
+  const jump = t < T.scream ? 0 : t < T.scream + 0.2 ? easeOut((t - T.scream) / 0.2) : t < T.brake - 0.32 ? 1 + Math.sin((t - T.scream) * 6) * 0.05 : t < T.brake - 0.15 ? 1 - easeIn((t - (T.brake - 0.32)) / 0.17) : 0;
   const flail = Math.sin(t * 26);
   cam(ctx, lerp(1.1, 1.0, easeOut(lt / 0.5)), 540, 1000, () => {
     alarmBG(ctx, t);
@@ -343,14 +343,14 @@ function shotAlarm(ctx, t0) {
 }
 
 function shotReality(ctx, t) {
-  const lt = t - 7.65;
+  const lt = t - T.quiet;
   const crowed = t > T.crow1 + 0.05;
   cam(ctx, 1.15, 540, 900, () => {
     ctx.drawImage(BG.face, 0, 0);
     drawStick(ctx, faceTim(t, {
       tremble: 0.2, eyes: crowed ? 'dot' : 'shock', look: [kf(t, [[T.crow1, 0], [T.crow1 + 0.12, 1]]), 0],
       brows: 'worry', mouth: t > T.smile ? 'wobble' : 'flat', blush: kf(t, [[T.smile, 0], [T.smile + 0.3, 0.9]]),
-      sweat: 1, sweatY: kf(t, [[T.smile, 0.1], [8.6, 0.7]], (u) => u),
+      sweat: 1, sweatY: kf(t, [[T.smile, 0.1], [T.quiet + 0.95, 0.7]], (u) => u),
     }));
     if (t > T.crow1) {
       const k = clamp((t - T.crow1) / 0.12);
@@ -467,7 +467,7 @@ function shotWide2(ctx, t) {
 
 const FN = { keypad: shotKeypad, wide1: shotWide1, face: shotFace, alarm: shotAlarm, reality: shotReality, wide2: shotWide2 };
 
-export async function createSample(canvas, { subtitles = true } = {}) {
+export async function createSample(canvas, { subtitles = true, fadeOut = true } = {}) {
   const ctx = canvas.getContext('2d');
   await Promise.all([
     document.fonts.load(`900 112px "Noto Sans SC"`, '非法闯入？！请输入密码0123456789*#撤退第次尝试1'),
@@ -477,7 +477,7 @@ export async function createSample(canvas, { subtitles = true } = {}) {
   ]);
   let durs = {};
   try {
-    durs = await (await fetch(new URL('../../assets/vo-tim/durations.json', import.meta.url))).json();
+    durs = await (await fetch(new URL('../../assets/vo-tim/full/durations.json', import.meta.url))).json();
   } catch {
     durs = {};
   }
@@ -517,7 +517,7 @@ export async function createSample(canvas, { subtitles = true } = {}) {
           }
         });
       }
-      const fade = t < 0.2 ? 1 - t / 0.2 : t > DURATION - 0.35 ? (t - (DURATION - 0.35)) / 0.35 : 0;
+      const fade = t < 0.2 ? 1 - t / 0.2 : fadeOut && t > DURATION - 0.35 ? (t - (DURATION - 0.35)) / 0.35 : 0;
       if (fade > 0) {
         ctx.fillStyle = `rgba(0,0,0,${clamp(fade)})`;
         ctx.fillRect(0, 0, W, H);

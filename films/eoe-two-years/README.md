@@ -3,7 +3,26 @@
 副标题：误入一家奇葩俱乐部之后……
 9:16 竖屏 AI 动画微电影，1080×1920，30fps。
 
-当前进度：**第一阶段：开场样片（约 11 秒）**。完整方案、成本和分镜见 [`docs/制作方案.md`](docs/制作方案.md)。
+当前进度：**完整版已交付（75 秒，火柴人风格，Tim 本人声音合成旁白）**。前几轮的方案和取舍见 [`docs/制作方案.md`](docs/制作方案.md)、[`docs/第二轮-风格与时长.md`](docs/第二轮-风格与时长.md)。
+
+## 完整版怎么重新生成
+
+代码在 `src/v5/`（时间轴 `timeline5.js`、各幕画面 `acts.js`、合成 `film5.js`），第一幕复用 `src/v4/`，角色在 `src/v3/stick.js`。
+
+```bash
+# 1. 旁白（需要 Tim 的参考录音和 ZipVoice 模型，见 scripts/vo-clone.py 开头的说明；结果在 assets/vo-tim/full/，不入库）
+# 2. 配乐 + 音效 + 配音混音 → dist/full/audio.wav（STEM=music 只出配乐）
+node scripts/build-audio-full.mjs
+# 3. 画面（约 2.5 分钟）+ 合成
+PAGE=src/v5/film5.html DUR=75 FRAMES_DIR=.frames-full npm run frames
+FRAMES_DIR=.frames-full AUDIO=dist/full/audio.wav OUT=dist/full/film.mp4 npm run encode
+# 无字幕版：上面两步前面加 SUBS=0，并换一个 FRAMES_DIR
+# 封面：node scripts/snap.mjs src/v5/cover.html dist/full/cover.png 1080 1920
+```
+
+改台词：同时改 `src/v5/timeline5.js` 的 `TEXT` 和重新合成对应的配音；改节奏：改各幕的 `dur`、`vo` 和 `beats`。
+
+下面是第一阶段（开场样片）时的说明。
 
 ## 直接看
 

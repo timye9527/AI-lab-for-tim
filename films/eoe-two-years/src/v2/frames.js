@@ -398,7 +398,7 @@ export function frameWarm(ctx, cast) {
   ctx.fill();
   drawTimFront(ctx, p);
   }
-  subtitle(ctx, '这里，已经有了他舍不得的人。', 1840);
+  if (!cast) subtitle(ctx, '这里，已经有了他舍不得的人。', 1840);
   grain(ctx, 0.04);
 }
 

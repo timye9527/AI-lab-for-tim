@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><link rel="stylesheet" href="../fonts.css">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+  // 视频封面：夜里的密码门 + 犹豫的 Tim + 片名
+  import { frameDoor, K, sparkle, outline, rect } from '../v2/frames.js';
+  import { drawStick, tim } from '../v3/stick.js';
+  await document.fonts.load('900 120px "Noto Sans SC"', '一个社恐的两年奇遇记误入一家奇葩俱乐部之后…EOE中文演讲俱乐部');
+  const ctx = document.getElementById('c').getContext('2d');
+  frameDoor(ctx, (c) => {
+    const s = 1.25;
+    drawStick(c, tim('before', { x: 760, y: 1588, s, face: -1, t: 0.21, tremble: 0.6, armR: { to: [(512 - 760) / s, (935 - 1588) / s], bend: -1 }, armL: { a: 10, b: 30 } }));
+  });
+  // 顶部片名
+  outline(ctx, rect(-10, 120, 1100, 470, 0), K.red, 0.01);
+  ctx.fillStyle = K.cream;
+  ctx.textAlign = 'center';
+  ctx.font = '900 112px "Noto Sans SC", sans-serif';
+  ctx.fillText('一个社恐的', 540, 290);
+  ctx.fillText('两年奇遇记', 540, 420);
+  ctx.font = '700 46px "Noto Sans SC", sans-serif';
+  ctx.fillStyle = K.yellow;
+  ctx.fillText('误入一家奇葩俱乐部之后……', 540, 520);
+  sparkle(ctx, 120, 200, 40, K.cream);
+  sparkle(ctx, 960, 470, 30, K.cream);
+  // 底部俱乐部名
+  outline(ctx, rect(240, 1700, 600, 110, 55), K.navy, 6);
+  ctx.fillStyle = K.cream;
+  ctx.font = '700 48px "Noto Sans SC", sans-serif';
+  ctx.fillText('EOE 中文演讲俱乐部', 540, 1772);
+  window.ready = true;
+</script></body></html>
