@@ -1,6 +1,15 @@
 // 配乐、音效、配音混音：时间点全部来自 timeline.js
 import { readFileSync } from 'node:fs';
-import { DURATION, T, HEARTBEATS, VO } from '../timeline.js';
+import * as TL1 from '../timeline.js';
+
+// 当前使用的时间轴（buildScore 时可以换成别的版本）
+let DURATION;
+let T;
+let HEARTBEATS;
+let VO;
+let VODIR = 'vo';
+let FACE0 = 3.75;
+let WIDE2 = 8.3;
 import { SR, Bus, render, pluck, noteFreq as nf, Biquad, noiseGen, reverb } from './synth.js';
 
 const TAU = Math.PI * 2;
@@ -226,7 +235,7 @@ function ambience(dur, seed = 41) {
 
 // 读 16-bit 单声道 WAV，重采样到 48k
 function readVO(id) {
-  const buf = readFileSync(new URL(`../../assets/vo/${id}.wav`, import.meta.url));
+  const buf = readFileSync(new URL(`../../assets/${VODIR}/${id}.wav`, import.meta.url));
   let off = 12;
   let sr = 24000;
   let data = null;
@@ -286,7 +295,11 @@ function tapeStop(bus, t0, t1) {
 }
 
 // ---------- 编排 ----------
-export function buildScore() {
+export function buildScore(tl = TL1) {
+  ({ DURATION, T, HEARTBEATS, VO } = tl);
+  VODIR = tl.VODIR || 'vo';
+  FACE0 = tl.FACE0 ?? 3.75;
+  WIDE2 = tl.WIDE2 ?? 8.3;
   const music = new Bus(DURATION);
   const sfx = new Bus(DURATION);
   const alarm = new Bus(DURATION);
@@ -298,7 +311,7 @@ export function buildScore() {
     const t = i / SR;
     let g = 0.05;
     if (t > T.alarm - 0.08 && t < T.quiet + 0.25) g = 0;
-    if (t >= T.quiet + 0.25 && t < 8.3) g = 0.035 * clamp((t - T.quiet - 0.25) / 0.3);
+    if (t >= T.quiet + 0.25 && t < WIDE2) g = 0.035 * clamp((t - T.quiet - 0.25) / 0.3);
     amb[i] *= g;
   }
   sfx.add(amb, 0, 1, 0);
@@ -330,7 +343,7 @@ export function buildScore() {
   // 左顾右盼：嗖嗖
   for (const t of [T.look1, T.look1 + 0.38, T.look2, T.look2 + 0.25]) sfx.add(swish(0.14, 900, 3000, 0.5, Math.round(t * 10)), t - 0.03, 0.5, 0.3);
   // 眼珠乱转：木鱼嗒嗒
-  for (let t = 3.75; t < T.gulp; t += 0.2) sfx.add(block(t % 0.4 < 0.2 ? 1150 : 950, 0.6), t, 0.4, (t * 10) % 2 ? -0.4 : 0.4);
+  for (let t = FACE0; t < T.gulp; t += 0.2) sfx.add(block(t % 0.4 < 0.2 ? 1150 : 950, 0.6), t, 0.4, (t * 10) % 2 ? -0.4 : 0.4);
   sfx.add(gulp(0.9), T.gulp, 0.6, 0);
 
   // ---- 警报幻想（单独一条总线，最后磁带停转） ----
@@ -351,7 +364,7 @@ export function buildScore() {
   sfx.add(scratch(0.8), T.brake - 0.06, 0.4, 0);
 
   // ---- 现实：蟋蟀、乌鸦 ----
-  for (let t = T.quiet + 0.2; t < 8.3; t += 0.42) sfx.add(cricket(0.5), t, 0.12, 0.6);
+  for (let t = T.quiet + 0.2; t < WIDE2; t += 0.42) sfx.add(cricket(0.5), t, 0.12, 0.6);
   sfx.add(caw(0.42, 1, 5), T.crow1, 0.5, 0.45);
 
   // ---- 开溜 ----

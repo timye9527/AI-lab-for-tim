@@ -5,3 +5,8 @@ review/
 dist/audio.wav
 .frames-v3/
 dist/v3/motion.wav
+# Tim 本人声音（合成）不进公开仓库
+assets/vo-tim/
+dist/v4/
+.frames-v4/
+.frames-v4n/

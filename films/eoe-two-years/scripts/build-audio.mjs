@@ -1,18 +1,23 @@
 // 生成配乐 + 音效 + 配音混音：dist/audio.wav
 import { writeFile, mkdir } from 'node:fs/promises';
 import { buildScore } from '../src/audio/score.js';
+
+// TL=src/v4/timeline4.js 可以换时间轴；OUT 指定输出文件
 import { limit, toWav, SR } from '../src/audio/synth.js';
 
 const GAIN = Number(process.env.GAIN || 1.0);
 const t0 = Date.now();
-const bus = buildScore();
+const tl = process.env.TL ? await import(new URL(`../${process.env.TL}`, import.meta.url)) : undefined;
+const bus = buildScore(tl);
 for (let i = 0; i < bus.n; i++) {
   bus.L[i] *= GAIN;
   bus.R[i] *= GAIN;
 }
 limit(bus, 0.89);
 await mkdir(new URL('../dist/', import.meta.url), { recursive: true });
-await writeFile(new URL('../dist/audio.wav', import.meta.url), toWav(bus));
+const outFile = new URL(`../${process.env.OUT || 'dist/audio.wav'}`, import.meta.url);
+await mkdir(new URL('./', outFile), { recursive: true });
+await writeFile(outFile, toWav(bus));
 // 每半秒的响度概览，检查静默和破音
 let line = '';
 const step = SR / 2;
