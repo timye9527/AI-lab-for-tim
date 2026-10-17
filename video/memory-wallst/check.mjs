@@ -1,9 +1,14 @@
 // 存储视频自检：事实保鲜 + 脚本引用 + 时长 + 违禁词（零依赖）
-// 用法：node video/memory-wallst/check.mjs [YYYY-MM-DD]
-import { readFileSync } from 'node:fs';
+// 用法：node video/memory-wallst/check.mjs [YYYY-MM-DD] [--prompter]
+// 可录制标准：引用的事实都是「已核」或「交叉印证」（≥2 个独立来源一致）；
+// 「待核一手」的单一来源，口播那一句必须带「据…」「报道」之类的限定词。
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const dir = new URL('./', import.meta.url);
-const today = process.argv[2] || new Date().toISOString().slice(0, 10);
+const args = process.argv.slice(2);
+const today = args.find(a => /^\d{4}-\d{2}-\d{2}$/.test(a)) || new Date().toISOString().slice(0, 10);
+const OK = ['已核', '交叉印证'];
+const HEDGE = /据|报道|说过|说：|说，|预测|预计|估计|大约|差不多|左右/;
 const RATE = 270; // 口播字/分钟
 const SOON = 14; // 多少天内要更新算「即将到期」
 
@@ -52,6 +57,9 @@ for (const block of script.split(/^## /m).slice(1)) {
   console.log(`${String(words).padStart(4)} 字 ≈ ${String(sec).padStart(3)} 秒（计划 ${plan} 秒）${title}${flag}`);
   if (/冷开场/.test(title) && sec > 30) warns.push(`冷开场估时 ${sec} 秒，超过 30 秒`);
   for (const l of lines) {
+    for (const m of l.matchAll(/\[(F\d+)\]/g)) {
+      if (byId[m[1]]?.verify === '待核一手' && !HEDGE.test(l)) errors.push(`${m[1]} 是单一来源，这句要加「据报道」之类的限定：${l.slice(2, 26)}…`);
+    }
     const n = (l.replace(/\[F\d+\]/g, '').match(/[\p{Script=Han}A-Za-z0-9]/gu) || []).length;
     if (n > 30) warns.push(`单句过长（${n} 字）：${l.slice(2, 26)}…`);
   }
@@ -64,10 +72,11 @@ for (const id of [...used].sort()) {
   const f = byId[id];
   if (!f) { errors.push(`${id} 不在 facts.csv 里`); continue; }
   if (f.verify === '不上屏' || f.verify === '过期') errors.push(`${id} 标记为「${f.verify}」，不能进脚本`);
-  else if (f.verify !== '已核') warns.push(`${id}【${f.verify}·${f.tier}】${f.fact.slice(0, 30)}`);
+  else if (!OK.includes(f.verify)) warns.push(`${id}【${f.verify}·${f.tier}】${f.fact.slice(0, 30)}`);
   if (f.stale_after && days(f.stale_after) < 0) errors.push(`${id} 已过保鲜期（${f.stale_after}），录制前必须更新：${f.fact.slice(0, 30)}`);
 }
-console.log(`共 ${used.size} 条；已核 ${[...used].filter(id => byId[id]?.verify === '已核').length} 条`);
+const okN = [...used].filter(id => OK.includes(byId[id]?.verify)).length;
+console.log(`共 ${used.size} 条；已核或交叉印证 ${okN} 条，其余 ${used.size - okN} 条见下方提醒`);
 
 // 3. 全台账保鲜：过期 + 即将有新数据
 console.log(`\n== 保鲜提醒（今天 ${today}）==`);
@@ -87,6 +96,18 @@ for (const w of ['买入', '卖出', '稳赚', '必涨', '目标价', '抄底', 
   if (spoken.includes(w)) errors.push(`口播出现违禁词「${w}」`);
 }
 if (!/不构成任何投资建议/.test(spoken)) errors.push('口播缺少免责声明');
+
+// 5. 提词器版：只留口播，去掉事实编号
+if (args.includes('--prompter')) {
+  const out = ['# 提词器版（由 check.mjs --prompter 生成，勿手改）', ''];
+  for (const block of body.split(/^## /m).slice(1)) {
+    out.push('## ' + block.split('\n')[0], '');
+    for (const l of block.split('\n').filter(l => l.startsWith('> '))) out.push(l.slice(2).replace(/\s*\[F\d+\]\s*/g, ''));
+    out.push('');
+  }
+  writeFileSync(new URL('05-提词器版.md', dir), out.join('\n'));
+  console.log('\n已生成 05-提词器版.md');
+}
 
 if (warns.length) console.log(`\n== 提醒（${warns.length}）==\n` + warns.map(w => '· ' + w).join('\n'));
 if (errors.length) {
