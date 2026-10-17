@@ -12,43 +12,62 @@
   .c { position: relative; overflow: hidden;
     background: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 60px 60px,
                 linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 60px 60px,
-                radial-gradient(ellipse at 70% 30%, rgba(48,164,108,.18), transparent 60%), #0B0D10; }
+                radial-gradient(ellipse at 75% 35%, rgba(48,164,108,.22), transparent 60%), #0B0D10; }
   .mono { font-family: 'JetBrains Mono', monospace; font-weight: 800; }
   .down { color: #30A46C; } .amber { color: #FFB224; }
-  .k { position: absolute; background: #FFB224; border-radius: 8px; transform: rotate(32deg); }
-  .tagline { position: absolute; color: #9BA1A6; font-weight: 700; }
+  .chip { display: inline-block; background: #FFB224; color: #0B0D10; font-weight: 900; border-radius: 14px; }
 </style>
 </head>
 <body>
 <div id="c" class="c"></div>
 <script>
-// 三种比例：16:9（B 站 / 西瓜 / YouTube）、3:4（小红书 / 视频号）、9:16（抖音）
+// v=wide 16:9（B 站 / 西瓜 / YouTube）、card 3:4（小红书 / 视频号）、tall 9:16（抖音）
+// c=a 主推「−26% · 真凶不是长鑫」；c=b 备选「7000 亿 · 谁来付钱」
+const q = new URLSearchParams(location.search);
 const V = { wide: [1920, 1080], card: [1080, 1440], tall: [1080, 1920] };
-const v = new URLSearchParams(location.search).get('v') || 'wide';
+const v = q.get('v') || 'wide', cv = q.get('c') || 'a';
 const [W, H] = V[v]; const c = document.getElementById('c');
 c.style.width = W + 'px'; c.style.height = H + 'px'; document.body.style.width = W + 'px';
-const S = W / 1920 * (v === 'wide' ? 1 : 1.75);
 const add = (html, css) => { const d = document.createElement('div'); d.style.position = 'absolute'; d.innerHTML = html; Object.assign(d.style, css); c.appendChild(d); return d; };
-if (v === 'wide') {
-  add('5 天蒸发', { left: '100px', top: '110px', fontSize: '90px', fontWeight: 900 });
-  add('<span class="mono amber">7000亿</span><span style="font-size:90px;font-weight:900">美元</span>', { left: '90px', top: '210px', fontSize: '220px', lineHeight: 1 });
-  add('是长鑫打趴了三星？', { left: '100px', top: '500px', fontSize: '110px', fontWeight: 900 });
-  add('<span class="mono down">−26%</span>', { right: '110px', top: '620px', fontSize: '170px' });
-  add('海力士 · 一周', { right: '120px', top: '820px', fontSize: '44px', fontWeight: 700, color: '#9BA1A6' });
-  add('', { left: '100px', top: '690px', width: '760px', height: '8px', background: '#FFB224' });
-  add('存储复盘 · 一周五刀', { left: '100px', top: '730px', fontSize: '52px', fontWeight: 700, color: '#9BA1A6' });
-  [[1460, 120], [1600, 160], [1740, 120]].forEach(([x, y]) => add('', { left: x + 'px', top: y + 'px', width: '22px', height: '240px', background: '#FFB224', borderRadius: '8px', transform: 'rotate(28deg)' }));
-} else {
-  const top = v === 'tall' ? 360 : 120;
-  add('5 天蒸发', { left: '80px', top: top + 'px', fontSize: '96px', fontWeight: 900 });
-  add('<span class="mono amber">7000亿</span>', { left: '70px', top: (top + 120) + 'px', fontSize: '230px', lineHeight: 1 });
-  add('美元', { left: '80px', top: (top + 360) + 'px', fontSize: '96px', fontWeight: 900 });
-  add('是长鑫<br>打趴了三星？', { left: '80px', top: (top + 520) + 'px', fontSize: '120px', fontWeight: 900, lineHeight: 1.15 });
-  add('<span class="mono down">−26%</span>', { left: '80px', top: (top + 860) + 'px', fontSize: '150px' });
-  add('海力士 · 一周', { left: '90px', top: (top + 1030) + 'px', fontSize: '44px', fontWeight: 700, color: '#9BA1A6' });
-  [[700, top + 880], [820, top + 920], [940, top + 880]].forEach(([x, y]) => add('', { left: x + 'px', top: y + 'px', width: '22px', height: '220px', background: '#FFB224', borderRadius: '8px', transform: 'rotate(28deg)' }));
-  add('存储复盘 · 一周五刀', { left: '84px', top: (H - 130) + 'px', fontSize: '44px', fontWeight: 700, color: '#9BA1A6' });
-}
+const knives = (pts, h) => pts.forEach(([x, y]) => add('', { left: x + 'px', top: y + 'px', width: '22px', height: h + 'px', background: '#FFB224', borderRadius: '8px', transform: 'rotate(28deg)' }));
+const A = {
+  wide: () => {
+    add('存储一周被砸', { left: '100px', top: '90px', fontSize: '100px', fontWeight: 900 });
+    add('<span class="mono down">−26%</span>', { left: '84px', top: '190px', fontSize: '330px', lineHeight: 1 });
+    add('真凶不是<span class="amber">长鑫</span>', { left: '100px', top: '560px', fontSize: '150px', fontWeight: 900 });
+    add('<span class="chip" style="font-size:52px;padding:10px 26px">被砸懵的，先看完这 10 分钟</span>', { left: '100px', top: '800px' });
+    add('SK 海力士 · 10/12–10/16', { left: '104px', top: '940px', fontSize: '38px', fontWeight: 700, color: '#9BA1A6' });
+    knives([[1500, 140], [1630, 180], [1760, 140]], 260);
+  },
+  tall: () => {
+    const T = v === 'tall' ? 300 : 110, s = v === 'tall' ? 1 : 0.92;
+    add('存储一周被砸', { left: '70px', top: T + 'px', fontSize: 108 * s + 'px', fontWeight: 900 });
+    add('<span class="mono down">−26%</span>', { left: '52px', top: T + 130 + 'px', fontSize: 300 * s + 'px', lineHeight: 1 });
+    add('真凶<br>不是<span class="amber">长鑫</span>', { left: '70px', top: T + 470 * s + 'px', fontSize: 170 * s + 'px', fontWeight: 900, lineHeight: 1.1 });
+    add(`<span class="chip" style="font-size:${46 * s}px;padding:10px 24px">被砸懵的，先看完这 10 分钟</span>`, { left: '70px', top: T + 900 * s + 'px' });
+    knives([[760, T + 1010 * s], [870, T + 1050 * s], [980, T + 1010 * s]], 200 * s);
+  },
+};
+const B = {
+  wide: () => {
+    add('5 天蒸发', { left: '100px', top: '100px', fontSize: '100px', fontWeight: 900 });
+    add('<span class="mono amber">7000亿</span><span style="font-size:96px;font-weight:900">美元</span>', { left: '84px', top: '200px', fontSize: '250px', lineHeight: 1 });
+    add('存储挨的这一刀<br>到底谁来买单？', { left: '100px', top: '500px', fontSize: '120px', fontWeight: 900, lineHeight: 1.15 });
+    add('<span class="mono down">−26%</span>', { right: '110px', top: '760px', fontSize: '150px' });
+    knives([[1500, 140], [1630, 180], [1760, 140]], 260);
+  },
+  tall: () => {
+    const T = v === 'tall' ? 300 : 110, s = v === 'tall' ? 1 : 0.92;
+    add('5 天蒸发', { left: '70px', top: T + 'px', fontSize: 108 * s + 'px', fontWeight: 900 });
+    add('<span class="mono amber">7000亿</span>', { left: '56px', top: T + 130 + 'px', fontSize: 230 * s + 'px', lineHeight: 1 });
+    add('存储挨的这一刀<br>谁来买单？', { left: '70px', top: T + 420 * s + 'px', fontSize: 120 * s + 'px', fontWeight: 900, lineHeight: 1.15 });
+    add('<span class="mono down">−26%</span>', { left: '70px', top: T + 740 * s + 'px', fontSize: 170 * s + 'px' });
+    knives([[790, T + 760 * s], [900, T + 800 * s], [1010, T + 760 * s]], 240 * s);
+  },
+};
+const set = cv === 'b' ? B : A;
+(v === 'wide' ? set.wide : set.tall)();
+add('存储复盘 · 一周五刀', { left: '84px', top: (H - (v === 'wide' ? 90 : 140)) + 'px', fontSize: '36px', fontWeight: 700, color: '#6E757C', display: v === 'wide' ? 'none' : 'block' });
 </script>
 </body>
 </html>

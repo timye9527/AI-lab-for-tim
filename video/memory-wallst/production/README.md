@@ -11,10 +11,11 @@ echo '{"type":"module"}' > out/package.json
 # 配音模型（约 147MB）：sherpa-onnx 的 tts-models 发布页 → kokoro-int8-multi-lang-v1_1.tar.bz2，解压后用 KOKORO_DIR 指过去
 
 npm run video:check                       # 1. 自检：事实、时长、违禁词
-python3 production/tts.py --sid 3         # 2. 配音 → out/audio/voice.wav、timeline.json、subtitles.srt（约 1.5 倍实时）
+python3 production/tts.py --sid 65 --speed 1.08   # 2. 配音 → out/audio/voice.wav、timeline.json、subtitles.srt（约 1.5 倍实时）
 node production/render.mjs                # 3. 画面 → out/video/picture.mp4（1080p 25fps，约 20–30 分钟）
 python3 production/mix.py                 # 4. 配乐 + 音效 + 混音 → out/final/存储复盘-一周五刀.mp4
-node production/cover.mjs                 # 5. 封面三种比例 → out/final/cover-*.png
+node production/cover.mjs                 # 5. 封面两套文案 × 三种比例 → out/final/cover-{a,b}-*.png
+node production/preview.mjs               #    发布预览整图 → out/sample/发布预览.png
 node production/chapters.mjs              #    章节时间戳写进 07-发布包.md
 ```
 
@@ -33,12 +34,14 @@ node production/chapters.mjs              #    章节时间戳写进 07-发布�
 
 ## 换声音 / 加主播
 
-- **换音色**：`tts.py --sid N`（Kokoro v1.1 共 103 个音色，中文女声、男声都有），试几个挑一个固定下来当「频道声音」。
+- **频道声音（待确认）**：男声，和上一期保持一致。候选 4 个：sid65 温暖低沉（推荐，语速偏慢，用 `--speed 1.08`）、sid60 沉稳清晰、sid100 明亮干练、sid58 年轻利落。男声在 sid 58–102 之间（按基频筛出），女声如 sid 3。
+- **做样片**：`tts.py --secs 0,1 --out out/sample_audio` 只合成前两段，再 `render.mjs --audio out/sample_audio --out ...`、`mix.py --audio out/sample_audio --picture ... --out ...`。
 - **用自己的声音**：照提词器 `05-提词器版.md` 录一条整轨，按 `timeline.json` 的格式标出每句起止（或者用剪映自动字幕导出的时间），替换 `out/audio/voice.wav` 和 `timeline.json` 后，从第 3 步重跑。仓库 `claude/clever-meitner-l6m2ck` 分支里有「本人声音合成管线」，也可以接进来。
 - **加 AI 主播**：这一版是「数据画面 + 旁白」的无脸版本。要加主播，在剪辑软件里把主播镜头插在这几个点：开场后（0:21）、长鑫段开头、终局结论「周期搬了家」、收尾；每段 3–6 秒，画面引擎那几秒是大字卡，盖住不影响信息。
 
 ## 已知限制
 
 - 配音是开源 TTS，自然度不如真人；英文专有名词（Rosenblatt、Counterpoint）偶尔读得生硬，发布前听一遍，必要时在 `SAY` 表里改写法。
-- 配乐和音效是代码合成的，干净但朴素；想更有质感，剪辑时换成有授权的曲库音乐即可（混音比例保持人声为主）。
+- 配乐和音效是代码合成的，干净但朴素；想更有质感，剪辑时换成有授权的曲库音乐即可（混音比例保持人声为主）。`mix.py --no-music` 出纯人声版。
+- 2026-10-17 修复：第一版配乐的底鼓用「频率 × 绝对时间」算相位，每拍产生一次扫频，听起来是持续的「吱吱 / biu biu」电波声。现在底鼓按单拍积分相位、去掉噪声滴答、整条配乐过低通，混音改为 24kHz 原生采样、编码时用 ffmpeg 升到 48kHz。
 - 图表除标明「示意」的以外，数字都来自 `facts.csv`；改数字要先改台账再改 `scenes.html`。

@@ -10,7 +10,7 @@ import numpy as np, soundfile as sf
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-OUT = os.path.join(ROOT, 'out', 'audio')
+OUT = os.path.join(ROOT, 'out', 'audio')  # 可用 --out 改
 
 # 读音修正：只影响配音，不影响字幕
 SAY = [
@@ -45,8 +45,10 @@ def srt_time(t):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--sid', type=int, default=3)
-    ap.add_argument('--speed', type=float, default=1.05)
+    ap.add_argument('--sid', type=int, default=60)  # 男声；女声如 3
+    ap.add_argument('--speed', type=float, default=1.0)
+    ap.add_argument('--secs', default='', help='只合成这些段落，如 0,1（做样片用）')
+    ap.add_argument('--out', default=OUT)
     ap.add_argument('--model-dir', default=os.environ.get('KOKORO_DIR', '/tmp/claude-0/tts/kokoro-int8-multi-lang-v1_1'))
     a = ap.parse_args()
     import sherpa_onnx
@@ -61,7 +63,9 @@ def main():
         rule_fsts=d + 'date-zh.fst,' + d + 'phone-zh.fst,' + d + 'number-zh.fst', max_num_sentences=1))
     sr = tts.sample_rate
     lines = parse(os.path.join(ROOT, '02-脚本-10分钟.md'))
-    os.makedirs(OUT, exist_ok=True)
+    if a.secs:
+        keep = {int(x) for x in a.secs.split(',')}; lines = [l for l in lines if l['sec'] in keep]
+    out = a.out; os.makedirs(out, exist_ok=True)
     chunks, t, prev = [np.zeros(int(sr * 0.6), dtype=np.float32)], 0.6, None
     for i, ln in enumerate(lines):
         gap = 0.0 if prev is None else (0.9 if ln['sec'] != prev else 0.2)
@@ -74,10 +78,10 @@ def main():
         chunks.append(s); t += len(s) / sr; prev = ln['sec']
         print(f'{i + 1}/{len(lines)} {ln["end"]:.1f}s {ln["text"][:20]}', flush=True)
     chunks.append(np.zeros(int(sr * 2.0), dtype=np.float32)); t += 2.0
-    sf.write(os.path.join(OUT, 'voice.wav'), np.concatenate(chunks), sr)
+    sf.write(os.path.join(out, 'voice.wav'), np.concatenate(chunks), sr)
     json.dump({'duration': round(t, 3), 'sid': a.sid, 'speed': a.speed, 'lines': lines},
-              open(os.path.join(OUT, 'timeline.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
-    with open(os.path.join(OUT, 'subtitles.srt'), 'w', encoding='utf8') as f:
+              open(os.path.join(out, 'timeline.json'), 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+    with open(os.path.join(out, 'subtitles.srt'), 'w', encoding='utf8') as f:
         for k, ln in enumerate(lines, 1):
             f.write(f'{k}\n{srt_time(ln["start"])} --> {srt_time(ln["end"])}\n{ln["text"]}\n\n')
     print(f'done {t:.1f}s')

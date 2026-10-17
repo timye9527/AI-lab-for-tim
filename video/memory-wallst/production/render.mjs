@@ -32,7 +32,8 @@ function estimate() {
   return { duration: t + 2, lines };
 }
 
-const tlPath = ROOT + 'out/audio/timeline.json';
+const AUDIO = opt('audio', ROOT + 'out/audio') + '/';
+const tlPath = AUDIO + 'timeline.json';
 const TL = args.includes('--estimate') || !existsSync(tlPath) ? estimate() : JSON.parse(readFileSync(tlPath, 'utf8'));
 
 const browser = await chromium.launch({ executablePath: CHROME, args: ['--force-color-profile=srgb', '--font-render-hinting=none'] });
