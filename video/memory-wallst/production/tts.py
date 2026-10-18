@@ -80,11 +80,25 @@ def zipvoice(a):
     ptxt = open(os.path.join(ref, 'ref.txt'), encoding='utf8').read().strip()
 
     def gen(text):
-        r = tts.generate(say_clone(text), ptxt, p.tolist(), psr, speed=a.speed, num_steps=16)
-        x = np.asarray(r.samples, dtype=np.float32)
-        idx = np.where(np.abs(x) > 0.012)[0]  # 去掉首尾空白
+        # 模型按 0.95 倍生成（给句尾留足时长，避免最后一个字被截断），再保持音调加速到目标语速
+        base = 0.95
+        for attempt in range(3):
+            r = tts.generate(say_clone(text), ptxt, p.tolist(), psr, speed=base, num_steps=16)
+            x = np.asarray(r.samples, dtype=np.float32)
+            if float(np.abs(x[-int(0.06 * r.sample_rate):]).max()) < 0.15:
+                break
+            base -= 0.05  # 句尾还在高音量 = 被截断，放慢重来
+        idx = np.where(np.abs(x) > 0.012)[0]
         if len(idx):
             x = x[max(0, idx[0] - 480): idx[-1] + 720]
+        f = int(0.04 * r.sample_rate); x[-f:] *= np.linspace(1, 0, f)  # 句尾淡出
+        tempo = a.speed / base
+        if abs(tempo - 1) > 0.01:
+            import subprocess, tempfile
+            with tempfile.TemporaryDirectory() as td:
+                sf.write(td + '/i.wav', x, r.sample_rate)
+                subprocess.run(['ffmpeg', '-loglevel', 'error', '-y', '-i', td + '/i.wav', '-af', f'atempo={tempo:.4f}', td + '/o.wav'], check=True)
+                x, _ = sf.read(td + '/o.wav', dtype='float32')
         class R: pass
         o = R(); o.samples, o.sample_rate = x, r.sample_rate
         return o

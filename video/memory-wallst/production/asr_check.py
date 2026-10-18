@@ -37,7 +37,8 @@ def check(expected_tts_text, heard):
     """返回 (错误率, 问题说明)。expected 是送进合成的文本（已转中文数字）。"""
     exp, got = syllables(expected_tts_text), syllables(heard)
     rate = edit(exp, got) / max(1, len(exp))
-    eng_exp = set(w.lower() for w in re.findall(r'[A-Za-z]{2,}', expected_tts_text))
+    joined = re.sub(r'(?<=\b[A-Za-z]) (?=[A-Za-z]\b)', '', expected_tts_text)  # 「C E O」合回「CEO」
+    eng_exp = set(w.lower() for w in re.findall(r'[A-Za-z]{2,}', joined + ' ' + expected_tts_text.replace(' ', '')))
     eng_got = [w for w in re.findall(r'[A-Za-z]{3,}', heard) if w.lower() not in eng_exp]
     issues = []
     if eng_got:
