@@ -5,7 +5,7 @@
 每一「刀」前放一个低频冲击音。人声说话时配乐自动压低。
 用法：python3 production/mix.py   → out/final/存储复盘-一周五刀.mp4
 """
-import json, os, subprocess
+import json, os, re, subprocess
 import numpy as np, soundfile as sf
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -83,7 +83,7 @@ def main():
     bgm *= (0.16 - 0.10 * vo)
     sfx = np.zeros(n, dtype=np.float32); hit = impact(rng)
     for l in tl['lines']:
-        if l['text'][:2] == '第' + l['text'][1] and l['text'][2:3] == '刀':
+        if re.match(r'第[一二三四五]刀', l['text']):
             s = int((l['start'] - 0.55) * SR); sfx[s:s + len(hit)] += hit[:max(0, min(len(hit), n - s))] * 0.5
     s0 = int(0.0 * SR); sfx[s0:s0 + len(hit)] += hit * 0.35  # 开场一记
     for l in tl['lines']:  # 栏目片头：低频上扬 + 落定
