@@ -11,5 +11,5 @@
 7. **网站和服务端保持零依赖。** 网站是原生 HTML / CSS / ES Module，服务端只用 Node 内置模块。`playwright-core` 只用于 `npm run notes` 生成素材。
 9. **大陆合规优先。** 笔记、商品页、段位卡上不放链接、二维码、微信；网址只能出现在付款后的自动发货内容里。改了文案要跑 `npm run notes`，看高危词提醒。
 10. **数据结构变更**要同时改 `db/schema.sql`、`server/db.mjs` 和 `server/admin.mjs`。
-11. **视频配音前必须过读音核对。** 合成前跑 `npm run video:pronounce`，看 `08-读音核对表.md` 的「待确认」；行业词的读音（长约 cháng、长鑫 cháng、上调 tiáo、剪刀差 chā……）写进 `production/pronounce.tsv`，和用户过稿时一起确认。拼音库和合成模型都会在行业词上读错，不能只靠自动判读。
+11. **视频配音前必须过读音核对。** 合成前跑 `npm run video:pronounce`，看 `08-读音核对表.md` 的「待确认」；行业词的读音（长约 cháng、长鑫 cháng、上调 tiáo、剪刀差 chā……）写进 `production/pronounce.tsv`，和用户过稿时一起确认。拼音库和合成模型都会在行业词上读错，不能只靠自动判读。配音时数字一律转中文读法（`numcn.py`，剩一个阿拉伯数字就拒绝合成），合成后看 `asr-report.md` 的听写回检，有问题的句子修完再出片。
 8. 文案用中文，代码注释简短、用中文。

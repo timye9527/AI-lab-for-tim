@@ -12,6 +12,7 @@
 """
 import argparse, json, re, os, sys
 import numpy as np, soundfile as sf
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -74,7 +75,7 @@ def zipvoice(a):
             tokens=L + 'tokens.txt', encoder=M + 'text_encoder.onnx', decoder=M + 'fm_decoder.onnx',
             vocoder=z + 'vocos_24khz.onnx', data_dir=L + 'espeak-ng-data', lexicon=lex),
         num_threads=os.cpu_count() or 4)))
-    ref = os.path.join(ROOT, 'out', 'voice-ref')
+    ref = a.ref_dir
     p, psr = sf.read(os.path.join(ref, 'ref.wav'), dtype='float32')
     ptxt = open(os.path.join(ref, 'ref.txt'), encoding='utf8').read().strip()
 
@@ -92,13 +93,17 @@ def zipvoice(a):
 # 克隆模型的读音修正：英文缩写拆开读，符号转中文；多音字交给 pronounce.tsv
 SAY_CLONE = [
     (r'4F²', '4 F 平方'), (r'−(\d+(?:\.\d+)?)%', r'跌百分之\1'), (r'(\d+(?:\.\d+)?)%', r'百分之\1'),
-    (r'\bCEO\b', 'C E O'), (r'\bHBM\b', 'H B M'), (r'\bFT\b', 'F T'), (r'\bAI\b', 'A I'), (r'OpenAI', 'Open A I'),
+    (r'\bCEO\b', 'C E O'), (r'\bHBM\b', 'H B M'), (r'\bFT\b', '英国金融时报'), (r'\bAI\b', 'A I'), (r'OpenAI', 'Open A I'),
     (r'DDR5', 'D D R 5'), (r'KOSPI', '韩国综合指数'), (r'[「」《》]', ''),
 ]
 
 def say_clone(text):
+    from numcn import to_chinese
     for a_, b_ in SAY_CLONE:
         text = re.sub(a_, b_, text)
+    text = to_chinese(text)  # 阿拉伯数字一律转中文读法，否则会被读成英文
+    if re.search(r'\d', text):
+        raise SystemExit(f'配音文本里还有阿拉伯数字，拒绝合成：{text}')
     return text
 
 def main():
@@ -109,6 +114,8 @@ def main():
     ap.add_argument('--secs', default='', help='只合成这些段落，如 0,1,2（做样片用）')
     ap.add_argument('--out', default=OUT)
     ap.add_argument('--force', action='store_true', help='跳过多音字核对（不推荐）')
+    ap.add_argument('--ref-dir', default=os.path.join(ROOT, 'out', 'voice-ref', 'default'), help='音色参考：ref.wav + ref.txt（make_ref.py 生成）')
+    ap.add_argument('--asr', default=os.environ.get('ASR_DIR', '/tmp/claude-0/zv/sherpa-onnx-paraformer-zh-small-2024-03-09'), help='回检用的语音识别模型')
     ap.add_argument('--zipvoice', default=os.environ.get('ZIPVOICE_DIR', '/tmp/claude-0/zv'))
     ap.add_argument('--model-dir', default=os.environ.get('KOKORO_DIR', '/tmp/claude-0/tts/kokoro-int8-multi-lang-v1_1'))
     a = ap.parse_args()
@@ -136,6 +143,13 @@ def main():
         chunks.append(np.zeros(int(sr * gap), dtype=np.float32)); t += gap
         audio = gen(ln['text'])
         s = np.asarray(audio.samples, dtype=np.float32)
+        if a.engine == 'zipvoice' and os.path.isdir(a.asr):  # 回检：听写回来和稿子比
+            from asr_check import transcribe, check
+            heard = transcribe(a.asr, s.tolist(), audio.sample_rate)
+            rate, issue = check(say_clone(ln['text']), heard)
+            ln.update(heard=heard, err=round(rate, 3), issue=issue)
+            if issue:
+                print(f'  ⚠ 回检：{issue} ｜ 听到：{heard}', flush=True)
         if audio.sample_rate != sr:
             s = np.interp(np.linspace(0, len(s) - 1, int(len(s) * sr / audio.sample_rate)), np.arange(len(s)), s).astype(np.float32)
         ln.update(i=i, start=round(t, 3), end=round(t + len(s) / sr, 3))
@@ -151,7 +165,12 @@ def main():
         for ln in lines:
             if ln['text']:
                 k += 1; f.write(f'{k}\n{srt_time(ln["start"])} --> {srt_time(ln["end"])}\n{ln["text"]}\n\n')
-    print(f'done {t:.1f}s')
+    bad = [l for l in lines if l.get('issue')]
+    with open(os.path.join(out, 'asr-report.md'), 'w', encoding='utf8') as f:
+        f.write(f'# 配音回检报告\n\n共 {sum(1 for l in lines if l["text"])} 句，有问题 {len(bad)} 句。\n\n| 稿子 | 听写 | 问题 |\n|---|---|---|\n')
+        for l in bad:
+            f.write(f'| {l["text"]} | {l["heard"]} | {l["issue"]} |\n')
+    print(f'done {t:.1f}s；回检有问题 {len(bad)} 句 → asr-report.md')
 
 if __name__ == '__main__':
     main()

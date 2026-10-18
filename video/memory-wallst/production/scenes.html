@@ -51,7 +51,7 @@
 </head>
 <body>
 <div id="stage">
-  <div id="chrome-top"><div class="brand"><b>存力研究所</b>存储一周复盘 · 2026.10.12 – 10.16</div><div id="chip"></div></div>
+  <div id="chrome-top"><div class="brand"><b>看懂AI主线</b>存储一周复盘 · 2026.10.12 – 10.16</div><div id="chip"></div></div>
   <div id="disclaimer">本视频仅为行业信息整理，不构成投资建议 · 过往表现不代表未来</div>
   <div id="scenes"></div>
   <div id="sub"></div>
@@ -407,8 +407,8 @@ const IDENT = (R, s) => {
   const stage3d = el(R, '', { left: '760px', top: '260px', width: '400px', height: '420px', perspective: '900px' });
   const layers = Array.from({ length: 12 }, (_, i) => el(stage3d, '', { left: '60px', top: `${330 - i * 22}px`, width: '280px', height: '18px', borderRadius: '4px',
     background: i === 0 ? 'linear-gradient(90deg,#8C6A1C,#FFB224)' : 'linear-gradient(90deg,#3E4D61,#8FA3BC)', boxShadow: '0 2px 0 rgba(0,0,0,.5)', transformOrigin: '50% 100%' }));
-  const name = el(R, '存力研究所', { left: '0', right: '0', top: '700px', textAlign: 'center', fontSize: '110px', fontWeight: 900, letterSpacing: '.06em' });
-  const slogan = el(R, '<span class="amber">AI × 存储</span>　·　挖投资主线', { left: '0', right: '0', top: '850px', textAlign: 'center', fontSize: '40px', fontWeight: 700, color: 'var(--muted)' });
+  const name = el(R, '看懂AI主线', { left: '0', right: '0', top: '700px', textAlign: 'center', fontSize: '110px', fontWeight: 900, letterSpacing: '.06em' });
+  const slogan = el(R, '<span class="amber">AI × 存储</span>　·　每周洞见', { left: '0', right: '0', top: '850px', textAlign: 'center', fontSize: '40px', fontWeight: 700, color: 'var(--muted)' });
   const bar = el(R, '', { left: '760px', top: '835px', width: '400px', height: '6px', background: 'var(--amber)', transformOrigin: '50% 50%' });
   return t => {
     const k = t - s;

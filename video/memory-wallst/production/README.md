@@ -11,11 +11,12 @@ echo '{"type":"module"}' > out/package.json
 pip install pypinyin
 # 克隆模型（约 800MB，sherpa-onnx GitHub 发布页）：tts-models/sherpa-onnx-zipvoice-zh-en-emilia、
 #   tts-models/sherpa-onnx-zipvoice-distill-int8-zh-en-emilia、vocoder-models/vocos_24khz.onnx，放在同一目录，用 ZIPVOICE_DIR 指过去
-# 参考录音：out/voice-ref/ref.wav + ref.txt（Tim 本人，不进仓库）
+python3 production/make_ref.py --sid 100   # 频道默认音色参考（开源 Kokoro 男声）→ out/voice-ref/default/
+# 语音识别（回检用，sherpa-onnx asr-models）：sherpa-onnx-paraformer-zh-small-2024-03-09，用 ASR_DIR 指过去
 
 npm run video:check                       # 1. 自检：事实、时长、违禁词
 npm run video:pronounce                   #    读音核对 → 08-读音核对表.md（「待确认」必须为 0，过稿时一起看）
-python3 production/tts.py                 # 2. 配音（Tim 本人声音克隆，1.08 倍速）→ out/audio/voice.wav、timeline.json、subtitles.srt（约 4–5 倍实时）
+python3 production/tts.py                 # 2. 配音（网络解说男声，1.08 倍速；数字自动转中文；逐句听写回检）→ out/audio/voice.wav、timeline.json、subtitles.srt、asr-report.md
 node production/render.mjs                # 3. 画面 → out/video/picture.mp4（1080p 25fps，约 20–30 分钟）
 python3 production/mix.py                 # 4. 配乐 + 音效 + 混音 → out/final/存储复盘-一周五刀.mp4
 node production/cover.mjs                 # 5. 封面两套文案 × 三种比例 → out/final/cover-{a,b}-*.png
@@ -38,7 +39,9 @@ node production/chapters.mjs              #    章节时间戳写进 07-发布�
 
 ## 换声音 / 加主播
 
-- **频道声音**：Tim 本人声音（ZipVoice 克隆，见 `09-栏目包装.md`）。Kokoro 开源男声只作备用：`tts.py --engine kokoro --sid 65`。
+- **频道声音**：开源男声做音色参考（`make_ref.py`），ZipVoice 生成语调，见 `09-栏目包装.md`。不用 Tim 本人声音。
+- **数字**：`numcn.py` 把阿拉伯数字转成中文读法，配音文本里剩数字就拒绝合成。
+- **听写回检**：`asr_check.py` 每句听写回来比对，问题写进 `asr-report.md`。
 - **多音字**：`pronounce.tsv` 是人工确认过的行业读音表，合成时写进词典、优先使用；`pronounce.py` 列出全稿多音字，「待确认」不为 0 时 `tts.py` 拒绝合成。
 - **片头停顿**：脚本里写 `@pause 5`，配音会留 5 秒，画面引擎放栏目片头，混音加上扬音和落定音。
 - **做样片**：`tts.py --secs 0,1 --out out/sample_audio` 只合成前两段，再 `render.mjs --audio out/sample_audio --out ...`、`mix.py --audio out/sample_audio --picture ... --out ...`。
