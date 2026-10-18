@@ -3,26 +3,44 @@
     "title": "投研中枢",
     "cat": "invest",
     "status": "运行中",
-    "date": "2026-10-13",
-    "summary": "把聪明钱观点、AI 产业链、ETF 温度、SOXL 雷达四个系统并成一个多页网站，看今日一屏、系统地图和跨系统逻辑链。",
-    "tags": ["多页网站", "整合入口"],
+    "date": "2026-10-18",
+    "summary": "把聪明钱观点、AI 产业链、ETF 温度、SOXL 雷达四个系统并成一个多页网站。现在每天更新，新增大行观点桌、光模块和半导体分台、每日 9:30 简报和视频选题台。",
+    "tags": [
+      "多页网站",
+      "日更"
+    ],
     "source": "AI-supply-chain/desk",
     "links": [
-      {"label": "打开页面", "url": "https://claude.ai/artifact/13iTa2ZVCGDphgQggCZk7U"},
-      {"label": "仓库", "url": "https://github.com/timye9527/AI-supply-chain/tree/main/desk"}
+      {
+        "label": "打开页面",
+        "url": "https://claude.ai/artifact/13iTa2ZVCGDphgQggCZk7U"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/AI-supply-chain/tree/main/desk"
+      }
     ]
   },
   "ai-supply-chain": {
     "title": "AI 产业链验证系统",
     "cat": "invest",
     "status": "运行中",
-    "date": "2026-10-13",
-    "summary": "存储、半导体、光模块交叉验证。核心产出是证据链、矛盾登记簿和可证伪的观察清单，按月出报告。",
-    "tags": ["证据链", "月报"],
+    "date": "2026-10-18",
+    "summary": "存储、半导体、光模块交叉验证。核心产出是证据链、矛盾登记簿和可证伪的观察清单。已从月报改为日更，并配周度收盘。",
+    "tags": [
+      "证据链",
+      "日更"
+    ],
     "source": "AI-supply-chain",
     "links": [
-      {"label": "看板", "url": "https://claude.ai/artifact/N5h34gYmqCSdQ289uXHB4R"},
-      {"label": "仓库", "url": "https://github.com/timye9527/AI-supply-chain"}
+      {
+        "label": "看板",
+        "url": "https://claude.ai/artifact/N5h34gYmqCSdQ289uXHB4R"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/AI-supply-chain"
+      }
     ]
   },
   "smart-money-map": {
@@ -31,26 +49,50 @@
     "status": "运行中",
     "date": "2026-10-08",
     "summary": "36 条观点、118 条来源，每条追到原始出处，标出共识与分歧。当前核心判断：10 年期美债利率是总开关。",
-    "tags": ["观点抽取", "来源追溯"],
+    "tags": [
+      "观点抽取",
+      "来源追溯"
+    ],
     "source": "smart-investor-intelligence（已并入 AI-supply-chain）",
     "links": [
-      {"label": "打开页面", "url": "https://claude.ai/artifact/FEYExXyY1Gee3mm8XJh71h"},
-      {"label": "仓库", "url": "https://github.com/timye9527/smart-investor-intelligence"}
+      {
+        "label": "打开页面",
+        "url": "https://claude.ai/artifact/FEYExXyY1Gee3mm8XJh71h"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/smart-investor-intelligence"
+      }
     ]
   },
   "etf-temperature": {
     "title": "ETF 市场温度计",
     "cat": "invest",
     "status": "运行中",
-    "date": "2026-10-06",
+    "date": "2026-10-17",
     "summary": "用 ETF 做传感器，把全球市场压成 87 个节点的市场树，每个节点 0–100 度，可拆成五个因子。收盘后自动更新。",
-    "tags": ["自动更新", "五因子"],
+    "tags": [
+      "自动更新",
+      "五因子"
+    ],
     "source": "ETF-Market-Temperature",
     "links": [
-      {"label": "线上网站", "url": "https://timye9527.github.io/ETF-Market-Temperature/"},
-      {"label": "看板快照", "url": "https://claude.ai/artifact/NJzk5PSu5E69fX8j7Tmb4e"},
-      {"label": "指标体系设计", "url": "https://claude.ai/artifact/JQGqUgUgCQRu4nJqqKYAke"},
-      {"label": "仓库", "url": "https://github.com/timye9527/ETF-Market-Temperature"}
+      {
+        "label": "线上网站",
+        "url": "https://timye9527.github.io/ETF-Market-Temperature/"
+      },
+      {
+        "label": "看板快照",
+        "url": "https://claude.ai/artifact/NJzk5PSu5E69fX8j7Tmb4e"
+      },
+      {
+        "label": "指标体系设计",
+        "url": "https://claude.ai/artifact/JQGqUgUgCQRu4nJqqKYAke"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/ETF-Market-Temperature"
+      }
     ]
   },
   "soxl-radar": {
@@ -59,10 +101,16 @@
     "status": "运行中",
     "date": "2026-10-08",
     "summary": "部署在香港服务器：分时均价线、按交易时段确认关键位，交易信号、复盘、系统状态分四条 Discord 通道推送。",
-    "tags": ["实时提醒", "Docker 部署"],
+    "tags": [
+      "实时提醒",
+      "Docker 部署"
+    ],
     "source": "soxl-trading-radar",
     "links": [
-      {"label": "仓库", "url": "https://github.com/timye9527/soxl-trading-radar"}
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/soxl-trading-radar"
+      }
     ]
   },
   "ai-2028-map": {
@@ -71,11 +119,20 @@
     "status": "已交付",
     "date": "2026-10-04",
     "summary": "通俗版系统报告：AI 走到哪一步、为什么 2028 是节点、经济社会怎么变、个人 2026→2028 行动路线。另有 19 页 PDF。",
-    "tags": ["中美对照", "PDF"],
+    "tags": [
+      "中美对照",
+      "PDF"
+    ],
     "source": "AI-trending",
     "links": [
-      {"label": "打开报告", "url": "https://claude.ai/artifact/78NrMVNkbaPcYUUyE7f2Ya"},
-      {"label": "仓库", "url": "https://github.com/timye9527/AI-trending"}
+      {
+        "label": "打开报告",
+        "url": "https://claude.ai/artifact/78NrMVNkbaPcYUUyE7f2Ya"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/AI-trending"
+      }
     ]
   },
   "etf-global-research": {
@@ -84,10 +141,15 @@
     "status": "已交付",
     "date": "2026-10-09",
     "summary": "梳理同类产品怎么做，再给出差异化方向。",
-    "tags": ["竞品调研"],
+    "tags": [
+      "竞品调研"
+    ],
     "source": "已发布页面",
     "links": [
-      {"label": "打开报告", "url": "https://claude.ai/artifact/M4wEn8TEZfLVvjNMausG9E"}
+      {
+        "label": "打开报告",
+        "url": "https://claude.ai/artifact/M4wEn8TEZfLVvjNMausG9E"
+      }
     ]
   },
   "stock-cases": {
@@ -96,10 +158,16 @@
     "status": "待完善",
     "date": "2026-10-13",
     "summary": "五工具研究打法、Marvell 万亿案例、IWM / 富途 / 拼多多三案，附个人策略模板，已按新加坡身份补上股息预扣和遗产税成本。",
-    "tags": ["案例", "方法论"],
+    "tags": [
+      "案例",
+      "方法论"
+    ],
     "source": "AI-lab-for-tim · claude/dazzling-brahmagupta-xkayse",
     "links": [
-      {"label": "研究目录", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/dazzling-brahmagupta-xkayse/research"}
+      {
+        "label": "研究目录",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/dazzling-brahmagupta-xkayse/research"
+      }
     ]
   },
   "jiucai-test": {
@@ -108,25 +176,46 @@
     "status": "已上线",
     "date": "2026-10-11",
     "summary": "12 道盘面题测出 6 档段位，再匹配 16 位历史人物。兑换码付费墙，能纯静态部署，也能上服务器。",
-    "tags": ["付费测试", "可复用引擎"],
+    "tags": [
+      "付费测试",
+      "可复用引擎"
+    ],
     "source": "AI-lab-for-tim",
     "links": [
-      {"label": "先付费版", "url": "https://claude.ai/artifact/EYNFFPAczsXGrs6TBVqyEC"},
-      {"label": "先玩后付版", "url": "https://claude.ai/artifact/CyLY1zkoqgvgy43UmC9r9D"},
-      {"label": "仓库", "url": "https://github.com/timye9527/AI-lab-for-tim"}
+      {
+        "label": "先付费版",
+        "url": "https://claude.ai/artifact/EYNFFPAczsXGrs6TBVqyEC"
+      },
+      {
+        "label": "先玩后付版",
+        "url": "https://claude.ai/artifact/CyLY1zkoqgvgy43UmC9r9D"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/AI-lab-for-tim"
+      }
     ]
   },
   "eoe-club-os": {
     "title": "EOE Club OS · 成长百科",
     "cat": "product",
     "status": "已上线",
-    "date": "2026-10-07",
-    "summary": "演讲俱乐部内部 Web App：例会入口、成长百科、官员工作台、会后记录和运营看板。",
-    "tags": ["Next.js", "社团运营"],
+    "date": "2026-10-13",
+    "summary": "演讲俱乐部内部 Web App：例会入口、成长百科、官员工作台、会后记录和运营看板。新增官员空缺提示和主席月度健康检查。",
+    "tags": [
+      "Next.js",
+      "社团运营"
+    ],
     "source": "EOE-operating-system",
     "links": [
-      {"label": "成长百科", "url": "https://claude.ai/artifact/FwahbaocfnuLXLquvHymvT"},
-      {"label": "仓库", "url": "https://github.com/timye9527/EOE-operating-system"}
+      {
+        "label": "成长百科",
+        "url": "https://claude.ai/artifact/FwahbaocfnuLXLquvHymvT"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/EOE-operating-system"
+      }
     ]
   },
   "canto-pop-quest": {
@@ -135,10 +224,15 @@
     "status": "已交付",
     "date": "2026-09-12",
     "summary": "十五章粤语训练游戏，从港乐、港片到职场对白，每章 20–50 题，带朗读和成长面板。",
-    "tags": ["学习游戏"],
+    "tags": [
+      "学习游戏"
+    ],
     "source": "canto-pop-quest",
     "links": [
-      {"label": "仓库", "url": "https://github.com/timye9527/canto-pop-quest"}
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/canto-pop-quest"
+      }
     ]
   },
   "finance-hits": {
@@ -147,11 +241,20 @@
     "status": "运行中",
     "date": "2026-10-12",
     "summary": "每周自动采集竞品爆款，配运营拆解，公开网站，支持简繁切换。已出到 W41。",
-    "tags": ["竞品监测", "周报"],
+    "tags": [
+      "竞品监测",
+      "周报"
+    ],
     "source": "finance-hits",
     "links": [
-      {"label": "线上网站", "url": "https://timye9527.github.io/finance-hits/"},
-      {"label": "仓库", "url": "https://github.com/timye9527/finance-hits"}
+      {
+        "label": "线上网站",
+        "url": "https://timye9527.github.io/finance-hits/"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/finance-hits"
+      }
     ]
   },
   "finance930-ops": {
@@ -160,10 +263,16 @@
     "status": "运行中",
     "date": "2026-09-21",
     "summary": "抓自频道近 8 周数据出周度摘要，配点击率和观看时长的判读基线，告诉你下周改封面还是改内容。",
-    "tags": ["自频道", "周复盘"],
+    "tags": [
+      "自频道",
+      "周复盘"
+    ],
     "source": "finance930-ops",
     "links": [
-      {"label": "仓库", "url": "https://github.com/timye9527/finance930-ops"}
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/finance930-ops"
+      }
     ]
   },
   "zhaojian": {
@@ -172,11 +281,19 @@
     "status": "已交付",
     "date": "2026-09-07",
     "summary": "东方美学女性人像账号（抖音 + 小红书）从 0 起盘的战略站：先做五件事、全局框架、产能配比。",
-    "tags": ["账号起盘"],
+    "tags": [
+      "账号起盘"
+    ],
     "source": "zhaojian",
     "links": [
-      {"label": "线上网站", "url": "https://timye9527.github.io/zhaojian/"},
-      {"label": "仓库", "url": "https://github.com/timye9527/zhaojian"}
+      {
+        "label": "线上网站",
+        "url": "https://timye9527.github.io/zhaojian/"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/zhaojian"
+      }
     ]
   },
   "xhs-e01": {
@@ -185,10 +302,16 @@
     "status": "已交付",
     "date": "2026-10-10",
     "summary": "E01 四版迭代和运营偏好沉淀；韭菜测试 24 篇笔记、6 张商品图、上架文案、竞品拆解和上线清单。",
-    "tags": ["小红书", "笔记素材"],
+    "tags": [
+      "小红书",
+      "笔记素材"
+    ],
     "source": "AI-lab-for-tim · claude/xiaohongshu-e01-production-gd18aa",
     "links": [
-      {"label": "分支", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/xiaohongshu-e01-production-gd18aa"}
+      {
+        "label": "分支",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/xiaohongshu-e01-production-gd18aa"
+      }
     ]
   },
   "xhs-yanni": {
@@ -197,10 +320,16 @@
     "status": "待完善",
     "date": "2026-10-12",
     "summary": "4 张 1080×1440 图和可直接复制的文案，黑底撕纸卡片模板可以复用到后续稿件。飞天奖细节待核对。",
-    "tags": ["小红书", "出图模板"],
+    "tags": [
+      "小红书",
+      "出图模板"
+    ],
     "source": "AI-lab-for-tim · claude/awesome-bohr-9gc09m",
     "links": [
-      {"label": "分支", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-bohr-9gc09m"}
+      {
+        "label": "分支",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-bohr-9gc09m"
+      }
     ]
   },
   "take-back-time": {
@@ -209,11 +338,20 @@
     "status": "已交付",
     "date": "2026-10-12",
     "summary": "32 秒 1080p 个人短片，画面和配乐都由程序生成，有网页播放器。",
-    "tags": ["短片", "程序生成"],
+    "tags": [
+      "短片",
+      "程序生成"
+    ],
     "source": "AI-lab-for-tim · claude/loving-albattani-okwtpd",
     "links": [
-      {"label": "播放", "url": "https://claude.ai/artifact/MgmG42STtXfzrhpTSDBMxW"},
-      {"label": "源码", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/loving-albattani-okwtpd/films/take-back-time"}
+      {
+        "label": "播放",
+        "url": "https://claude.ai/artifact/MgmG42STtXfzrhpTSDBMxW"
+      },
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/loving-albattani-okwtpd/films/take-back-time"
+      }
     ]
   },
   "finance-video": {
@@ -222,22 +360,148 @@
     "status": "待完善",
     "date": "2026-10-08",
     "summary": "选题过滤、脚本、分镜、AI 主播、华尔街风格图表到剪辑的整套流程，附参考视频拆解和 10 秒开头样片。主播目前是占位剪影。",
-    "tags": ["视频流程", "样片"],
+    "tags": [
+      "视频流程",
+      "样片"
+    ],
     "source": "AI-lab-for-tim · claude/festive-sagan-wfu4pq",
     "links": [
-      {"label": "源码", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/festive-sagan-wfu4pq/finance-video"}
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/festive-sagan-wfu4pq/finance-video"
+      }
     ]
   },
   "eoe-ai-workshop": {
     "title": "EOE AI 实战工作坊 PPT",
     "cat": "media",
     "status": "待完善",
-    "date": "2026-10-11",
-    "summary": "30 页工作坊讲稿（29 页正文 + 附录），配演讲备注、演示任务和素材清单。音乐和二维码素材待补。",
-    "tags": ["PPT", "工作坊"],
+    "date": "2026-10-13",
+    "summary": "《动动嘴，让 AI 把活干了》V2：34 页、30 分钟，换成 EOE 视觉，加入辣条故事和个人介绍，配演讲备注和演示任务。音视频素材还是占位。",
+    "tags": [
+      "PPT",
+      "工作坊"
+    ],
     "source": "AI-lab-for-tim · claude/awesome-ptolemy-jzgxj5",
     "links": [
-      {"label": "源码", "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-ptolemy-jzgxj5/workshops/eoe-ai-workshop"}
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-ptolemy-jzgxj5/workshops/eoe-ai-workshop"
+      },
+      {
+        "label": "配套工具包",
+        "url": "https://timye9527.github.io/ai-workshop-toolkit/"
+      }
+    ]
+  },
+  "ai-workshop-toolkit": {
+    "title": "EOE AI 实战工具包",
+    "cat": "product",
+    "status": "已上线",
+    "date": "2026-10-14",
+    "summary": "工作坊的随身网站，手机优先：三条学习路线、11 个 AI 工具指南、8 个 Prompt 模板、12 篇实践指南，可搜索、复制、收藏。",
+    "tags": [
+      "工作坊配套",
+      "公开网站"
+    ],
+    "source": "ai-workshop-toolkit",
+    "links": [
+      {
+        "label": "线上网站",
+        "url": "https://timye9527.github.io/ai-workshop-toolkit/"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/ai-workshop-toolkit"
+      }
+    ]
+  },
+  "invest-video": {
+    "title": "普通话 YouTube 投研视频栏目",
+    "cat": "content",
+    "status": "运行中",
+    "date": "2026-10-17",
+    "summary": "从投研中枢出选题，按集出制作包。EP04 做了表现诊断（点击率 3.4%，0:24 流失过半）；EP05 重做开头钩子，脚本、配音稿、字幕、分镜表、三版封面和无声样片齐全。",
+    "tags": [
+      "YouTube",
+      "制作包"
+    ],
+    "source": "AI-supply-chain/video",
+    "links": [
+      {
+        "label": "投研中枢",
+        "url": "https://claude.ai/artifact/13iTa2ZVCGDphgQggCZk7U"
+      },
+      {
+        "label": "仓库",
+        "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
+      }
+    ]
+  },
+  "eoe-two-years": {
+    "title": "动画微电影《一个社恐的两年奇遇记》",
+    "cat": "media",
+    "status": "待完善",
+    "date": "2026-10-17",
+    "summary": "七幕火柴人动画，94.5 秒，配乐和本人声音合成。已出审片意见、三版优化方案和小红书标题、正文、封面方案，等你选版本、核对事实。",
+    "tags": [
+      "动画",
+      "声音克隆"
+    ],
+    "source": "AI-lab-for-tim · claude/clever-meitner-l6m2ck",
+    "links": [
+      {
+        "label": "成片",
+        "url": "https://claude.ai/artifact/NKvYzboLEtPxpAn8AbBRtt"
+      },
+      {
+        "label": "风格定稿",
+        "url": "https://claude.ai/artifact/NiYBfq6tiFbQJUMYKV2RJu"
+      },
+      {
+        "label": "开场样片",
+        "url": "https://claude.ai/artifact/ASLmmEC285kcHZKB3ySXha"
+      },
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/clever-meitner-l6m2ck/films/eoe-two-years"
+      }
+    ]
+  },
+  "memory-wallst": {
+    "title": "存力研究所《存储一周被砸 26%，真凶不是长鑫》",
+    "cat": "media",
+    "status": "待完善",
+    "date": "2026-10-18",
+    "summary": "约 8 分钟的存储行业视频 v3：63 条事实台账、完整口播稿、前 30 秒留存设计、本人声音克隆配音、一键出片流水线和发布包。自检通过，待过稿。",
+    "tags": [
+      "财经视频",
+      "事实台账"
+    ],
+    "source": "AI-lab-for-tim · claude/youthful-babbage-m1umv1",
+    "links": [
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/youthful-babbage-m1umv1/video/memory-wallst"
+      }
+    ]
+  },
+  "dram-hbm": {
+    "title": "DRAM / HBM 图解短视频",
+    "cat": "media",
+    "status": "待完善",
+    "date": "2026-10-15",
+    "summary": "两段约 2 分钟的科普视频：晶圆和 HBM 两张等轴测交互图解（深浅两版）、录屏脚本和分镜稿。发布前要核对 TrendForce 数据。",
+    "tags": [
+      "科普",
+      "交互图解"
+    ],
+    "source": "AI-lab-for-tim · claude/ecstatic-planck-vcya5k",
+    "links": [
+      {
+        "label": "源码",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/ecstatic-planck-vcya5k/video/dram-hbm"
+      }
     ]
   }
 }
