@@ -86,6 +86,14 @@ def main():
         if l['text'][:2] == '第' + l['text'][1] and l['text'][2:3] == '刀':
             s = int((l['start'] - 0.55) * SR); sfx[s:s + len(hit)] += hit[:max(0, min(len(hit), n - s))] * 0.5
     s0 = int(0.0 * SR); sfx[s0:s0 + len(hit)] += hit * 0.35  # 开场一记
+    for l in tl['lines']:  # 栏目片头：低频上扬 + 落定
+        if l.get('pause'):
+            a0, d = int(l['start'] * SR), l['pause']
+            m = int(SR * 3.3); tau = np.arange(m) / SR
+            rise = np.sin(2 * np.pi * (60 * tau + 160 / (2 * 3.3) * tau ** 2)) * (tau / 3.3) ** 2 * 0.5
+            sfx[a0:a0 + m] += lowpass(rise.astype(np.float32), 700)[:max(0, min(m, n - a0))]
+            h0 = a0 + int(SR * 3.35); sfx[h0:h0 + len(hit)] += hit[:max(0, min(len(hit), n - h0))] * 0.6
+            bgm[a0:a0 + int(d * SR)] *= 0.25
     if args.no_music:
         bgm *= 0; sfx *= 0
     mix = v + bgm + sfx

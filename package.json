@@ -10,7 +10,8 @@
     "notes": "node scripts/notes.mjs",
     "build:preview": "node scripts/build-preview.mjs",
     "codes:static": "node --no-warnings scripts/codes-static.mjs",
-    "video:check": "node video/memory-wallst/check.mjs"
+    "video:check": "node video/memory-wallst/check.mjs",
+    "video:pronounce": "python3 video/memory-wallst/production/pronounce.py"
   },
   "engines": {
     "node": ">=22.13"

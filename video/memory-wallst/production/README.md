@@ -8,10 +8,14 @@ cd video/memory-wallst
 pip install sherpa-onnx soundfile numpy
 npm i --prefix out --no-save playwright-core@1.56 @fontsource/noto-sans-sc@5 @fontsource/jetbrains-mono@5
 echo '{"type":"module"}' > out/package.json
-# 配音模型（约 147MB）：sherpa-onnx 的 tts-models 发布页 → kokoro-int8-multi-lang-v1_1.tar.bz2，解压后用 KOKORO_DIR 指过去
+pip install pypinyin
+# 克隆模型（约 800MB，sherpa-onnx GitHub 发布页）：tts-models/sherpa-onnx-zipvoice-zh-en-emilia、
+#   tts-models/sherpa-onnx-zipvoice-distill-int8-zh-en-emilia、vocoder-models/vocos_24khz.onnx，放在同一目录，用 ZIPVOICE_DIR 指过去
+# 参考录音：out/voice-ref/ref.wav + ref.txt（Tim 本人，不进仓库）
 
 npm run video:check                       # 1. 自检：事实、时长、违禁词
-python3 production/tts.py --sid 65 --speed 1.08   # 2. 配音 → out/audio/voice.wav、timeline.json、subtitles.srt（约 1.5 倍实时）
+npm run video:pronounce                   #    读音核对 → 08-读音核对表.md（「待确认」必须为 0，过稿时一起看）
+python3 production/tts.py                 # 2. 配音（Tim 本人声音克隆，1.08 倍速）→ out/audio/voice.wav、timeline.json、subtitles.srt（约 4–5 倍实时）
 node production/render.mjs                # 3. 画面 → out/video/picture.mp4（1080p 25fps，约 20–30 分钟）
 python3 production/mix.py                 # 4. 配乐 + 音效 + 混音 → out/final/存储复盘-一周五刀.mp4
 node production/cover.mjs                 # 5. 封面两套文案 × 三种比例 → out/final/cover-{a,b}-*.png
@@ -34,7 +38,9 @@ node production/chapters.mjs              #    章节时间戳写进 07-发布�
 
 ## 换声音 / 加主播
 
-- **频道声音（待确认）**：男声，和上一期保持一致。候选 4 个：sid65 温暖低沉（推荐，语速偏慢，用 `--speed 1.08`）、sid60 沉稳清晰、sid100 明亮干练、sid58 年轻利落。男声在 sid 58–102 之间（按基频筛出），女声如 sid 3。
+- **频道声音**：Tim 本人声音（ZipVoice 克隆，见 `09-栏目包装.md`）。Kokoro 开源男声只作备用：`tts.py --engine kokoro --sid 65`。
+- **多音字**：`pronounce.tsv` 是人工确认过的行业读音表，合成时写进词典、优先使用；`pronounce.py` 列出全稿多音字，「待确认」不为 0 时 `tts.py` 拒绝合成。
+- **片头停顿**：脚本里写 `@pause 5`，配音会留 5 秒，画面引擎放栏目片头，混音加上扬音和落定音。
 - **做样片**：`tts.py --secs 0,1 --out out/sample_audio` 只合成前两段，再 `render.mjs --audio out/sample_audio --out ...`、`mix.py --audio out/sample_audio --picture ... --out ...`。
 - **用自己的声音**：照提词器 `05-提词器版.md` 录一条整轨，按 `timeline.json` 的格式标出每句起止（或者用剪映自动字幕导出的时间），替换 `out/audio/voice.wav` 和 `timeline.json` 后，从第 3 步重跑。仓库 `claude/clever-meitner-l6m2ck` 分支里有「本人声音合成管线」，也可以接进来。
 - **加 AI 主播**：这一版是「数据画面 + 旁白」的无脸版本。要加主播，在剪辑软件里把主播镜头插在这几个点：开场后（0:21）、长鑫段开头、终局结论「周期搬了家」、收尾；每段 3–6 秒，画面引擎那几秒是大字卡，盖住不影响信息。

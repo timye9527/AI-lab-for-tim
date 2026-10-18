@@ -22,6 +22,7 @@ function estimate() {
   let sec = -1, title = '', t = 0.6, prev = null; const lines = [];
   for (const raw of md.split('\n')) {
     if (raw.startsWith('## ')) { sec++; title = raw.slice(3).trim(); continue; }
+    if (sec >= 0 && raw.startsWith('@pause')) { const p = Number(raw.split(/\s+/)[1]); t += 0.3; lines.push({ sec, title, text: '', pause: p, start: +t.toFixed(3), end: +(t + p).toFixed(3) }); t += p + 0.3; prev = sec; continue; }
     if (sec < 0 || !raw.startsWith('> ')) continue;
     const text = raw.slice(2).replace(/\s*\[F\d+\]\s*/g, '').trim();
     t += prev === null ? 0 : prev !== sec ? 0.9 : 0.2;
@@ -29,7 +30,8 @@ function estimate() {
     const d = (text.match(/[\p{Script=Han}A-Za-z0-9]/gu) || []).length / 270 * 60;
     lines.push({ sec, title, text, start: +t.toFixed(3), end: +(t + d).toFixed(3) }); t += d; prev = sec;
   }
-  return { duration: t + 2, lines };
+  const keep = opt('secs') ? opt('secs').split(',').map(Number) : null;
+  return { duration: t + 2, lines: keep ? lines.filter(l => keep.includes(l.sec)) : lines };
 }
 
 const AUDIO = opt('audio', ROOT + 'out/audio') + '/';
