@@ -21,9 +21,13 @@ def _load(name):
     return rows
 
 
-OVERRIDES = {}
+OVERRIDES, DISPUTED = {}, {}
 for row in _load('pron.txt'):
     w, *py = row.split()
+    # 行尾写「?」的是争议读音：词典读法和日常听感可能不一致，每期都列出来请主理人拍板
+    if py and py[-1] == '?':
+        py = py[:-1]
+        DISPUTED[w] = py
     OVERRIDES[w] = py
 READS = []
 for row in _load('read.txt'):
@@ -157,7 +161,7 @@ def g2p_run(run):
         for L in range(min(MAXW, len(run) - i), 0, -1):
             w = run[i:i + L]
             if w in OVERRIDES:
-                out += [(c, p, '词表') for c, p in zip(w, OVERRIDES[w])]
+                out += [(c, p, '争议' if w in DISPUTED else '词表') for c, p in zip(w, OVERRIDES[w])]
                 i += L
                 break
         else:
@@ -171,7 +175,7 @@ def g2p_run(run):
             i = j
     # 「一」「不」变调，词表里写死的不动
     for k, (c, p, src) in enumerate(out):
-        if src == '词表' or c not in '一不':
+        if src in ('词表', '争议') or c not in '一不':
             continue
         nxt = out[k + 1][1].split()[0] if k + 1 < len(out) else None
         prev = out[k - 1][0] if k else ''
@@ -249,10 +253,44 @@ def mark(p):
     return (s[:idx] + MARKS[s[idx]][t - 1] + s[idx + 1:]).replace('v', 'ü')
 
 
-# 词典最容易在上下文里取错音的字，读音表里单独列出来重点审
-RISKY = set('得了着量冲转还行长重调差数处为地和便降空给传')
-# 这些读法是绝大多数情况，不再列出，免得噪音盖住真问题
-USUAL = {'了': 'le5', '和': 'he2', '给': 'gei3', '还': 'hai2', '地': 'di4'}
+# 词典最容易在上下文里取错音的字，读音表里单独列出来，按语境逐个判断（规则见 读音规范.md「多音字语境规则」）
+RISKY = set('得了着量冲转还行长重调差数处为地和便降空给传应曾朝种相将少好中当发角结系场只背薄难参血塞累折露')
+# 这些字绝大多数时候读常见音，读成常见音就不列，免得噪音盖住真问题
+USUAL = {'了': 'le5', '和': 'he2', '给': 'gei3', '还': 'hai2', '地': 'di4', '中': 'zhong1', '场': 'chang3', '只': 'zhi3',
+         '参': 'can1', '种': 'zhong3', '结': 'jie2', '难': 'nan2', '少': 'shao3', '好': 'hao3', '背': 'bei4', '相': 'xiang1',
+         '应': 'ying1', '朝': 'chao2', '曾': 'ceng2', '将': 'jiang1', '薄': 'bo2', '血': 'xue4', '塞': 'sai1', '累': 'lei4',
+         '折': 'zhe2', '露': 'lu4', '系': 'xi4', '发': 'fa1', '角': 'jiao3'}
+
+# 语境规则：这些搭配里要读少见音。词典没读成这个音时，读音表标出「按语境应读 X」
+CONTEXT = [
+    (r'还(?=了?[钱债款贷账])', 'huan2', '还钱、还债的「还」'),
+    (r'(?<=[归偿退])还', 'huan2', '归还、偿还的「还」'),
+    (r'(?<=[几一两三四五六七八九十多每])只(?=[股票基鸡鸟船手])', 'zhi1', '量词「几只股票」'),
+    (r'中(?=[奖标毒弹签])', 'zhong4', '中奖、中标的「中」'),
+    (r'(?<=[打命猜])中', 'zhong4', '打中、命中的「中」'),
+    (r'好(?=[奇学客胜色战])', 'hao4', '好奇、好学的「好」'),
+    (r'(?<=[爱喜嗜偏])好', 'hao4', '爱好、偏好的「好」'),
+    (r'应(?=[用对付聘答变激邀])', 'ying4', '应用、应对的「应」'),
+    (r'(?<=[回响反适供相呼答])应', 'ying4', '回应、供应的「应」'),
+    (r'难(?=[民友])', 'nan4', '难民的「难」'),
+    (r'(?<=[灾遇患苦落逃避发责劫])难', 'nan4', '灾难、遇难的「难」'),
+    (r'少(?=[年女将爷])', 'shao4', '少年的「少」'),
+    (r'种(?=[植地树田菜])', 'zhong4', '种植的「种」'),
+    (r'(?<=[耕播接])种', 'zhong4', '播种、接种的「种」'),
+    (r'相(?=[机貌声片册])', 'xiang4', '相机、相貌的「相」'),
+    (r'(?<=[真首宰丞照面亮])相', 'xiang4', '真相、首相的「相」'),
+    (r'参(?=差)', 'cen1', '参差的「参」'),
+    (r'背(?=[包负着起])', 'bei1', '背包、背负的「背」'),
+    (r'结(?=[实巴])', 'jie1', '结实的「结」'),
+    (r'(?<=[头理])发', 'fa4', '头发、理发的「发」'),
+    (r'发(?=[型廊丝])', 'fa4', '发型的「发」'),
+    (r'(?<=[主配])角', 'jue2', '主角、配角的「角」'),
+    (r'角(?=[色逐斗])', 'jue2', '角色、角逐的「角」'),
+    (r'朝(?=[阳气晖夕])', 'zhao1', '朝阳的「朝」'),
+    (r'曾(?=[孙祖])', 'zeng1', '曾孙的「曾」'),
+    (r'(?<=[单稀刻])薄', 'bo2', '单薄、稀薄的「薄」'),
+    (r'(?<=[露雪])露', 'lu4', '露的读音'),
+]
 
 
 def risky(c, py, prev=''):
@@ -262,6 +300,19 @@ def risky(c, py, prev=''):
     if c == '了' and prev in '不得':
         return True
     return USUAL.get(c) != py
+
+
+def context_hits(chars):
+    """按语境规则检查：命中搭配但读音不是规则要求的，返回 [(位置, 字, 现读, 应读, 说明)]。"""
+    text = ''.join(c for c, _, _ in chars)
+    out = []
+    for pat, want, why in CONTEXT:
+        for m in re.finditer(pat, text):
+            k = m.start()
+            c, py, src = chars[k]
+            if py != want and src not in ('词表', '争议'):
+                out.append((k, c, py, want, why))
+    return out
 
 
 def is_poly(c):

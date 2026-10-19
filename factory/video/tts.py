@@ -256,11 +256,30 @@ def write_sheet(path, beats, plans):
              '> 读错了就在 `factory/video/pron.txt` 加词；字母读法在 `letters.txt`，英文和符号的读法改 `read.txt`。', '']
     risky = []
     for i, p in enumerate(plans):
-        hits = [f'{c}({pron.mark(py)})' for k, (c, py, src) in enumerate(p['chars']) if src == '词典' and pron.risky(c, py, p['chars'][k - 1][0] if k else '')]
+        ctx = {k: (want, why) for k, _, _, want, why in pron.context_hits(p['chars'])}
+        hits = []
+        for k, (c, py, src) in enumerate(p['chars']):
+            if k in ctx:
+                hits.append(f'{c}({pron.mark(py)}，按语境应读 {pron.mark(ctx[k][0])}：{ctx[k][1]})')
+            elif src == '词典' and pron.risky(c, py, p['chars'][k - 1][0] if k else ''):
+                hits.append(f'{c}({pron.mark(py)})')
         if hits:
             risky.append(f'- 第 {i + 1} 句：' + '、'.join(hits))
+    disputed = {}
+    for i, p in enumerate(plans):
+        norm_zh = ''.join(c for c, _, _ in p['chars'])
+        for w, py in pron.DISPUTED.items():
+            if w in norm_zh:
+                disputed.setdefault(w, []).append(i + 1)
+    if disputed:
+        lines += ['## 需要拍板：争议读音（词典读法和日常听感可能不一致）', '']
+        lines += [f'- {w}：现在读 {pron.mark(" ".join(pron.DISPUTED[w]))}，出现在第 {"、".join(map(str, ns))} 句' for w, ns in disputed.items()]
+        lines += ['', '> 拍板后：确认按词典读，就把 `pron.txt` 里这行末尾的「?」删掉；要改读法，就改拼音再删「?」；也可以改写稿子避开这个词。', '']
     if risky:
-        lines += ['## 重点审：高风险字（由词典自动取音，没经过覆盖表）', ''] + risky + ['', '## 逐句', '']
+        lines += ['## 重点审：高风险字（由词典自动取音，没经过覆盖表）', '',
+                  '> 逐个按语境判断：读出整句，想这个字在句子里是什么意思，再对照 `读音规范.md` 的「多音字语境规则」。', ''] + risky + ['']
+    if disputed or risky:
+        lines += ['## 逐句', '']
     for i, (b, p) in enumerate(zip(beats, plans)):
         marked, k = '', 0
         for c in re.sub(rf'[^{pron.ZH}]', '', p['norm']):

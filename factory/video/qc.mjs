@@ -75,8 +75,19 @@ export async function runQC({ page, ep, scenes, subs, beats, out, epDir }) {
 
   // 2. 读音（声调要人工）
   const sheet = join(epDir, '读音表.md');
-  const risky = existsSync(sheet) ? (readFileSync(sheet, 'utf8').match(/^- 第 \d+ 句：.*$/gm) || []) : [];
-  sec.push('## 2. 读音声调（人工）', '', `识别模型听不出声调。打开 \`读音表.md\`，先看「重点审」的 ${risky.length} 句，确认括号里的拼音没错。`, '');
+  const sheetText = existsSync(sheet) ? readFileSync(sheet, 'utf8') : '';
+  const risky = sheetText.match(/^- 第 \d+ 句：.*$/gm) || [];
+  const disputed = (sheetText.split('## 需要拍板')[1] || '').split('\n## ')[0].match(/^- .*$/gm) || [];
+  sec.push('## 2. 读音声调和多音字（人工）', '',
+    `识别模型听不出声调，也判断不了多音字在语境里该读哪个音。打开 \`读音表.md\`：`, '',
+    `- 「重点审」${risky.length} 句：逐个按语境判断，读对了把词写进 \`pron.txt\` 的「人工审过」，读错了改拼音。`,
+    `- 「需要拍板」${disputed.length} 处争议读音：词典读法和日常听感可能不一致，由主理人决定。`, '');
+  for (const d of disputed) {
+    soft.push(`争议读音待拍板：${d.slice(2)}`);
+    sec.push(`  - △ ${d.slice(2)}`);
+  }
+  if (risky.length) soft.push(`读音表有 ${risky.length} 句多音字待按语境审`);
+  sec.push('');
 
   // 3. 画面
   sec.push('## 3. 画面（自动）', '');
@@ -127,7 +138,7 @@ export async function runQC({ page, ep, scenes, subs, beats, out, epDir }) {
     '> 自动检查之外，发布前还要人工过一遍文末清单。', ''];
   const tail = ['## 6. 人工清单', '',
     '- [ ] 戴耳机听前 30 秒和每章开头：有没有怪音、重复、吞字',
-    '- [ ] `读音表.md`「重点审」逐条确认声调',
+    '- [ ] `读音表.md`「重点审」逐条按语境确认声调，「需要拍板」的争议读音已决定',
     '- [ ] 原话和数字对照出处（拆解卡里标了「待核实」的）',
     '- [ ] 封面、标题不出现个股、收益、点位', ''];
   return { hard, soft, report: [...head, ...sec, ...tail].join('\n') };
