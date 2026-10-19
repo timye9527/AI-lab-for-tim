@@ -20,17 +20,14 @@
         "url": "https://github.com/timye9527/AI-supply-chain/tree/main/desk"
       }
     ],
-    "priority": "主线",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "上游"
-    ],
-    "why": "闭环的信息源头，日更和视频选题台都从这里出。精力放在选题质量上，不再加新分台。",
+    "priority": "推进",
+    "why": "交易和内容共用的信息上游：日更给你盘感，选题台给视频和文章供料。",
     "asset": "已入库",
     "assetNote": "AI-supply-chain 默认分支，desk/ 有重建脚本",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "系统",
+    "next": "保持日更，不再加新分台；选题台只给视频和 ETF 文章供料。"
   },
   "ai-supply-chain": {
     "title": "AI 产业链验证系统",
@@ -54,16 +51,13 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "上游"
-    ],
-    "why": "中枢的主要数据来源，日更已经自动化。保持运行，结论直接喂给视频选题，不单独加投入。",
+    "why": "中枢的主要数据来源，日更已自动化，不单独加投入。",
     "asset": "已入库",
     "assetNote": "AI-supply-chain 默认分支",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "系统",
+    "parent": "invest-desk"
   },
   "smart-money-map": {
     "title": "聪明钱观点地图",
@@ -87,16 +81,13 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "上游"
-    ],
-    "why": "已并入投研中枢，跟着日更走，不再单独维护这个页面。",
+    "why": "已并入投研中枢，跟着日更走。",
     "asset": "已入库",
     "assetNote": "内容已并入 AI-supply-chain/smart-investor",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "系统",
+    "parent": "invest-desk"
   },
   "etf-temperature": {
     "title": "ETF 市场温度计",
@@ -127,17 +118,14 @@
         "url": "https://github.com/timye9527/ETF-Market-Temperature"
       }
     ],
-    "priority": "维持",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "上游"
-    ],
-    "why": "收盘后自动更新，偶尔给视频提供市场状态画面，不需要人工投入。",
+    "priority": "重点",
+    "why": "看市场状态的仪表盘，也是 ETF 文章变现的数据底座。",
     "asset": "已入库",
     "assetNote": "main + gh-pages，每日自动跑",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "系统",
+    "next": "每周从温度计自动出一份文章素材（冷热变化、极值节点、板块轮动），给投资账号写 ETF 文章用。"
   },
   "soxl-radar": {
     "title": "SOXL 交易雷达",
@@ -156,13 +144,14 @@
         "url": "https://github.com/timye9527/soxl-trading-radar"
       }
     ],
-    "priority": "降级",
-    "line": [],
-    "stage": [],
-    "why": "个人交易工具，不在两条主线里。服务器保持在跑，出问题再修，不再加新功能。",
+    "priority": "重点",
+    "why": "交易是你真正喜欢的事，雷达让你每天保持盘感，是最重要的资产之一。继续迭代信号和复盘。",
     "asset": "已入库",
     "assetNote": "main 可部署；另有 7 个 codex/ 分支没合并",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "系统",
+    "next": "把信号的事后复盘固定成每周一次，看哪些提醒真的有用，再调关键位规则。"
   },
   "ai-2028-map": {
     "title": "AI 2028 地图",
@@ -186,14 +175,12 @@
       }
     ],
     "priority": "封存",
-    "line": [
-      "影响力"
-    ],
-    "stage": [],
-    "why": "一次性报告，已经做完。想再利用就拆成几条内容，报告本身不再更新。",
+    "why": "一次性报告，已经做完。想再利用就拆成几条内容。",
     "asset": "已入库",
     "assetNote": "默认分支含网页和 19 页 PDF",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性"
   },
   "etf-global-research": {
     "title": "美股 ETF 投资全球：竞品调研与差异化构思",
@@ -212,12 +199,13 @@
       }
     ],
     "priority": "封存",
-    "line": [],
-    "stage": [],
-    "why": "一次性竞品调研，结论已经用过。",
+    "why": "设计 ETF 温度计时做的竞品调研，是温度计的一环，结论已经用进设计里。",
     "asset": "未入库",
     "assetNote": "只在已发布页面里，GitHub 上没有源文件",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "过程量",
+    "parent": "etf-temperature"
   },
   "stock-cases": {
     "title": "个股研究案例库",
@@ -237,17 +225,14 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "闭环",
-      "影响力"
-    ],
-    "stage": [
-      "上游"
-    ],
-    "why": "五工具打法和策略模板能反复用，单个案例可以改成视频选题。按需补案例。",
+    "why": "已做两组案例，五工具打法和策略模板已经成型，下次直接套模板。",
     "asset": "在分支",
     "assetNote": "claude/dazzling-brahmagupta-xkayse，6 个提交没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "交易",
+    "kind": "跑流程",
+    "parent": "invest-desk",
+    "runs": 2
   },
   "jiucai-test": {
     "title": "韭菜段位测试",
@@ -274,18 +259,13 @@
         "url": "https://github.com/timye9527/AI-lab-for-tim"
       }
     ],
-    "priority": "维持",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "中游",
-      "分发"
-    ],
-    "why": "唯一跑到变现的闭环样本，引擎已经做完。先上线拿真实数据，再决定加不加码。",
+    "priority": "降级",
+    "why": "商业化要靠小红书粉丝这个前置变量，粉丝起来之前投入回报低。引擎已做完，先放着；ETF 文章变现更现成。",
     "asset": "部分缺失",
     "assetNote": "引擎在 main；最新的竞品拆解、16 题分章、统一兑换码还在 claude/xiaohongshu-e01-production-gd18aa",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "运营与其他",
+    "kind": "系统"
   },
   "eoe-club-os": {
     "title": "EOE Club OS · 成长百科",
@@ -309,12 +289,12 @@
       }
     ],
     "priority": "降级",
-    "line": [],
-    "stage": [],
-    "why": "俱乐部内部系统，周期长，和商业化、个人影响力关系弱。只修影响使用的问题，不开新模块。",
+    "why": "俱乐部内部系统，周期长，离交易和金融内容都远。只修影响使用的问题。",
     "asset": "已入库",
     "assetNote": "默认分支 claude/eoe-club-os-v01-qmb5q0",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "运营与其他",
+    "kind": "系统"
   },
   "canto-pop-quest": {
     "title": "粤语港乐闯关",
@@ -333,12 +313,12 @@
       }
     ],
     "priority": "封存",
-    "line": [],
-    "stage": [],
     "why": "个人学习工具，已经够用。",
     "asset": "已入库",
     "assetNote": "main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "运营与其他",
+    "kind": "一次性"
   },
   "finance-hits": {
     "title": "粤语财经 YouTube 爆款周报",
@@ -362,21 +342,17 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "分发"
-    ],
-    "why": "分发端的对标雷达，每周自动采集。周报出来后补拆解即可，FRAMEWORK.md 继续当方法论母本。",
+    "why": "粤语财经对标周报，自动跑。要找爆款结构时再看。",
     "asset": "已入库",
     "assetNote": "main，GitHub Pages",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "系统"
   },
   "finance930-ops": {
     "title": "Finance 930 自频道周复盘",
     "cat": "content",
-    "status": "运行中",
+    "status": "暂停",
     "date": "2026-09-21",
     "summary": "抓自频道近 8 周数据出周度摘要，配点击率和观看时长的判读基线，告诉你下周改封面还是改内容。",
     "tags": [
@@ -390,18 +366,13 @@
         "url": "https://github.com/timye9527/finance930-ops"
       }
     ],
-    "priority": "主线",
-    "line": [
-      "闭环",
-      "影响力"
-    ],
-    "stage": [
-      "分发"
-    ],
-    "why": "闭环最后一环：发出去效果怎样、下周改什么。现在最弱，9 月 21 日之后没更新，要恢复每周复盘。",
+    "priority": "降级",
+    "why": "你决定先停。等视频管线稳定出片后，再恢复发布后的数据复盘。",
     "asset": "已入库",
     "assetNote": "代码在 main；依赖本机 Python 和每周手动导出的 Studio 数据",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "系统"
   },
   "zhaojian": {
     "title": "照见计划 · 摄影账号内容战略",
@@ -424,12 +395,12 @@
       }
     ],
     "priority": "封存",
-    "line": [],
-    "stage": [],
-    "why": "摄影账号的一次性战略交付，不在两条主线里。",
+    "why": "摄影账号的一次性战略交付。",
     "asset": "已入库",
     "assetNote": "main，GitHub Pages",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "运营与其他",
+    "kind": "一次性"
   },
   "xhs-e01": {
     "title": "小红书首期内容 + 韭菜测试素材包",
@@ -449,16 +420,13 @@
       }
     ],
     "priority": "封存",
-    "line": [
-      "影响力"
-    ],
-    "stage": [
-      "分发"
-    ],
-    "why": "首期素材已交付，运营偏好已沉淀进 PLAYBOOK.md，素材本身不再加工。",
+    "why": "首期素材已交付，运营偏好已沉淀进 PLAYBOOK.md。",
     "asset": "在分支",
     "assetNote": "claude/xiaohongshu-e01-production-gd18aa，8 个提交没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性",
+    "parent": "xhs-account"
   },
   "xhs-yanni": {
     "title": "小红书闫妮稿 · 撕纸卡片模板",
@@ -478,17 +446,13 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "影响力"
-    ],
-    "stage": [
-      "中游",
-      "分发"
-    ],
-    "why": "撕纸卡片出图脚本能复用到后续小红书图文；单篇稿子做完即止。",
+    "why": "第 2 次出图，撕纸卡片模板可复用。",
     "asset": "在分支",
     "assetNote": "claude/awesome-bohr-9gc09m，3 个提交没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "跑流程",
+    "parent": "xhs-account"
   },
   "take-back-time": {
     "title": "短片《把時間拿回來》",
@@ -512,19 +476,18 @@
       }
     ],
     "priority": "封存",
-    "line": [
-      "影响力"
-    ],
-    "stage": [],
-    "why": "个人作品，已经成片，留作作品集。",
+    "why": "已成片，留作作品集。",
     "asset": "在分支",
     "assetNote": "源码和 1080p 成片在 claude/loving-albattani-okwtpd，没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性",
+    "parent": "films"
   },
   "finance-video": {
     "title": "财经视频生产线",
     "cat": "media",
-    "status": "待完善",
+    "status": "暂停",
     "date": "2026-10-08",
     "summary": "选题过滤、脚本、分镜、AI 主播、华尔街风格图表到剪辑的整套流程，附参考视频拆解和 10 秒开头样片。主播目前是占位剪影。",
     "tags": [
@@ -539,16 +502,13 @@
       }
     ],
     "priority": "封存",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "中游"
-    ],
-    "why": "最早的视频生产线，已被存储视频和内容工厂的流水线取代，保留存档。",
+    "why": "第一版管线，已被新版取代，暂停。",
     "asset": "在分支",
     "assetNote": "claude/festive-sagan-wfu4pq，没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "过程量",
+    "parent": "video-pipeline"
   },
   "eoe-ai-workshop": {
     "title": "EOE AI 实战工作坊 PPT",
@@ -572,14 +532,12 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "影响力"
-    ],
-    "stage": [],
-    "why": "以你名义的公开分享，是影响力资产。讲完后封存，讲稿结构可复用到下次分享。",
+    "why": "以你名义的公开分享，是个人品牌资产。讲完后封存，讲稿结构下次复用。",
     "asset": "部分缺失",
     "assetNote": "仓库只有生成脚本和文档，在 claude/awesome-ptolemy-jzgxj5；PPT 成品、照片、音视频含肖像，按设计不进公开仓库，目前没有另存",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性"
   },
   "ai-workshop-toolkit": {
     "title": "EOE AI 实战工具包",
@@ -603,16 +561,13 @@
       }
     ],
     "priority": "维持",
-    "line": [
-      "影响力"
-    ],
-    "stage": [
-      "分发"
-    ],
-    "why": "工作坊配套网站，现场扫码用。工作坊结束后保持在线即可。",
+    "why": "工作坊配套网站，现场扫码用，结束后保持在线。",
     "asset": "已入库",
     "assetNote": "默认分支 codex/ai-workshop-toolkit，GitHub Pages",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性",
+    "parent": "eoe-ai-workshop"
   },
   "invest-video": {
     "title": "普通话 YouTube 投研视频栏目",
@@ -635,20 +590,14 @@
         "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
       }
     ],
-    "priority": "主线",
-    "line": [
-      "闭环",
-      "影响力"
-    ],
-    "stage": [
-      "上游",
-      "中游",
-      "分发"
-    ],
-    "why": "从投研中枢选题、按集出制作包、发布后做表现诊断，闭环已经转起来了。",
+    "priority": "维持",
+    "why": "上一版：EP04 已发布并做了表现诊断，结论已用进新版开头设计；选题台继续用。",
     "asset": "已入库",
     "assetNote": "AI-supply-chain 默认分支 video/",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "过程量",
+    "parent": "video-pipeline"
   },
   "eoe-two-years": {
     "title": "动画微电影《一个社恐的两年奇遇记》",
@@ -679,24 +628,21 @@
         "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/clever-meitner-l6m2ck/films/eoe-two-years"
       }
     ],
-    "priority": "维持",
-    "line": [
-      "影响力"
-    ],
-    "stage": [
-      "中游"
-    ],
-    "why": "俱乐部纪念作品，本身一次性；里面的本人声音合成管线可以复用到视频生产。定版发布后封存。",
+    "priority": "推进",
+    "why": "等你选版本发布；本人声音合成管线可以复用到视频管线。",
     "asset": "部分缺失",
     "assetNote": "源码在 claude/clever-meitner-l6m2ck；本人声音素材和完整版成片按设计不进公开仓库，目前没有另存",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "个人品牌",
+    "kind": "一次性",
+    "parent": "films"
   },
   "memory-wallst": {
     "title": "存力研究所《存储一周被砸 26%，真凶不是长鑫》",
     "cat": "media",
     "status": "待完善",
-    "date": "2026-10-18",
-    "summary": "约 8 分钟的存储行业视频 v3：63 条事实台账、完整口播稿、前 30 秒留存设计、本人声音克隆配音、一键出片流水线和发布包。自检通过，待过稿。",
+    "date": "2026-10-19",
+    "summary": "约 8 分钟的存储行业视频 v3：63 条事实台账、完整口播稿、前 30 秒留存设计、沉稳男声定稿、全段画面和 YouTube 上传包。待过稿。",
     "tags": [
       "财经视频",
       "事实台账"
@@ -708,24 +654,19 @@
         "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/youthful-babbage-m1umv1/video/memory-wallst"
       }
     ],
-    "priority": "主线",
-    "line": [
-      "闭环",
-      "影响力"
-    ],
-    "stage": [
-      "上游",
-      "中游"
-    ],
-    "why": "链路最完整：事实台账、脚本、留存设计、本人声音配音、出片、发布包都有。是视频生产线主干的候选。",
+    "priority": "推进",
+    "why": "最新版本之一：事实台账、留存设计、配音、YouTube 上传包最完整，这期跑完就发布。",
     "asset": "在分支",
     "assetNote": "claude/youthful-babbage-m1umv1，12 个提交没进 main；声音参考和成片在 out/，不提交",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "系统",
+    "parent": "video-pipeline"
   },
   "dram-hbm": {
     "title": "DRAM / HBM 图解短视频",
     "cat": "media",
-    "status": "待完善",
+    "status": "暂停",
     "date": "2026-10-15",
     "summary": "两段约 2 分钟的科普视频：晶圆和 HBM 两张等轴测交互图解（深浅两版）、录屏脚本和分镜稿。发布前要核对 TrendForce 数据。",
     "tags": [
@@ -739,17 +680,14 @@
         "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/ecstatic-planck-vcya5k/video/dram-hbm"
       }
     ],
-    "priority": "降级",
-    "line": [
-      "闭环"
-    ],
-    "stage": [
-      "中游"
-    ],
-    "why": "内容已被存储视频 v3 吸收。等轴测图解工具留着，做图解时再用。",
+    "priority": "封存",
+    "why": "早期科普短片，内容已被存力研究所吸收，暂停。",
     "asset": "在分支",
     "assetNote": "claude/ecstatic-planck-vcya5k，没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "过程量",
+    "parent": "video-pipeline"
   },
   "content-factory": {
     "title": "内容工厂 · 投资人深度内容改编",
@@ -768,18 +706,105 @@
         "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/dazzling-mayer-ykt7px/factory"
       }
     ],
-    "priority": "主线",
-    "line": [
-      "闭环",
-      "影响力"
-    ],
-    "stage": [
-      "上游",
-      "中游"
-    ],
-    "why": "人物池和选题，加上一份脚本数据直接出竖屏视频，工厂化程度最高。",
+    "priority": "推进",
+    "why": "最新版本之一：一份脚本数据直接出竖屏视频，读音和质检规范在持续补。",
     "asset": "在分支",
     "assetNote": "claude/dazzling-mayer-ykt7px，6 个提交没进 main",
-    "reviewed": "2026-10-19"
+    "reviewed": "2026-10-19",
+    "track": "金融内容",
+    "kind": "系统",
+    "parent": "video-pipeline"
+  },
+  "video-pipeline": {
+    "title": "财经视频管线",
+    "cat": "media",
+    "status": "运行中",
+    "date": "2026-10-19",
+    "summary": "从选题、事实台账、脚本，到配音、出片、发布包的一条管线。前后跑了五版，现在以内容工厂和存力研究所两条最新分支为准。",
+    "tags": [
+      "管线",
+      "以最新版为准"
+    ],
+    "source": "AI-lab-for-tim · claude/dazzling-mayer-ykt7px、claude/youthful-babbage-m1umv1",
+    "links": [
+      {
+        "label": "内容工厂",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/dazzling-mayer-ykt7px/factory"
+      },
+      {
+        "label": "存力研究所",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/youthful-babbage-m1umv1/video/memory-wallst"
+      }
+    ],
+    "track": "金融内容",
+    "kind": "系统",
+    "priority": "重点",
+    "why": "内容是你的优势，财经视频是把交易判断变成作品的主渠道。旧版本只是同一条管线的早期迭代，停掉即可，以最新版本持续跑。",
+    "reviewed": "2026-10-19",
+    "next": "用最新版跑完存力研究所这期并发布；发布后把留存数据写回脚本规范。",
+    "asset": "在分支",
+    "assetNote": "最新两版都在工作分支上：内容工厂、存力研究所各有十几个提交没进 main"
+  },
+  "xhs-account": {
+    "title": "小红书个人号",
+    "cat": "content",
+    "status": "运行中",
+    "date": "2026-10-12",
+    "summary": "个人品牌的图文阵地：首期内容、撕纸卡片出图模板、运营偏好沉淀。",
+    "tags": [
+      "个人品牌",
+      "图文"
+    ],
+    "source": "AI-lab-for-tim · claude/awesome-bohr-9gc09m、claude/xiaohongshu-e01-production-gd18aa",
+    "links": [
+      {
+        "label": "出图模板",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-bohr-9gc09m"
+      },
+      {
+        "label": "首期内容",
+        "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/xiaohongshu-e01-production-gd18aa"
+      }
+    ],
+    "track": "个人品牌",
+    "kind": "跑流程",
+    "priority": "推进",
+    "why": "个人品牌的主阵地，也是以后带货的前置变量。粉丝起来之前，先保证稳定更新。",
+    "reviewed": "2026-10-19",
+    "next": "第 3 篇继续用同一套出图模板，做完就把模板固化成一条命令。",
+    "runs": 2,
+    "asset": "在分支",
+    "assetNote": "两次出图都在工作分支上，没进 main"
+  },
+  "films": {
+    "title": "个人短片与音乐",
+    "cat": "media",
+    "status": "运行中",
+    "date": "2026-10-17",
+    "summary": "程序生成画面、自己配乐、本人声音合成的短片：《把時間拿回來》和《一个社恐的两年奇遇记》。",
+    "tags": [
+      "作品集",
+      "音乐"
+    ],
+    "source": "AI-lab-for-tim · claude/loving-albattani-okwtpd、claude/clever-meitner-l6m2ck",
+    "links": [
+      {
+        "label": "把時間拿回來",
+        "url": "https://claude.ai/artifact/MgmG42STtXfzrhpTSDBMxW"
+      },
+      {
+        "label": "社恐奇遇记",
+        "url": "https://claude.ai/artifact/NKvYzboLEtPxpAn8AbBRtt"
+      }
+    ],
+    "track": "个人品牌",
+    "kind": "跑流程",
+    "priority": "推进",
+    "why": "内容 × 音乐 × 程序画面是你独有的表达方式，作品集越积越值钱。",
+    "reviewed": "2026-10-19",
+    "next": "社恐微电影定版发布；第 3 部之前把画面、配乐、声音三段管线抽成通用工具。",
+    "runs": 2,
+    "asset": "部分缺失",
+    "assetNote": "两部源码都在工作分支；本人声音和完整版成片按设计不进公开仓库，还没有私有存放处"
   }
 }

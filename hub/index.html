@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* 布局：一本登记簿。顶部是主线判断和本周检查，中间是闭环地图和资产缺口，下面是全部条目 */
+/* 布局：先讲定位，再给本周三推三降，然后按主线分道列项目，最后是系统化和资产提醒 */
 :root {
   --bg: #f3f4f1;
   --sheet: #fbfbf9;
@@ -18,11 +18,10 @@
   --warn-soft: #f5ead6;
   --bad: #a3392b;
   --bad-soft: #f6e2de;
-  --c-invest: #23517a;
-  --c-report: #6a4c93;
-  --c-product: #2f7a4f;
-  --c-content: #a14a2a;
-  --c-media: #7a6a1f;
+  --t-trade: #23517a;
+  --t-fin: #2f7a4f;
+  --t-brand: #a14a2a;
+  --t-ops: #6b7178;
   --display: "Noto Serif SC", "Songti SC", "STSong", serif;
   --body: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -32,7 +31,7 @@
     --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
     --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
     --warn: #e0b064; --warn-soft: #2e2618; --bad: #ec8b7c; --bad-soft: #33201c;
-    --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
+    --t-trade: #7fb0dc; --t-fin: #74c190; --t-brand: #e39373; --t-ops: #9aa2ab;
     color-scheme: dark;
   }
 }
@@ -40,15 +39,17 @@
   --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
   --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
   --warn: #e0b064; --warn-soft: #2e2618; --bad: #ec8b7c; --bad-soft: #33201c;
-  --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
+  --t-trade: #7fb0dc; --t-fin: #74c190; --t-brand: #e39373; --t-ops: #9aa2ab;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 32px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 36px; }
 a { color: var(--accent); }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; left: -9999px; }
+section { display: grid; gap: 12px; }
 h2.sec { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0; }
 .sec-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
 .sec-h .d { color: var(--muted); font-size: 13px; }
@@ -57,69 +58,46 @@ h2.sec { font-family: var(--display); font-weight: 600; font-size: 21px; margin:
 /* 抬头 */
 header.top { display: grid; gap: 18px; }
 .mast { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
-.mast h1 { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+.mast h1 { font-family: var(--display); font-weight: 900; font-size: clamp(30px, 6vw, 44px); line-height: 1.1; margin: 0; letter-spacing: .02em; }
 .mast p { margin: 6px 0 0; color: var(--muted); max-width: 46em; }
 .mast .side { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .04em; }
 
-/* 两条主线 */
-.lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-block: 2px solid var(--ink); }
-.lines > div { padding: 14px 18px 14px 0; display: grid; gap: 4px; }
-.lines > div + div { border-left: 1px solid var(--rule); padding-left: 18px; }
-@media (max-width: 600px) { .lines > div + div { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; } }
-.lines .k { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
-.lines strong { font-family: var(--display); font-size: 18px; }
-.lines p { margin: 0; color: var(--muted); font-size: 14px; }
+/* 定位 */
+.who { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 2px solid var(--ink); }
+.who > div { padding: 12px 14px; display: grid; gap: 2px; border-left: 1px solid var(--rule); }
+.who > div:first-child { border-left: 0; padding-left: 0; }
+.who .k { font-size: 12px; color: var(--muted); letter-spacing: .06em; }
+.who strong { font-family: var(--display); font-size: 19px; }
+.who span.v { font-size: 13px; color: var(--muted); }
+.meet { margin: 0; font-size: 14px; }
+.meet b { font-weight: 600; }
+@media (max-width: 720px) {
+  .who { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .who > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .who > div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+}
 
-/* 本周检查 */
-.review { display: grid; gap: 12px; }
-.review .sum { margin: 0; max-width: 62ch; }
-.acts-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
-.acts-list li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
-.acts-list .kind { font-size: 12px; padding: 1px 0; text-align: center; border-radius: 4px; height: fit-content; }
+/* 本周焦点 */
+.focus { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; }
+@media (max-width: 760px) { .focus { grid-template-columns: minmax(0, 1fr); } }
+.col h3 { margin: 0 0 4px; font-size: 13px; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+.pick { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px 12px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.pick .no { font-family: var(--mono); font-size: 24px; line-height: 1.1; color: var(--accent); font-variant-numeric: tabular-nums; }
+.pick h4 { margin: 0; font-size: 17px; font-weight: 600; }
+.pick p { margin: 0; font-size: 14px; color: var(--muted); }
+.pick .nx { color: var(--ink); }
+.pick .nx b { font-weight: 600; }
+.down .pick .no { color: var(--warn); font-size: 18px; }
+.down .pick h4 { font-size: 16px; }
+.todo { list-style: none; margin: 0; padding: 0; }
+.todo li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.todo .kind { font-size: 12px; text-align: center; border-radius: 4px; height: fit-content; padding: 1px 0; }
 .kind.k-decide { background: var(--accent-soft); color: var(--accent); }
 .kind.k-fix { background: var(--bad-soft); color: var(--bad); }
 .kind.k-keep { background: var(--ok-soft); color: var(--ok); }
-
-/* 闭环地图 */
-.loop { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; position: relative; }
-.stage { padding: 14px 16px 16px; border: 1px solid var(--rule); background: var(--sheet); display: grid; gap: 10px; align-content: start; min-width: 0; }
-.stage + .stage { border-left: 0; }
-.stage h3 { margin: 0; font-size: 15px; display: flex; align-items: baseline; gap: 8px; }
-.stage h3 .arrow { color: var(--muted); font-family: var(--mono); font-size: 13px; }
-.stage .what { margin: 0; font-size: 12.5px; color: var(--muted); }
-.stage .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.stage.weak { box-shadow: inset 0 3px 0 var(--bad); }
-.stage .flag { font-size: 12.5px; color: var(--bad); margin: 0; }
-.chip { font-size: 13px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--rule); background: var(--bg); }
-.chip.p-main { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 600; }
-@media (max-width: 720px) {
-  .loop { grid-template-columns: minmax(0, 1fr); }
-  .stage + .stage { border-left: 1px solid var(--rule); border-top: 0; }
-}
-
-/* 资产缺口 */
-.gaps { display: grid; gap: 0; }
-.gap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: start; }
-.gap h4 { margin: 0; font-size: 15px; font-weight: 600; }
-.gap p { margin: 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
-.gap .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-.gaps .sub { font-size: 13px; color: var(--muted); padding: 14px 0 4px; }
-
-/* 总账：每类数量 */
-.ledger { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-block: 2px solid var(--ink); }
-.ledger button { all: unset; cursor: pointer; padding: 12px 14px; display: grid; gap: 2px; border-left: 1px solid var(--rule); }
-.ledger button:first-child { border-left: 0; }
-.ledger button:hover { background: var(--sheet); }
-.ledger button[aria-pressed="true"] { background: var(--sheet); box-shadow: inset 0 -3px 0 var(--cat, var(--ink)); }
-.ledger button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.ledger .n { font-family: var(--mono); font-size: 26px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--cat, var(--ink)); }
-.ledger .k { font-size: 13px; color: var(--muted); }
-@media (max-width: 720px) {
-  .ledger { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .ledger button:nth-child(4) { border-left: 0; }
-  .ledger button:nth-child(n+4) { border-top: 1px solid var(--rule); }
-}
+.todo .t { color: var(--muted); }
+.todo .t strong { color: var(--ink); font-weight: 600; display: block; }
 
 /* 工具条 */
 .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
@@ -132,22 +110,22 @@ header.top { display: grid; gap: 18px; }
 .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: 6px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
 .btn.danger { background: transparent; color: var(--warn); border-color: var(--warn); }
-.btn:hover { filter: brightness(1.08); }
-.sr { position: absolute; left: -9999px; }
 
-/* 分册 */
-.listing { display: grid; gap: 28px; }
-section.book { display: grid; gap: 0; }
-.book .sec-h h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--cat, var(--ink)); margin-right: 10px; vertical-align: 2px; }
+/* 主线分道 */
+.lanes { display: grid; gap: 30px; }
+.lane { display: grid; gap: 0; }
+.lane .sec-h { border-bottom-color: var(--lane, var(--ink)); border-bottom-width: 2px; }
+.lane .sec-h h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--lane, var(--ink)); margin-right: 10px; vertical-align: 2px; }
 
 /* 条目行 */
-.row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 6px 20px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: start; }
-.row .date { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 3px; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 20px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: start; }
 .row .main { min-width: 0; display: grid; gap: 6px; }
-.row h3 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; text-wrap: balance; }
-.row .sum { margin: 0; color: var(--muted); max-width: 62ch; }
-.row .why { margin: 0; font-size: 13.5px; max-width: 62ch; padding-left: 10px; border-left: 2px solid var(--rule); }
-.row .why b { font-weight: 600; }
+.row h3 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.row h3 .date { font-family: var(--mono); font-size: 12px; color: var(--muted); font-weight: 400; }
+.row .sum { margin: 0; color: var(--muted); max-width: 64ch; }
+.row .why { margin: 0; font-size: 14px; max-width: 64ch; padding-left: 10px; border-left: 2px solid var(--rule); }
+.row .why b, .row .nx b { font-weight: 600; }
+.row .nx { margin: 0; font-size: 14px; max-width: 64ch; padding-left: 10px; border-left: 2px solid var(--accent); }
 .row .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
 .row .tag { border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; }
 .row .src { font-family: var(--mono); font-size: 11.5px; overflow-wrap: anywhere; }
@@ -155,30 +133,51 @@ section.book { display: grid; gap: 0; }
 .row .links a { text-decoration: none; font-size: 13px; padding: 3px 10px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
 .row .links a:hover { text-decoration: underline; }
 .row .right { display: grid; justify-items: end; gap: 6px; }
+.row.child { padding: 12px 0 12px 14px; border-bottom: 1px dashed var(--rule); }
+.row.child h3 { font-size: 15px; }
+.row.child .sum { font-size: 14px; }
+details.kids { margin-top: 2px; }
+details.kids > summary { cursor: pointer; font-size: 13px; color: var(--muted); padding: 2px 0; }
+details.kids > summary:hover { color: var(--ink); }
+details.kids > div { border-left: 2px solid var(--rule); margin-top: 4px; }
+@media (max-width: 640px) {
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .row .right { justify-items: start; grid-auto-flow: column; justify-content: start; align-items: center; }
+}
+
+.pr { font-size: 12px; padding: 1px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid var(--rule); color: var(--muted); }
+.pr.p-top { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+.pr.p-push { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pr.p-keep { color: var(--ink); }
+.pr.p-down { color: var(--warn); border-color: var(--warn); border-style: dashed; }
+.pr.p-shelf { color: var(--muted); border-style: dotted; }
+.kd { font-size: 12px; color: var(--muted); white-space: nowrap; }
 .pill { font-size: 12px; padding: 1px 8px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
 .pill.s-run { background: var(--ok-soft); color: var(--ok); }
 .pill.s-live { background: var(--accent-soft); color: var(--accent); }
 .pill.s-done { border-color: var(--rule); color: var(--muted); }
 .pill.s-todo { background: var(--warn-soft); color: var(--warn); }
-.pr { font-size: 12px; padding: 1px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid var(--rule); color: var(--muted); }
-.pr.p-main { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.pr.p-keep { color: var(--ink); }
-.pr.p-down { color: var(--warn); border-color: var(--warn); border-style: dashed; }
-.pr.p-shelf { color: var(--muted); border-style: dotted; }
+.pill.s-pause { border: 1px dashed var(--muted); color: var(--muted); }
 .as { font-size: 12px; white-space: nowrap; }
-.as::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+.as::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
 .as.a-ok { color: var(--ok); } .as.a-ok::before { background: var(--ok); }
 .as.a-branch { color: var(--warn); } .as.a-branch::before { background: var(--warn); }
 .as.a-part { color: var(--warn); } .as.a-part::before { background: transparent; border: 2px solid var(--warn); width: 6px; height: 6px; }
 .as.a-none { color: var(--bad); } .as.a-none::before { background: var(--bad); }
 .edit { all: unset; cursor: pointer; font-size: 12px; color: var(--muted); text-decoration: underline; }
 .edit:focus-visible { outline: 2px solid var(--accent); }
-@media (max-width: 720px) {
-  .row { grid-template-columns: minmax(0, 1fr) auto; }
-  .row .date { grid-column: 1 / -1; padding: 0; }
-  .row .right { grid-column: 2; grid-row: 2; }
-}
-.empty { padding: 28px 0; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.empty { padding: 20px 0; color: var(--muted); border-bottom: 1px solid var(--rule); }
+
+/* 提醒区 */
+.alerts { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 28px; align-items: start; }
+@media (max-width: 760px) { .alerts { grid-template-columns: minmax(0, 1fr); } }
+.alerts section { gap: 4px; }
+.line-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 14px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.line-item h4 { margin: 0; font-size: 15px; font-weight: 600; }
+.line-item p { margin: 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; grid-column: 1 / -1; }
+.line-item .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.runs { font-family: var(--mono); font-size: 12px; color: var(--warn); white-space: nowrap; }
+.subhead { font-size: 13px; color: var(--muted); padding: 12px 0 2px; }
 
 /* 规则 */
 details.rules { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 0 16px; }
@@ -189,17 +188,16 @@ details.rules summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
 .rules-grid code { font-family: var(--mono); font-size: 12.5px; background: var(--bg); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
 
 /* 编辑抽屉 */
-dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); color: var(--ink); padding: 0; width: min(580px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); color: var(--ink); padding: 0; width: min(600px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
 dialog::backdrop { background: rgba(10, 14, 18, .45); }
 dialog form { display: grid; gap: 12px; padding: 20px; }
 dialog h2 { margin: 0; font-family: var(--display); font-size: 20px; }
 dialog label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
-dialog input:not([type=checkbox]), dialog select, dialog textarea { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
-dialog textarea { resize: vertical; min-height: 60px; }
+dialog input, dialog select, dialog textarea { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+dialog textarea { resize: vertical; min-height: 56px; }
 dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-dialog fieldset { border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
-dialog fieldset legend { padding: 0 4px; }
-dialog fieldset label { display: inline-flex; gap: 4px; align-items: center; color: var(--ink); }
+dialog .three { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { dialog .three { grid-template-columns: 1fr 1fr; } }
 dialog .acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 dialog .acts .btn.danger { margin-right: auto; }
 dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
@@ -211,52 +209,40 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
     <div class="mast">
       <div>
         <h1>成果中台</h1>
-        <p>登记做出来的东西，按两条主线判断该加码、维持、降级还是封存，并检查每项是不是已经存进 GitHub、以后能复现。</p>
+        <p>按你的长期主线给每个项目定档：重点推进什么、维持什么、该降级或停掉什么，并检查每项是否已经存进 GitHub、以后能复现。</p>
       </div>
       <div class="side">
         <span class="stamp" id="stamp">正在读取登记簿…</span>
         <button class="btn" id="addBtn" type="button" hidden>登记新成果</button>
       </div>
     </div>
-    <div class="lines" aria-label="两条主线">
-      <div>
-        <span class="k">主线一</span>
-        <strong>表达与影响力资产</strong>
-        <p>以你的名义对外输出的作品和能力：视频、演讲、文章、作品集，越积越值钱。</p>
-      </div>
-      <div>
-        <span class="k">主线二</span>
-        <strong>内容生产闭环</strong>
-        <p>上游筛选信息、选题，中游写稿、配音、出片，下游分发、看数据、改下一期，整条链跑通。</p>
-      </div>
+    <div class="who" aria-label="定位">
+      <div><span class="k">热爱</span><strong>交易</strong><span class="v">保持市场敏感度</span></div>
+      <div><span class="k">优势</span><strong>内容</strong><span class="v">观点、片子、音乐</span></div>
+      <div><span class="k">职业</span><strong>运营</strong><span class="v">账号、分发、商业化</span></div>
+      <div><span class="k">长期赛道</span><strong>金融</strong><span class="v">长期赚钱、创造价值</span></div>
     </div>
+    <p class="meet"><b>交汇点：</b>用内容把交易和金融的判断变成作品和收入，用运营能力把它发出去。</p>
   </header>
 
-  <section class="review" id="review" aria-labelledby="reviewH">
-    <div class="sec-h"><h2 class="sec" id="reviewH">本周检查</h2><span class="d" id="reviewDate">等待周检数据</span></div>
-    <p class="sum" id="reviewSum">周检结论会显示在这里：该你拍板的事、闭环里断掉的环节、需要补进 GitHub 的成果。</p>
-    <ul class="acts-list" id="reviewActs"></ul>
+  <section aria-labelledby="focusH">
+    <div class="sec-h"><h2 class="sec" id="focusH">本周焦点</h2><span class="d" id="reviewDate">等待周检数据</span></div>
+    <p style="margin:0;max-width:64ch" id="reviewSum"></p>
+    <div class="focus">
+      <div class="col"><h3>重点推进</h3><div id="focusList"></div></div>
+      <div class="col down"><h3>考虑降级</h3><div id="dropList"></div></div>
+    </div>
+    <div class="col"><h3 style="margin-top:8px">要你拍板或补齐</h3><ul class="todo" id="todo"></ul></div>
   </section>
 
-  <section aria-labelledby="loopH" style="display:grid;gap:12px">
-    <div class="sec-h"><h2 class="sec" id="loopH">闭环地图</h2><span class="d">主线和维持的成果落在哪个环节</span></div>
-    <div class="loop" id="loop"></div>
-  </section>
-
-  <section aria-labelledby="gapH" style="display:grid;gap:4px">
-    <div class="sec-h"><h2 class="sec" id="gapH">资产化缺口</h2><span class="d">告诉我先补哪几项，我把它们整理进 GitHub</span><span class="c" id="gapCount"></span></div>
-    <div class="gaps" id="gaps"></div>
-  </section>
-
-  <section style="display:grid;gap:16px" aria-labelledby="allH">
-    <div class="sec-h"><h2 class="sec" id="allH">全部成果</h2></div>
-    <nav class="ledger" id="ledger" aria-label="按类型筛选"></nav>
+  <section aria-labelledby="allH">
+    <div class="sec-h"><h2 class="sec" id="allH">全部项目</h2><span class="d">挂在系统下面的子项默认折叠</span><span class="c" id="allCount"></span></div>
     <div class="tools">
       <div class="seg" role="group" aria-label="排列方式">
-        <button type="button" id="byPr" aria-pressed="true">按优先级</button>
-        <button type="button" id="byCat" aria-pressed="false">按类型</button>
+        <button type="button" id="byTrack" aria-pressed="true">按主线</button>
+        <button type="button" id="byPr" aria-pressed="false">按优先级</button>
       </div>
-      <label for="q" class="sr">搜索成果</label>
+      <label for="q" class="sr">搜索项目</label>
       <input id="q" type="search" placeholder="搜标题、简介、判断理由、仓库">
       <label for="assetSel" class="sr">按资产状态筛选</label>
       <select id="assetSel">
@@ -264,45 +250,58 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
         <option>已入库</option><option>在分支</option><option>部分缺失</option><option>未入库</option>
       </select>
     </div>
-    <div class="listing" id="books"></div>
+    <div class="lanes" id="lanes"></div>
   </section>
+
+  <div class="alerts">
+    <section aria-labelledby="sysH">
+      <div class="sec-h"><h2 class="sec" id="sysH">该系统化了</h2></div>
+      <p style="margin:0;font-size:13px;color:var(--muted)">一次性或跑流程的事重复到第 3 次，就推动它变成固定的系统。</p>
+      <div id="sysList"></div>
+    </section>
+    <section aria-labelledby="gapH">
+      <div class="sec-h"><h2 class="sec" id="gapH">资产化缺口</h2><span class="d">告诉我先补哪几项</span><span class="c" id="gapCount"></span></div>
+      <div id="gaps"></div>
+    </section>
+  </div>
 
   <details class="rules">
     <summary>判断规则和登记方法</summary>
     <div class="rules-grid">
       <div>
-        <h4>四档优先级</h4>
+        <h4>三条主线 + 其他</h4>
         <ul>
-          <li><strong>主线</strong>：直接推进两条主线、能复用，投主要精力</li>
-          <li><strong>维持</strong>：有用，但自动跑或按需做，不加投入</li>
-          <li><strong>降级</strong>：周期长或和主线关系弱，只修必须修的</li>
-          <li><strong>封存</strong>：一次性的，做完存档，不再投入</li>
+          <li><strong>交易与市场</strong>：交易本身和投研系统，保持盘感</li>
+          <li><strong>金融内容</strong>：把金融判断做成视频、文章，直接变现</li>
+          <li><strong>个人品牌</strong>：以你名义的作品、账号、演讲、音乐</li>
+          <li><strong>运营与其他</strong>：职业相关和兴趣项目，不占主要精力</li>
         </ul>
       </div>
       <div>
-        <h4>判断时问三件事</h4>
+        <h4>五档优先级</h4>
         <ul>
-          <li>它在给你积累对外的作品和影响力吗</li>
-          <li>它补上了闭环的哪一环，下一期还能接着用吗</li>
-          <li>它要你持续投入多少时间，换来的是不是复利</li>
+          <li><strong>重点</strong>：本阶段前三，投主要精力</li>
+          <li><strong>推进</strong>：继续往前做，按节奏投入</li>
+          <li><strong>维持</strong>：自动跑或按需做，不加投入</li>
+          <li><strong>降级</strong>：前置条件没满足或离主线远，只修必须修的</li>
+          <li><strong>封存</strong>：做完存档，或旧版本已停</li>
         </ul>
       </div>
       <div>
-        <h4>四种资产状态</h4>
+        <h4>四种项目性质</h4>
         <ul>
-          <li><span class="as a-ok">已入库</span>：在仓库默认分支，有说明，能复现</li>
-          <li><span class="as a-branch">在分支</span>：推上了 GitHub，但还在工作分支，没进 main</li>
-          <li><span class="as a-part">部分缺失</span>：主体在，成品、素材或关键版本不在</li>
-          <li><span class="as a-none">未入库</span>：只在页面或本机，GitHub 上没有</li>
+          <li><strong>系统</strong>：长期运行、越用越值钱</li>
+          <li><strong>跑流程</strong>：在用单次项目验证一条流程，第 3 次就该系统化</li>
+          <li><strong>一次性</strong>：做完即止</li>
+          <li><strong>过程量</strong>：某个系统的一环或旧版本，挂在系统下面</li>
         </ul>
       </div>
       <div>
-        <h4>收录和登记</h4>
+        <h4>资产状态和周检</h4>
         <ul>
-          <li>收：页面、报告、产品、素材、视频、PPT。不收：只做检索、没有交付物的对话</li>
-          <li>每周一自动周检一次，更新条目、重估优先级、检查资产</li>
-          <li>数据集 <code>items</code>，周检结论在 <code>meta/review</code></li>
-          <li>备份和规则在 <code>AI-lab-for-tim/hub/</code></li>
+          <li><span class="as a-ok">已入库</span> 在默认分支、能复现；<span class="as a-branch">在分支</span> 还在工作分支；<span class="as a-part">部分缺失</span> 缺成品或素材；<span class="as a-none">未入库</span> GitHub 上没有</li>
+          <li>每周一自动周检，结论写进 <code>meta/review</code></li>
+          <li>规则和备份在 <code>AI-lab-for-tim/hub/</code></li>
         </ul>
       </div>
     </div>
@@ -313,24 +312,25 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
   <form id="form" method="dialog" novalidate>
     <h2 id="dlgTitle">登记新成果</h2>
     <label>标题<input id="f-title" required maxlength="60"></label>
-    <div class="two">
-      <label>类型<select id="f-cat"></select></label>
-      <label>状态<select id="f-status"><option>运行中</option><option>已上线</option><option>已交付</option><option>待完善</option></select></label>
+    <div class="three">
+      <label>主线<select id="f-track"></select></label>
+      <label>优先级<select id="f-priority"></select></label>
+      <label>性质<select id="f-kind"></select></label>
     </div>
-    <div class="two">
-      <label>优先级<select id="f-priority"><option>主线</option><option>维持</option><option>降级</option><option>封存</option></select></label>
+    <div class="three">
+      <label>状态<select id="f-status"><option>运行中</option><option>已上线</option><option>已交付</option><option>待完善</option><option>暂停</option></select></label>
       <label>资产状态<select id="f-asset"><option>已入库</option><option>在分支</option><option>部分缺失</option><option>未入库</option></select></label>
-    </div>
-    <fieldset id="f-line"><legend>服务哪条主线</legend></fieldset>
-    <fieldset id="f-stage"><legend>闭环环节</legend></fieldset>
-    <label>判断理由<textarea id="f-why" maxlength="200"></textarea></label>
-    <label>资产说明（在哪、缺什么）<input id="f-assetNote" maxlength="160"></label>
-    <div class="two">
       <label>日期<input id="f-date" type="date" required></label>
-      <label>来源（仓库 / 分支）<input id="f-source" maxlength="120"></label>
     </div>
+    <label>挂在哪个系统下面（可不选）<select id="f-parent"><option value="">不挂，作为顶层项目</option></select></label>
+    <label>判断理由<textarea id="f-why" maxlength="200"></textarea></label>
+    <label>下一步（重点和推进的项目填）<input id="f-next" maxlength="160"></label>
+    <label>资产说明（在哪、缺什么）<input id="f-assetNote" maxlength="160"></label>
     <label>一句话简介<textarea id="f-summary" maxlength="200"></textarea></label>
-    <label>标签（用逗号分开）<input id="f-tags" maxlength="80"></label>
+    <div class="two">
+      <label>来源（仓库 / 分支）<input id="f-source" maxlength="120"></label>
+      <label>标签（用逗号分开）<input id="f-tags" maxlength="80"></label>
+    </div>
     <label>入口链接（每行一个：名称 | 网址）<textarea id="f-links" rows="3" placeholder="打开页面 | https://claude.ai/artifact/…"></textarea></label>
     <p class="err" id="f-err"></p>
     <div class="acts">
@@ -342,32 +342,27 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
 </dialog>
 
 <script>
-// 类型、优先级、资产状态定义：新增只改这里
-const CATS = [
-  { id: "invest",  name: "投研系统",   desc: "持续更新的看板和投研工具", color: "--c-invest" },
-  { id: "report",  name: "研究报告",   desc: "一次成型的报告和案例",     color: "--c-report" },
-  { id: "product", name: "产品与工具", desc: "能用、能卖、能玩的东西",   color: "--c-product" },
-  { id: "content", name: "内容运营",   desc: "账号、周报、选题、素材",   color: "--c-content" },
-  { id: "media",   name: "影像与演示", desc: "视频、短片、PPT",          color: "--c-media" },
+// 主线、优先级、性质、资产状态定义：调整只改这里
+const TRACKS = [
+  { id: "交易",       name: "交易与市场",   desc: "交易本身和投研系统，保持盘感",     color: "--t-trade" },
+  { id: "金融内容",   name: "金融内容",     desc: "把金融判断做成视频和文章，直接变现", color: "--t-fin" },
+  { id: "个人品牌",   name: "个人品牌",     desc: "以你名义的作品、账号、演讲、音乐",   color: "--t-brand" },
+  { id: "运营与其他", name: "运营与其他",   desc: "职业相关和兴趣项目，不占主要精力",   color: "--t-ops" },
 ];
 const PRIORITY = [
-  { id: "主线", cls: "p-main",  desc: "投主要精力" },
+  { id: "重点", cls: "p-top",   desc: "本阶段前三，投主要精力" },
+  { id: "推进", cls: "p-push",  desc: "继续往前做，按节奏投入" },
   { id: "维持", cls: "p-keep",  desc: "自动跑或按需做" },
   { id: "降级", cls: "p-down",  desc: "只修必须修的" },
-  { id: "封存", cls: "p-shelf", desc: "做完存档" },
+  { id: "封存", cls: "p-shelf", desc: "做完存档，或旧版本已停" },
 ];
+const KINDS = ["系统", "跑流程", "一次性", "过程量"];
 const ASSET = { "已入库": "a-ok", "在分支": "a-branch", "部分缺失": "a-part", "未入库": "a-none" };
-const LINES = ["影响力", "闭环"];
-const STAGES = [
-  { id: "上游", name: "上游 · 筛选", what: "信息源、证据、观点、选题" },
-  { id: "中游", name: "中游 · 制作", what: "脚本、配音、画面、成片" },
-  { id: "分发", name: "下游 · 分发复盘", what: "发布、看数据、改下一期" },
-];
-const STATUS_CLASS = { "运行中": "s-run", "已上线": "s-live", "已交付": "s-done", "待完善": "s-todo" };
+const STATUS_CLASS = { "运行中": "s-run", "已上线": "s-live", "已交付": "s-done", "待完善": "s-todo", "暂停": "s-pause" };
 const KIND_CLASS = { "拍板": "k-decide", "补齐": "k-fix", "保持": "k-keep" };
 
-const state = { items: [], review: null, cat: "", q: "", asset: "", view: "pr", loaded: false, canWrite: false, editing: null };
-try { state.cat = localStorage.getItem("hub.cat") || ""; state.view = localStorage.getItem("hub.view") || "pr"; } catch (e) {}
+const state = { items: [], review: null, q: "", asset: "", view: "track", loaded: false, canWrite: false, editing: null, open: new Set() };
+try { state.view = localStorage.getItem("hub.view2") || "track"; } catch (e) {}
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
@@ -375,172 +370,163 @@ const safeUrl = (u) => { try { const x = new URL(u); return x.protocol === "http
 const prRank = (p) => { const i = PRIORITY.findIndex(x => x.id === p); return i < 0 ? 9 : i; };
 const prCls = (p) => (PRIORITY.find(x => x.id === p) || {}).cls || "p-keep";
 const byPrDate = (a, b) => prRank(a.priority) - prRank(b.priority) || String(b.date).localeCompare(String(a.date));
+const byId = (id) => state.items.find(i => i.id === id);
+const kids = (id) => state.items.filter(i => i.parent === id).sort(byPrDate);
+const tops = () => state.items.filter(i => !i.parent || !byId(i.parent));
 
 function matches(it) {
-  if (state.cat && it.cat !== state.cat) return false;
   if (state.asset && it.asset !== state.asset) return false;
   if (state.q) {
-    const hay = [it.title, it.summary, it.why, it.source, it.assetNote, ...(it.tags || [])].join(" ").toLowerCase();
+    const hay = [it.title, it.summary, it.why, it.next, it.source, it.assetNote, ...(it.tags || [])].join(" ").toLowerCase();
     if (!hay.includes(state.q.toLowerCase())) return false;
   }
   return true;
 }
+const filtering = () => !!(state.q || state.asset);
 
-function renderReview() {
-  const r = state.review;
-  const acts = $("reviewActs"); acts.textContent = "";
-  if (!r) return;
-  $("reviewDate").textContent = r.date ? `${r.date} 检查` : "";
-  if (r.summary) $("reviewSum").textContent = r.summary;
-  for (const a of r.actions || []) {
-    const li = el("li");
-    li.append(el("span", "kind " + (KIND_CLASS[a.kind] || "k-decide"), a.kind || "拍板"));
-    const t = el("div"); t.append(el("strong", null, a.title || ""));
-    if (a.text) { t.append(document.createElement("br")); t.append(el("span", null, a.text)); t.lastChild.style.color = "var(--muted)"; t.lastChild.style.fontSize = "14px"; }
-    li.append(t); acts.append(li);
-  }
-}
-
-function renderLoop() {
-  const root = $("loop"); root.textContent = "";
-  const active = state.items.filter(i => i.priority === "主线" || i.priority === "维持");
-  // 主线成果最少的一环标为薄弱环节
-  const mainCount = STAGES.map(s => active.filter(i => i.priority === "主线" && (i.stage || []).includes(s.id)).length);
-  const minMain = Math.min(...mainCount);
-  const weakIdx = mainCount.filter(n => n === minMain).length === 1 ? mainCount.indexOf(minMain) : -1;
-  STAGES.forEach((s, idx) => {
-    const box = el("div", "stage");
-    const h = el("h3"); h.append(el("span", null, s.name)); if (idx < 2) h.append(el("span", "arrow", "→"));
-    box.append(h, el("p", "what", s.what));
-    const list = active.filter(i => (i.stage || []).includes(s.id)).sort(byPrDate);
-    const chips = el("div", "chips");
-    for (const it of list) { const c = el("span", "chip" + (it.priority === "主线" ? " p-main" : ""), it.title.replace(/[《「].*$/, "").replace(/\s·.*$/, "")); c.title = `${it.priority}：${it.title}`; chips.append(c); }
-    if (!list.length) chips.append(el("span", "what", "还没有成果落在这一环"));
-    box.append(chips);
-    const mains = mainCount[idx];
-    if (state.loaded && (idx === weakIdx || mains === 0)) { box.classList.add("weak"); box.append(el("p", "flag", mains ? `主线成果最少（${mains} 项），是闭环里最弱的一环` : "没有主线成果，闭环在这里断了")); }
-    root.append(box);
+function renderFocus() {
+  const r = state.review || {};
+  $("reviewDate").textContent = r.date ? `${r.date} 检查` : "等待周检数据";
+  $("reviewSum").textContent = r.summary || "";
+  const fl = $("focusList"); fl.textContent = "";
+  (r.focus || []).forEach((f, i) => {
+    const d = el("div", "pick"); d.append(el("span", "no", String(i + 1)));
+    const m = el("div"); m.append(el("h4", null, f.title));
+    if (f.why) m.append(el("p", null, f.why));
+    if (f.next) { const n = el("p", "nx"); n.append(el("b", null, "下一步："), document.createTextNode(f.next)); m.append(n); }
+    d.append(m); fl.append(d);
   });
-}
-
-function renderGaps() {
-  const root = $("gaps"); root.textContent = "";
-  const gaps = state.items.filter(i => i.asset && i.asset !== "已入库").sort(byPrDate);
-  $("gapCount").textContent = state.loaded ? `${gaps.length} 项` : "";
-  if (!state.loaded) return;
-  if (!gaps.length) { root.append(el("div", "empty", "所有成果都已经进了 GitHub 默认分支。")); return; }
-  const urgent = gaps.filter(i => i.priority === "主线" || i.priority === "维持");
-  const rest = gaps.filter(i => !urgent.includes(i));
-  const add = (it) => {
-    const g = el("div", "gap");
-    const m = el("div"); m.append(el("h4", null, it.title)); if (it.assetNote) m.append(el("p", null, it.assetNote));
-    const b = el("div", "badges"); b.append(el("span", "pr " + prCls(it.priority), it.priority || "未判断"), el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset));
-    g.append(m, b); root.append(g);
-  };
-  if (urgent.length) { root.append(el("div", "sub", `建议先补：主线和维持的 ${urgent.length} 项`)); urgent.forEach(add); }
-  if (rest.length) { root.append(el("div", "sub", `可以晚点补：降级和封存的 ${rest.length} 项`)); rest.forEach(add); }
-}
-
-function renderLedger() {
-  const nav = $("ledger"); nav.textContent = "";
-  for (const c of [{ id: "", name: "全部", color: null }, ...CATS]) {
-    const b = el("button"); b.type = "button";
-    b.setAttribute("aria-pressed", String(state.cat === c.id));
-    if (c.color) b.style.setProperty("--cat", `var(${c.color})`);
-    const n = c.id ? state.items.filter(i => i.cat === c.id).length : state.items.length;
-    b.append(el("span", "n", state.loaded ? String(n) : "–"), el("span", "k", c.name));
-    b.addEventListener("click", () => {
-      state.cat = state.cat === c.id ? "" : c.id;
-      try { localStorage.setItem("hub.cat", state.cat); } catch (e) {}
-      renderLedger(); renderBooks();
-    });
-    nav.append(b);
+  if (!(r.focus || []).length) fl.append(el("div", "empty", "周检后在这里列出本阶段最该投入的三件事。"));
+  const dl = $("dropList"); dl.textContent = "";
+  (r.drop || []).forEach((f) => {
+    const d = el("div", "pick"); d.append(el("span", "no", "↓"));
+    const m = el("div"); m.append(el("h4", null, f.title)); if (f.why) m.append(el("p", null, f.why));
+    d.append(m); dl.append(d);
+  });
+  if (!(r.drop || []).length) dl.append(el("div", "empty", "周检后在这里列出可以降级的三件事。"));
+  const td = $("todo"); td.textContent = "";
+  for (const a of r.actions || []) {
+    const li = el("li"); li.append(el("span", "kind " + (KIND_CLASS[a.kind] || "k-decide"), a.kind || "拍板"));
+    const t = el("div", "t"); t.append(el("strong", null, a.title || "")); if (a.text) t.append(document.createTextNode(a.text));
+    li.append(t); td.append(li);
   }
+  td.parentElement.hidden = !(r.actions || []).length;
 }
 
-function renderRow(it) {
-  const row = el("article", "row");
-  row.append(el("div", "date", it.date || ""));
+function chips(it) {
+  const right = el("div", "right");
+  if (it.priority) right.append(el("span", "pr " + prCls(it.priority), it.priority));
+  if (it.kind) right.append(el("span", "kd", it.kind));
+  right.append(el("span", "pill " + (STATUS_CLASS[it.status] || "s-done"), it.status || "已交付"));
+  if (it.asset) { const a = el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset); if (it.assetNote) a.title = it.assetNote; right.append(a); }
+  if (state.canWrite) { const e = el("button", "edit", "编辑"); e.type = "button"; e.addEventListener("click", () => openForm(it)); right.append(e); }
+  return right;
+}
+
+function renderRow(it, opts = {}) {
+  const row = el("article", "row" + (opts.child ? " child" : ""));
   const main = el("div", "main");
-  main.append(el("h3", null, it.title || "未命名"));
+  const h = el("h3"); h.append(el("span", null, it.title || "未命名"), el("span", "date", it.date || ""));
+  main.append(h);
   if (it.summary) main.append(el("p", "sum", it.summary));
   if (it.why) { const w = el("p", "why"); w.append(el("b", null, "判断："), document.createTextNode(it.why)); main.append(w); }
+  if (it.next && !opts.child) { const n = el("p", "nx"); n.append(el("b", null, "下一步："), document.createTextNode(it.next)); main.append(n); }
   const meta = el("div", "meta");
-  for (const s of it.stage || []) meta.append(el("span", "tag", s));
   for (const t of it.tags || []) meta.append(el("span", "tag", t));
   if (it.source) meta.append(el("span", "src", it.source));
   if (meta.childNodes.length) main.append(meta);
   const links = el("div", "links");
-  for (const l of it.links || []) {
-    const href = safeUrl(l.url); if (!href) continue;
-    const a = el("a", null, l.label || "打开"); a.href = href; a.target = "_blank"; a.rel = "noopener";
-    links.append(a);
-  }
+  for (const l of it.links || []) { const href = safeUrl(l.url); if (!href) continue; const a = el("a", null, l.label || "打开"); a.href = href; a.target = "_blank"; a.rel = "noopener"; links.append(a); }
   if (links.childNodes.length) main.append(links);
-  row.append(main);
-  const right = el("div", "right");
-  if (it.priority) right.append(el("span", "pr " + prCls(it.priority), it.priority));
-  right.append(el("span", "pill " + (STATUS_CLASS[it.status] || "s-done"), it.status || "已交付"));
-  if (it.asset) { const a = el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset); if (it.assetNote) a.title = it.assetNote; right.append(a); }
-  if (state.canWrite) { const e = el("button", "edit", "编辑"); e.type = "button"; e.addEventListener("click", () => openForm(it)); right.append(e); }
-  row.append(right);
+  if (!opts.child && !opts.flat) {
+    const ks = kids(it.id);
+    if (ks.length) {
+      const d = el("details", "kids"); d.open = state.open.has(it.id);
+      d.addEventListener("toggle", () => { d.open ? state.open.add(it.id) : state.open.delete(it.id); });
+      d.append(el("summary", null, `包含 ${ks.length} 项：` + ks.map(k => `${k.title}（${k.priority}）`).join("、")));
+      const box = el("div"); ks.forEach(k => box.append(renderRow(k, { child: true }))); d.append(box);
+      main.append(d);
+    }
+  }
+  row.append(main, chips(it));
   return row;
 }
 
-function book(name, desc, color, list) {
-  const sec = el("section", "book");
-  if (color) sec.style.setProperty("--cat", `var(${color})`);
-  const h = el("div", "sec-h");
-  const t = el("h2", "sec", name); h.append(t);
-  if (desc) h.append(el("span", "d", desc));
-  h.append(el("span", "c", list.length + " 项"));
-  sec.append(h); list.forEach(it => sec.append(renderRow(it)));
+function lane(name, desc, color, list, flat) {
+  const sec = el("section", "lane");
+  if (color) sec.style.setProperty("--lane", `var(${color})`);
+  const h = el("div", "sec-h"); h.append(el("h2", "sec", name)); if (desc) h.append(el("span", "d", desc)); h.append(el("span", "c", list.length + " 项"));
+  sec.append(h); list.forEach(it => sec.append(renderRow(it, { flat })));
   return sec;
 }
 
-function renderBooks() {
-  const root = $("books"); root.textContent = "";
+function renderLanes() {
+  const root = $("lanes"); root.textContent = "";
+  $("allCount").textContent = state.loaded ? `${tops().length} 个项目 · ${state.items.length} 项成果` : "";
   if (!state.loaded) { root.append(el("div", "empty", "正在读取登记簿…")); return; }
   if (!state.items.length) { root.append(el("div", "empty", "登记簿还是空的。让 Claude 往数据集 items 写入成果，或点右上角「登记新成果」。")); return; }
-  const pool = state.items.filter(matches);
-  if (!pool.length) { root.append(el("div", "empty", "没有符合条件的成果。换个关键词或清掉筛选试试。")); return; }
-  if (state.view === "pr") {
-    for (const p of PRIORITY) {
-      const list = pool.filter(i => i.priority === p.id).sort((a, b) => String(b.date).localeCompare(String(a.date)));
-      if (list.length) root.append(book(p.id, p.desc, null, list));
-    }
-    const un = pool.filter(i => prRank(i.priority) === 9);
-    if (un.length) root.append(book("未判断", "下次周检补上", null, un));
+  const flat = filtering();
+  const pool = flat ? state.items.filter(matches) : tops();
+  if (!pool.length) { root.append(el("div", "empty", "没有符合条件的项目。换个关键词或清掉筛选试试。")); return; }
+  if (state.view === "track") {
+    for (const t of TRACKS) { const list = pool.filter(i => i.track === t.id).sort(byPrDate); if (list.length) root.append(lane(t.name, t.desc, t.color, list, flat)); }
+    const rest = pool.filter(i => !TRACKS.some(t => t.id === i.track)); if (rest.length) root.append(lane("未归类", "下次周检补上", null, rest, flat));
   } else {
-    for (const c of CATS) {
-      const list = pool.filter(i => i.cat === c.id).sort(byPrDate);
-      if (list.length) root.append(book(c.name, c.desc, c.color, list));
-    }
-    const orphan = pool.filter(i => !CATS.some(c => c.id === i.cat));
-    if (orphan.length) root.append(book("未分类", "", null, orphan));
+    for (const p of PRIORITY) { const list = pool.filter(i => i.priority === p.id).sort((a, b) => String(b.date).localeCompare(String(a.date))); if (list.length) root.append(lane(p.id, p.desc, null, list, flat)); }
+    const un = pool.filter(i => prRank(i.priority) === 9); if (un.length) root.append(lane("未判断", "下次周检补上", null, un, flat));
   }
 }
 
+function renderAlerts() {
+  const sys = $("sysList"); sys.textContent = "";
+  const runs = state.items.filter(i => i.kind === "跑流程" && (i.runs || 0) >= 2 && i.priority !== "封存").sort((a, b) => (b.runs || 0) - (a.runs || 0));
+  for (const it of runs) {
+    const d = el("div", "line-item"); d.append(el("h4", null, it.title));
+    d.append(el("span", "runs", it.runs >= 3 ? `已 ${it.runs} 次，该系统化` : `已 ${it.runs} 次，下次固化`));
+    if (it.next) d.append(el("p", null, it.next));
+    sys.append(d);
+  }
+  if (state.loaded && !runs.length) sys.append(el("div", "empty", "暂时没有重复到需要系统化的事。"));
+  const root = $("gaps"); root.textContent = "";
+  const gaps = state.items.filter(i => i.asset && i.asset !== "已入库");
+  $("gapCount").textContent = state.loaded ? `${gaps.length} 项` : "";
+  if (!state.loaded) return;
+  // 子项按所属系统的优先级排
+  const eff = (i) => { const p = i.parent && byId(i.parent); return Math.min(prRank(i.priority), p ? prRank(p.priority) : 9); };
+  gaps.sort((a, b) => eff(a) - eff(b) || String(b.date).localeCompare(String(a.date)));
+  const urgent = gaps.filter(i => eff(i) <= 2), rest = gaps.filter(i => eff(i) > 2);
+  const add = (it) => {
+    const g = el("div", "line-item");
+    const t = it.parent && byId(it.parent) ? `${it.title} · ${byId(it.parent).title}` : it.title;
+    g.append(el("h4", null, t));
+    const b = el("div", "badges"); b.append(el("span", "pr " + prCls(it.priority), it.priority || "未判断"), el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset)); g.append(b);
+    if (it.assetNote) g.append(el("p", null, it.assetNote));
+    root.append(g);
+  };
+  if (!gaps.length) { root.append(el("div", "empty", "所有成果都已经进了 GitHub 默认分支。")); return; }
+  if (urgent.length) { root.append(el("div", "subhead", `建议先补：重点、推进、维持里的 ${urgent.length} 项`)); urgent.forEach(add); }
+  if (rest.length) { root.append(el("div", "subhead", `可以晚点补：降级和封存的 ${rest.length} 项`)); rest.forEach(add); }
+}
+
 function render() {
-  renderReview(); renderLoop(); renderGaps(); renderLedger(); renderBooks();
+  renderFocus(); renderLanes(); renderAlerts();
   const newest = state.items.map(i => i.date).filter(Boolean).sort().pop();
   $("stamp").textContent = state.loaded ? `共 ${state.items.length} 项 · 最近一次 ${newest || "—"}` : "正在读取登记簿…";
   $("addBtn").hidden = !state.canWrite;
+  $("byTrack").setAttribute("aria-pressed", String(state.view === "track"));
   $("byPr").setAttribute("aria-pressed", String(state.view === "pr"));
-  $("byCat").setAttribute("aria-pressed", String(state.view === "cat"));
 }
 
-for (const c of CATS) { const o = el("option", null, c.name); o.value = c.id; $("f-cat").append(o); }
-const boxes = (fs, names) => names.forEach(n => { const l = el("label"); const i = el("input"); i.type = "checkbox"; i.value = n; i.id = fs + "-" + n; l.append(i, document.createTextNode(n)); $(fs).append(l); });
-boxes("f-line", LINES); boxes("f-stage", STAGES.map(s => s.id));
-const checked = (fs) => [...$(fs).querySelectorAll("input:checked")].map(i => i.value);
-const setChecked = (fs, vals) => $(fs).querySelectorAll("input").forEach(i => { i.checked = (vals || []).includes(i.value); });
+const opt = (sel, v, label) => { const o = el("option", null, label ?? v); o.value = v; $(sel).append(o); };
+TRACKS.forEach(t => opt("f-track", t.id, t.name));
+PRIORITY.forEach(p => opt("f-priority", p.id));
+KINDS.forEach(k => opt("f-kind", k));
 
-$("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); renderBooks(); });
-$("assetSel").addEventListener("change", (e) => { state.asset = e.target.value; renderBooks(); });
-const setView = (v) => { state.view = v; try { localStorage.setItem("hub.view", v); } catch (e) {} render(); };
+$("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); renderLanes(); });
+$("assetSel").addEventListener("change", (e) => { state.asset = e.target.value; renderLanes(); });
+const setView = (v) => { state.view = v; try { localStorage.setItem("hub.view2", v); } catch (e) {} render(); };
+$("byTrack").addEventListener("click", () => setView("track"));
 $("byPr").addEventListener("click", () => setView("pr"));
-$("byCat").addEventListener("click", () => setView("cat"));
 
 // 编辑表单
 let db = null;
@@ -549,17 +535,21 @@ function slug(s) { const base = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repl
 function openForm(it) {
   state.editing = it || null;
   $("dlgTitle").textContent = it ? "编辑成果" : "登记新成果";
+  const ps = $("f-parent"); while (ps.options.length > 1) ps.remove(1);
+  tops().filter(t => !it || t.id !== it.id).sort(byPrDate).forEach(t => opt("f-parent", t.id, t.title));
   $("f-title").value = it?.title || "";
-  $("f-cat").value = it?.cat || state.cat || CATS[0].id;
-  $("f-status").value = it?.status || "已交付";
+  $("f-track").value = it?.track || TRACKS[0].id;
   $("f-priority").value = it?.priority || "维持";
+  $("f-kind").value = it?.kind || "一次性";
+  $("f-status").value = it?.status || "已交付";
   $("f-asset").value = it?.asset || "在分支";
-  setChecked("f-line", it?.line); setChecked("f-stage", it?.stage);
-  $("f-why").value = it?.why || "";
-  $("f-assetNote").value = it?.assetNote || "";
   $("f-date").value = it?.date || new Date().toISOString().slice(0, 10);
-  $("f-source").value = it?.source || "";
+  $("f-parent").value = it?.parent || "";
+  $("f-why").value = it?.why || "";
+  $("f-next").value = it?.next || "";
+  $("f-assetNote").value = it?.assetNote || "";
   $("f-summary").value = it?.summary || "";
+  $("f-source").value = it?.source || "";
   $("f-tags").value = (it?.tags || []).join("，");
   $("f-links").value = (it?.links || []).map(l => `${l.label} | ${l.url}`).join("\n");
   $("f-err").textContent = "";
@@ -579,15 +569,17 @@ $("form").addEventListener("submit", async (e) => {
     if (!safeUrl(url)) { $("f-err").textContent = `这一行的网址打不开：${line.trim()}`; return; }
     links.push({ label: label || "打开", url });
   }
-  const body = {
-    title, cat: $("f-cat").value, status: $("f-status").value, date: $("f-date").value,
-    priority: $("f-priority").value, asset: $("f-asset").value,
-    line: checked("f-line"), stage: checked("f-stage"),
-    why: $("f-why").value.trim(), assetNote: $("f-assetNote").value.trim(),
-    source: $("f-source").value.trim(), summary: $("f-summary").value.trim(),
+  // 保留表单里没有的字段（cat、runs 等）
+  const body = Object.assign({}, state.editing ? (({ id, ...rest }) => rest)(state.editing) : { cat: "media" }, {
+    title, track: $("f-track").value, priority: $("f-priority").value, kind: $("f-kind").value,
+    status: $("f-status").value, asset: $("f-asset").value, date: $("f-date").value,
+    why: $("f-why").value.trim(), next: $("f-next").value.trim(), assetNote: $("f-assetNote").value.trim(),
+    summary: $("f-summary").value.trim(), source: $("f-source").value.trim(),
     tags: $("f-tags").value.split(/[,，、]/).map(s => s.trim()).filter(Boolean), links,
     reviewed: new Date().toISOString().slice(0, 10),
-  };
+  });
+  const parent = $("f-parent").value; if (parent) body.parent = parent; else delete body.parent;
+  if (!body.next) delete body.next;
   const id = state.editing?.id || slug(title);
   $("saveBtn").disabled = true;
   try { await db.collection("items").doc(id).set(body); $("dlg").close(); toast("已保存"); }
@@ -615,6 +607,6 @@ render();
     state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     state.loaded = true; render();
   }, () => { state.loaded = true; render(); $("stamp").textContent = "登记簿暂时读不到，刷新试试"; });
-  db.doc("meta/review").onSnapshot((d) => { state.review = d.exists ? d.data() : null; renderReview(); }, () => {});
+  db.doc("meta/review").onSnapshot((d) => { state.review = d.exists ? d.data() : null; renderFocus(); }, () => {});
 })();
 </script>
