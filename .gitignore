@@ -12,3 +12,5 @@ data/
 out/
 backup/
 *.zip
+# 视频工厂的字体和模型缓存（体积大，按 factory/README.md 下载）
+factory/.cache/

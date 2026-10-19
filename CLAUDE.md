@@ -8,7 +8,7 @@
 4. **合规。** 不出现具体股票、基金或板块推荐，不承诺收益，不自称「风险测评」。底部免责声明不能删。
 5. **史实要真。** 人物的 `fact` 必须是有出处的史实，并标注出处；`quote` 是编写的「人物心声」，不能冒充原话。
 6. **兑换码和数据不提交。** `codes/`、`data/`、`backup/`、`out/` 都已被忽略。
-7. **网站和服务端保持零依赖。** 网站是原生 HTML / CSS / ES Module，服务端只用 Node 内置模块。`playwright-core` 只用于 `npm run notes` 生成素材。
+7. **网站和服务端保持零依赖。** 网站是原生 HTML / CSS / ES Module，服务端只用 Node 内置模块。`playwright-core` 只用于 `npm run notes` 和 `npm run video` 生成素材；视频配音用的 Python 依赖只在 `factory/` 里。
 9. **大陆合规优先。** 笔记、商品页、段位卡上不放链接、二维码、微信；网址只能出现在付款后的自动发货内容里。改了文案要跑 `npm run notes`，看高危词提醒。
 10. **数据结构变更**要同时改 `db/schema.sql`、`server/db.mjs` 和 `server/admin.mjs`。
 8. 文案用中文，代码注释简短、用中文。

@@ -31,6 +31,8 @@
 
 首批选题见 [`topics.md`](topics.md)。
 
+**生产线已经搭好**：见 [`../../factory/README.md`](../../factory/README.md)。第一期《李录哥大演讲》的脚本、拆解卡在 `factory/episodes/001-lilu-columbia/`，`npm run video` 一条命令出片。
+
 ## 合规红线（视频号 / 抖音 / 小红书通用）
 
 沿用 [`../LAUNCH-CN.md`](../LAUNCH-CN.md) 第 5 节，并补充：
