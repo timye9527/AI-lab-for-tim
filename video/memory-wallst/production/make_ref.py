@@ -2,15 +2,15 @@
 """生成频道默认音色的参考句（不用任何真人录音）。
 
 用 Kokoro v1.1（Apache-2.0）的男声合成一句解说腔参考，交给 ZipVoice 做音色参考、重新生成语调。
-  python3 production/make_ref.py [--sid 100] [--out out/voice-ref/default]
-备选：--sid 60（沉稳）；AISHELL-3 男声见 09-栏目包装.md。
+  python3 production/make_ref.py [--sid 60] [--out out/voice-ref/default]
+备选：--sid 100（明亮干练）；AISHELL-3 男声见 09-栏目包装.md。
 """
 import argparse, os
 import numpy as np, soundfile as sf
 
 REF = '今天我们来聊一个所有人都在关心的问题：存储这一周，到底发生了什么？'
 ap = argparse.ArgumentParser()
-ap.add_argument('--sid', type=int, default=100)
+ap.add_argument('--sid', type=int, default=60)  # 频道定的沉稳男声
 ap.add_argument('--out', default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'out', 'voice-ref', 'default'))
 ap.add_argument('--model-dir', default=os.environ.get('KOKORO_DIR', '/tmp/claude-0/tts/kokoro-int8-multi-lang-v1_1'))
 a = ap.parse_args()

@@ -11,7 +11,7 @@ echo '{"type":"module"}' > out/package.json
 pip install pypinyin
 # 克隆模型（约 800MB，sherpa-onnx GitHub 发布页）：tts-models/sherpa-onnx-zipvoice-zh-en-emilia、
 #   tts-models/sherpa-onnx-zipvoice-distill-int8-zh-en-emilia、vocoder-models/vocos_24khz.onnx，放在同一目录，用 ZIPVOICE_DIR 指过去
-python3 production/make_ref.py --sid 100   # 频道默认音色参考（开源 Kokoro 男声）→ out/voice-ref/default/
+python3 production/make_ref.py --sid 60    # 频道音色参考（开源 Kokoro 沉稳男声）→ out/voice-ref/default/
 # 语音识别（回检用，sherpa-onnx asr-models）：sherpa-onnx-paraformer-zh-small-2024-03-09，用 ASR_DIR 指过去
 
 npm run video:check                       # 1. 自检：事实、时长、违禁词
@@ -22,6 +22,8 @@ python3 production/mix.py                 # 4. 配乐 + 音效 + 混音 → out/
 node production/cover.mjs                 # 5. 封面两套文案 × 三种比例 → out/final/cover-{a,b}-*.png
 node production/preview.mjs               #    发布预览整图 → out/sample/发布预览.png
 node production/chapters.mjs              #    章节时间戳写进 07-发布包.md
+python3 production/youtube_meta.py        # 6. YouTube 元数据 / 缩略图 / 字幕 → out/final/，刷新 10-YouTube上传包.md
+python3 production/youtube_upload.py upload   #    （可选）API 上传，见 youtube_upload.py 开头说明
 ```
 
 抽帧检查：`node production/render.mjs --stills 10,60,120 --tag check`（输出到 `out/stills/check/`）；没有配音时加 `--estimate` 按字数估时间轴。

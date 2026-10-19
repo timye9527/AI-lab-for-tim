@@ -458,6 +458,198 @@ const KNIVES3 = (R, s) => {
   };
 };
 
+
+// ================= v3：争议一 / 二 / 三、总账、开关、收尾 =================
+const head = (R, s, txt) => { const h = el(R, txt, { left: '120px', top: '120px', fontSize: '46px', fontWeight: 900 }); return t => show(h, t, s); };
+
+// 3 争议一：长鑫到底有多可怕
+const V3_CX = (R, s, I) => {
+  const c = n => cue(I, n);
+  const H = head(R, s, '<span class="amber mono">争议一</span>　长鑫到底有多可怕？');
+  const two = el(R, '<span class="pill" style="font-size:30px;border-color:var(--up)">立刻的威胁？</span>　　<span class="pill" style="font-size:30px;border-color:var(--blue)">三年后的威胁？</span>', { left: '120px', top: '210px' });
+  const cell = (n, cols, w, h, color) => Array.from({ length: n }, (_, i) => `<rect x="${(i % cols) * w}" y="${Math.floor(i / cols) * h}" width="${w - 4}" height="${h - 4}" rx="3" fill="${color}"/>`).join('');
+  const g6 = svg(R, 360, 360, cell(36, 6, 60, 60, '#3A3F47'), { left: '160px', top: '330px' });
+  const g4 = svg(R, 360, 360, cell(54, 9, 40, 60, '#FFB224'), { left: '620px', top: '330px' });
+  const l6 = el(R, '<b>6F²</b> · 现在主流', { left: '160px', top: '290px', fontSize: '28px' });
+  const l4 = el(R, '<b class="amber">4F²</b> · 同面积多塞约 1/3', { left: '620px', top: '290px', fontSize: '28px' });
+  const gen = el(R, '这不是小改进，<span class="amber">是换代</span>', { left: '1080px', top: '330px', fontSize: '54px', fontWeight: 900 });
+  const nand = card(R, '<div class="tag">上一次存储大换代</div><div style="font-size:34px;font-weight:700;margin-top:8px">闪存：平面 → 3D</div><div class="mono amber" style="font-size:40px;font-weight:800">2013 · 三星首个量产</div>', { left: '1080px', top: '440px', width: '640px' });
+  const seat = el(R, '谁先跨过换代，谁就有机会<span class="amber">重新排座次</span>', { left: '1080px', top: '640px', fontSize: '34px', fontWeight: 700 });
+  const sam = el(R, '<span class="pill">三星 4F² 量产目标：<b class="amber mono">2028</b>（据报道）</span>', { left: '160px', top: '740px' });
+  const miss = el(R, '', { left: '160px', top: '260px', width: '820px' });
+  const items = ['速度', '容量', '良率', 'HBM（据韩媒）'].map((n, i) => el(miss, `<span class="down" style="font-weight:900">✕</span>　${n}`, { left: '0', top: `${60 + i * 80}px`, fontSize: '40px', fontWeight: 700 }));
+  el(miss, '<div class="tag">长鑫没公布的</div>', { left: '0', top: '0' });
+  const gs = quoteCard(R, '高盛 · 10/16', '市场高估了长鑫的追赶速度：认证和良率爬坡都要时间。', [dots(2), dots(0), dots(1, 'warn')], 'Investing.com', { left: '1020px', top: '270px', width: '760px' });
+  const cp = quoteCard(R, 'Counterpoint · 10/16', '<span class="amber">2028 年前</span>，新增供给不太可能有大影响。', [dots(2), dots(0), dots(0)], 'Benzinga', { left: '1020px', top: '560px', width: '760px' });
+  const wk = el(R, '', { left: '160px', top: '270px', width: '1600px', height: '480px' });
+  el(wk, '<div class="tag">这一周跌幅</div>', { left: '0', top: '0' });
+  const bars = [['美光', 11, '刚被马斯克夸「报价合理」'], ['三星', 22, '长鑫撞的是韩国通用内存主场'], ['海力士', 26, '']].map(([n, v, note], i) => {
+    el(wk, `<span style="font-size:34px;font-weight:700">${n}</span>`, { left: '0', top: `${70 + i * 130}px` });
+    const b = el(wk, '', { left: '160px', top: `${70 + i * 130}px`, width: '0', height: '56px', background: i ? 'var(--down)' : '#2B6B4C' }, 'bar');
+    const lab = el(wk, `<span class="mono down" style="font-size:36px;font-weight:800">−${v}%</span>　<span class="muted" style="font-size:24px">${note}</span>`, { left: `${190 + v * 26}px`, top: `${76 + i * 130}px` });
+    return [b, lab, v];
+  });
+  const fin = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(11,13,16,.94)' });
+  el(fin, '长鑫改变的不是今年的供给', { left: '0', right: '0', top: '330px', textAlign: 'center', fontSize: '52px', fontWeight: 700, color: 'var(--muted)' });
+  el(fin, '而是 <span class="amber">2028 年以后</span>的终局想象', { left: '0', right: '0', top: '420px', textAlign: 'center', fontSize: '72px', fontWeight: 900 });
+  const val = el(fin, '<span class="pill" style="font-size:32px">存储股现在的估值，押的正是 <b class="amber mono">2027–2028</b></span>', { left: '0', right: '0', top: '580px', textAlign: 'center' });
+  const tB = c('但再看它没说什么'), tC = c('还有一个细节'), tD = c('所以我的判断是');
+  return t => {
+    H(t); show(two, t, s + 0.2, c('先看它发布了什么') - 0.2);
+    show(l6, t, c('先看它发布了什么'), tB - 0.3); show(g6, t, c('先看它发布了什么'), tB - 0.3);
+    show(l4, t, c('同样一块面积'), tB - 0.3); show(g4, t, c('同样一块面积'), tB - 0.3);
+    show(gen, t, c('这不是小改进'), tB - 0.3); show(nand, t, c('上一次存储'), tB - 0.3); show(seat, t, c('谁先跨过'), tB - 0.3);
+    show(sam, t, c('三星自己的'), tB - 0.3);
+    show(miss, t, tB, tC - 0.3); items.forEach((e, i) => show(e, t, tB + 0.3 + i * 0.35));
+    show(gs, t, c('高盛'), tC - 0.3); show(cp, t, c('Counterpoint'), tC - 0.3);
+    show(wk, t, tC, tD - 0.3); bars.forEach(([b, lab, v], i) => { grow(b, t, c('这一周美光') + i * 0.25, 'width', v * 26); show(lab, t, c('这一周美光') + i * 0.25 + 0.4); });
+    show(fin, t, tD, Infinity, 0.4, 0); show(val, t, c('而存储股现在'));
+  };
+};
+
+// 4 争议二：AI 的钱，还够不够
+const V3_MONEY = (R, s, I) => {
+  const c = n => cue(I, n);
+  const H = head(R, s, '<span class="amber mono">争议二</span>　AI 的钱，还够不够？');
+  const red = [['台积电 · 10/15', '利润创纪录，AI 需求仍<span class="up">大于供给</span>', '多头的证据'], ['美光', '<span class="mono">26</span> 份长期供货协议，锁定明年 <span class="mono up">75%+</span> 产量', '美光已经签了']]
+    .map(([w, txt, nd], i) => [card(R, `<div class="tag">${w}</div><div style="font-size:38px;font-weight:700;margin-top:8px">${txt}</div>`, { left: '120px', top: `${240 + i * 190}px`, width: '820px', borderLeft: '6px solid var(--up)' }), c(nd)]);
+  const ask = el(R, '空头只问一句：<span class="amber">谁来付钱？</span>', { left: '1000px', top: '260px', fontSize: '50px', fontWeight: 900 });
+  const oa = el(R, '', { left: '1000px', top: '360px', width: '800px', height: '230px' });
+  el(oa, '<div class="tag">OpenAI 9 月底年化收入（FT）</div>', { left: '0', top: '0' });
+  const b7 = el(oa, '', { left: '0', top: '50px', height: '60px', width: '0', background: '#3A3F47' }, 'bar');
+  el(oa, '市场以为 <span class="mono">~$700亿</span>', { left: '16px', top: '62px', fontSize: '26px', fontWeight: 700 });
+  const b5 = el(oa, '', { left: '0', top: '130px', height: '60px', width: '0', background: 'var(--up)' }, 'bar');
+  el(oa, '实际约 <span class="mono">$500亿</span>', { left: '16px', top: '142px', fontSize: '26px', fontWeight: 700 });
+  const ht = card(R, '<div class="tag">陈福阳 · 博通 CEO</div><div style="font-size:34px;font-weight:700;margin-top:6px">六大 AI 芯片客户里，<span class="amber">两家</span>需要融资</div>', { left: '1000px', top: '620px', width: '800px', borderLeft: '6px solid var(--blue)' });
+  const loop = svg(R, 1680, 300, `
+    <defs><marker id="m4" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#3E63DD"/></marker></defs>
+    <rect x="120" y="60" width="420" height="110" rx="14" fill="#14171C" stroke="#3E63DD" stroke-width="2"/><text x="330" y="128" fill="#EDEEF0" font-size="40" text-anchor="middle" font-weight="700">博通（卖芯片）</text>
+    <rect x="1140" y="60" width="420" height="110" rx="14" fill="#14171C" stroke="#3E63DD" stroke-width="2"/><text x="1350" y="128" fill="#EDEEF0" font-size="40" text-anchor="middle" font-weight="700">AI 实验室（买芯片）</text>
+    <path id="la4" d="M540 95 L1140 95" stroke="#3E63DD" stroke-width="6" marker-end="url(#m4)"/><text x="840" y="80" fill="#9BA1A6" font-size="30" text-anchor="middle">几百亿美元债务融资</text>
+    <path id="lb4" d="M1140 140 L540 140" stroke="#3E63DD" stroke-width="6" stroke-dasharray="14 10" marker-end="url(#m4)"/><text x="840" y="190" fill="#9BA1A6" font-size="30" text-anchor="middle">芯片订单</text>`, { left: '120px', top: '230px' });
+  const sell = el(R, '卖芯片的人，<span class="amber">借钱给买芯片的人</span>', { left: '0', right: '0', top: '470px', textAlign: 'center', fontSize: '56px', fontWeight: 900 });
+  const lu = card(R, '<div class="tag">2000 年 · 互联网泡沫</div><div style="font-size:36px;font-weight:700;font-family:serif;margin-top:6px">朗讯、北电借钱给客户买设备 → 一地坏账</div>', { left: '420px', top: '600px', width: '1080px', background: '#1E1B14', borderColor: '#4A4231' });
+  const ring = svg(R, 900, 520, `
+    <defs><marker id="m5" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#FFB224"/></marker></defs>
+    <circle id="rg" cx="450" cy="260" r="190" fill="none" stroke="#FFB224" stroke-width="6" stroke-dasharray="40 18" marker-end="url(#m5)"/>
+    <text x="450" y="55" fill="#EDEEF0" font-size="34" text-anchor="middle" font-weight="700">内存涨价</text>
+    <text x="760" y="270" fill="#EDEEF0" font-size="34" text-anchor="middle" font-weight="700">云巨头预算上调</text>
+    <text x="450" y="500" fill="#EDEEF0" font-size="34" text-anchor="middle" font-weight="700">需求看起来更旺</text>
+    <text x="140" y="270" fill="#EDEEF0" font-size="34" text-anchor="middle" font-weight="700">内存再涨</text>`, { left: '510px', top: '250px' });
+  const rate = card(R, '<div class="tag">利率</div><div style="font-size:44px;font-weight:900;margin-top:8px">美联储 9 月已加息 · 月底再加？</div><div class="muted" style="font-size:28px;margin-top:8px">借钱造数据中心的成本，会更高</div>', { left: '420px', top: '330px', width: '1080px', borderLeft: '6px solid var(--blue)' });
+  const fair = [['据彭博：OpenAI 仍预计年底年化收入 <span class="mono">$700亿+</span>', '公平地说'], ['陈福阳：新模型已经能赚到大钱', '陈福阳也承认']]
+    .map(([txt, nd], i) => [card(R, `<div style="font-size:34px;font-weight:700">${txt}</div>`, { left: '420px', top: `${260 + i * 130}px`, width: '1080px', borderLeft: '6px solid var(--up)' }), c(nd)]);
+  const core = el(R, '不是 AI 有没有用，而是<br><span class="amber">谁能一直借到钱来付</span>', { left: '0', right: '0', top: '560px', textAlign: 'center', fontSize: '54px', fontWeight: 900, lineHeight: 1.35 });
+  const tB = c('空头不反驳'), tL = c('而博通'), tR = c('这里面还藏着'), tRate = c('所以利率'), tF = c('公平地说');
+  return t => {
+    H(t);
+    red.forEach(([e, t0]) => show(e, t, t0, tL - 0.3));
+    show(ask, t, tB, tL - 0.3); show(oa, t, c('FT 报道'), tL - 0.3); grow(b7, t, c('FT 报道'), 'width', 780); grow(b5, t, c('FT 报道') + 0.5, 'width', 560);
+    show(ht, t, c('陈福阳说'), tL - 0.3);
+    show(loop, t, tL, tR - 0.3); draw(loop.querySelector('#la4'), t, tL, 0.7); show(sell, t, c('卖芯片的人'), tR - 0.3); show(lu, t, c('2000 年'), tR - 0.3);
+    show(ring, t, tR, tRate - 0.3); const rg = ring.querySelector('#rg');
+    rg.setAttribute('transform', `rotate(${(t - tR) * (t > c('倒着转') ? -60 : 40)} 450 260)`); rg.setAttribute('stroke', t > c('倒着转') ? '#3E63DD' : '#FFB224');
+    show(rate, t, tRate, tF - 0.3);
+    fair.forEach(([e, t0]) => show(e, t, t0)); show(core, t, c('争议的核心'));
+  };
+};
+
+// 5 争议三：周期消失了吗
+const V3_CYCLE = (R, s, I) => {
+  const c = n => cue(I, n);
+  const H = head(R, s, '<span class="amber mono">争议三</span>　存储的周期，消失了吗？');
+  const lyn = quoteCard(R, '彼得·林奇（大意）', '周期股市盈率最低的时候，往往是<span class="amber">好日子快结束</span>的时候。', ['', '', ''], '《彼得·林奇的成功投资》', { left: '120px', top: '230px', width: '1680px' });
+  lyn.querySelector('.cred').remove();
+  const sc = svg(R, 960, 470, `
+    <line x1="30" y1="430" x2="940" y2="430" stroke="#3A3F47" stroke-width="2"/>
+    <path id="pr5" d="M30 410 C290 390 490 270 690 160 S890 70 940 55" fill="none" stroke="#E5484D" stroke-width="6"/>
+    <path id="px5" d="M30 400 C240 350 410 180 550 150 S790 280 940 340" fill="none" stroke="#EDEEF0" stroke-width="6"/>
+    <text x="945" y="55" fill="#E5484D" font-size="24">利润</text><text x="945" y="345" fill="#EDEEF0" font-size="24">股价</text>
+    <text x="30" y="462" fill="#6E757C" font-size="18">示意，非真实走势</text>`, { left: '120px', top: '400px' });
+  const pts = [['7 月 · 三星 −7%', 590, 165, '7 月，三星'], ['7 月底 · 海力士 −10%', 740, 230, '7 月底'], ['10/8 · 三星仍跌', 890, 320, '10 月 8 号']]
+    .map(([n, x, y, nd]) => [el(R, `<div style="width:22px;height:22px;border-radius:50%;background:#FFB224"></div><div style="font-size:22px;margin-top:4px;white-space:nowrap">${n}</div>`, { left: `${120 + x}px`, top: `${400 + y}px` }), c(nd)]);
+  const pe = el(R, '', { left: '1160px', top: '400px', width: '640px', height: '440px' });
+  el(pe, '<div class="tag">海力士 / 三星市盈率（按 2027–28 年盈利，美银）</div>', { left: '0', top: '0' });
+  const pb1 = el(pe, '', { left: '40px', bottom: '80px', width: '180px', height: '0', background: 'var(--amber)' }, 'bar');
+  const pb2 = el(pe, '', { left: '330px', bottom: '80px', width: '180px', height: '0', background: '#3A3F47' }, 'bar');
+  el(pe, '<div class="mono" style="font-size:40px;font-weight:800">2–3x</div><div class="tag">现在</div>', { left: '40px', bottom: '0' });
+  el(pe, '<div class="mono" style="font-size:40px;font-weight:800">4–7x</div><div class="tag">过去上行期</div>', { left: '330px', bottom: '0' });
+  const bb = el(R, '<span class="up" style="font-weight:900">多头：</span>错杀，便宜得离谱　　<span class="blue" style="font-weight:900">空头：</span>市场不信这利润能持续', { left: '120px', top: '880px', fontSize: '30px', fontWeight: 700 });
+  const lt = card(R, '<div class="up" style="font-weight:900;font-size:30px">多头底牌：长约</div><div style="font-size:34px;font-weight:700;margin-top:8px">产量提前一两年锁死，价格不再一个季度一谈</div>', { left: '120px', top: '260px', width: '820px', borderLeft: '6px solid var(--up)' });
+  const ltb = card(R, '<div class="blue" style="font-weight:900;font-size:30px">空头：锁量，锁不住付款能力</div><div style="font-size:34px;font-weight:700;margin-top:8px">马斯克「客户不会忘记」= 将来重谈的筹码</div>', { left: '980px', top: '260px', width: '820px', borderLeft: '6px solid var(--blue)' });
+  const sup = el(R, '', { left: '120px', top: '520px', width: '1680px', height: '300px' });
+  el(sup, '<div class="tag">供给时间表</div>', { left: '0', top: '0' });
+  const tl5 = svg(sup, 1680, 200, `<line x1="40" y1="100" x2="1640" y2="100" stroke="#3A3F47" stroke-width="4"/>` + [[2026, 40], [2027, 440], [2028, 840], [2029, 1240], [2031, 1640]].map(([y, x]) => `<circle cx="${x}" cy="100" r="9" fill="#9BA1A6"/><text x="${x}" y="150" fill="#9BA1A6" font-size="26" font-family="JetBrains Mono" text-anchor="middle">${y}</text>`).join(''), { left: '0', top: '40px' });
+  const sk = el(sup, '<span class="pill">海力士 54 万亿韩元 → 2031</span>', { left: '1260px', top: '50px' });
+  const ss = el(sup, '<span class="pill">三星龙仁 <span class="muted" style="text-decoration:line-through">2030+</span> → <b class="amber">2029</b></span>', { left: '1040px', top: '210px' });
+  const b3 = el(sup, '<span class="pill">建一座厂：<b>3 年以上</b> → 股价提前打折</span>', { left: '40px', top: '210px' });
+  const dg = el(R, '「每次有人说存储周期消失了，<span class="amber">周期都还在</span>。」<span class="muted" style="font-size:24px">—— 一位科技基金经理</span>', { left: '120px', top: '860px', fontSize: '34px', fontWeight: 700 });
+  const fin = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(11,13,16,.94)' });
+  el(fin, '周期没有消失，它只是<span class="amber">搬了家</span>', { left: '0', right: '0', top: '300px', textAlign: 'center', fontSize: '72px', fontWeight: 900 });
+  el(fin, '<span class="muted">库存 · 价格</span>　<span class="amber mono">──→</span>　AI 公司能不能借到钱', { left: '0', right: '0', top: '450px', textAlign: 'center', fontSize: '46px', fontWeight: 700 });
+  const cpq = el(fin, 'Counterpoint：不是传统存储周期抛售，是融资恐慌', { left: '0', right: '0', top: '580px', textAlign: 'center', fontSize: '30px', color: 'var(--muted)' });
+  const tS = c('今年这条规律'), tPE = c('据美银'), tLT = c('多头的底牌'), tSup = c('供给这边'), tF = c('我的看法是');
+  return t => {
+    H(t); show(lyn, t, s + 0.3, tS - 0.2);
+    show(sc, t, tS, tLT - 0.3); draw(sc.querySelector('#pr5'), t, tS, 1.4); draw(sc.querySelector('#px5'), t, tS + 0.3, 1.4);
+    pts.forEach(([e, t0]) => show(e, t, t0, tLT - 0.3));
+    show(pe, t, tPE, tLT - 0.3); grow(pb1, t, tPE, 'height', 100); grow(pb2, t, c('过去的上行'), 'height', 280); show(bb, t, c('多头说'), tLT - 0.3);
+    show(lt, t, tLT, tF - 0.3); show(ltb, t, c('空头的回答'), tF - 0.3);
+    show(sup, t, tSup, tF - 0.3); show(sk, t, tSup + 0.3); show(ss, t, c('三星龙仁')); show(b3, t, c('建一座厂'));
+    show(dg, t, c('一位科技基金经理'), tF - 0.3);
+    show(fin, t, tF, Infinity, 0.4, 0); show(cpq, t, c('Counterpoint 也说'));
+  };
+};
+
+// 6 多空总账
+const V3_SUM = (R, s, I) => {
+  const c = n => cue(I, n);
+  const H = head(R, s, '多空总账');
+  const L = ['需求是真的：台积电、长约在证明', '长鑫的威胁在 2028 年以后', '估值已便宜到历史低位'].map((x, i) => card(R, `<div style="font-size:34px;font-weight:700">${x}</div>`, { left: '120px', top: `${250 + i * 120}px`, width: '820px', padding: '20px 28px', borderLeft: '6px solid var(--up)' }));
+  const Rr = ['钱开始变贵，AI 公司的账被追问', '过剩有了时间表（据报道）', '业绩最好时，往往是股价最高时'].map((x, i) => card(R, `<div style="font-size:34px;font-weight:700">${x}</div>`, { left: '980px', top: `${250 + i * 120}px`, width: '820px', padding: '20px 28px', borderLeft: '6px solid var(--blue)' }));
+  const lh = el(R, '<span class="up">红方</span>', { left: '120px', top: '200px', fontSize: '32px', fontWeight: 900 });
+  const rh = el(R, '<span class="blue">蓝方</span>', { left: '980px', top: '200px', fontSize: '32px', fontWeight: 900 });
+  const q = el(R, '谁来为这场 AI 军备竞赛<span class="amber">付钱</span>？', { left: '0', right: '0', top: '680px', textAlign: 'center', fontSize: '64px', fontWeight: 900 });
+  return t => {
+    H(t); const tr = c('红方说'), tb = c('蓝方说');
+    show(lh, t, tr); L.forEach((e, i) => show(e, t, tr + i * 0.5)); show(rh, t, tb); Rr.forEach((e, i) => show(e, t, tb + i * 0.5));
+    show(q, t, c('两边吵到最后'));
+  };
+};
+
+// 7 四个开关
+const V3_SW = (R, s, I) => {
+  const c = n => cue(I, n);
+  const H = head(R, s, '接下来两周 · <span class="amber">四个开关</span>');
+  const sw = [['10/27–28', '美联储议息', '加不加息', '第一'], ['10 月底', '云巨头财报', '明年资本开支还加不加', '第二'], ['10/29 前后', '三星 · 海力士财报', '长约价格有没有松动', '第三'], ['Q4', 'OpenAI 融资', '据报道估值 1.4 万亿美元', '第四']]
+    .map(([d, n, w, nd], i) => [card(R, `<div class="mono amber" style="font-size:34px;font-weight:800">${d}</div><div style="font-size:36px;font-weight:900;margin-top:16px">${n}</div><div class="muted" style="font-size:26px;margin-top:12px">${w}</div>`, { left: `${120 + i * 425}px`, top: '280px', width: '395px', height: '340px' }), c(nd)]);
+  return t => { H(t); sw.forEach(([e, t0]) => { show(e, t, t0); e.style.borderColor = t > t0 ? 'var(--amber)' : 'var(--line)'; }); };
+};
+
+// 8 收尾：三个问题翻面成答案
+const V3_END = (R, s, I) => {
+  const c = n => cue(I, n);
+  const Q = [['长鑫到底<br>有多可怕？', '导火索，<br>不是炸药'], ['AI 的钱<br>还够不够？', '炸药<br>是钱'], ['存储的周期<br>消失了吗？', '没消失，<br>只是搬了家']];
+  const cards = Q.map(([q, a], i) => {
+    const e = card(R, `<div class="mono amber" style="font-size:36px;font-weight:800">0${i + 1}</div><div class="qq" style="font-size:52px;font-weight:900;line-height:1.25;margin-top:14px">${q}</div>`, { left: `${150 + i * 560}px`, top: '200px', width: '500px', height: '380px' });
+    return [e, a];
+  });
+  const ask = el(R, '这一周是<span class="up">错杀</span>，还是<span class="blue">周期顶点的第一声枪响</span>？', { left: '0', right: '0', top: '650px', textAlign: 'center', fontSize: '48px', fontWeight: 900 });
+  const chips = el(R, '<span class="pill" style="border-color:var(--up);font-size:32px">评论区打「红」</span>　　<span class="pill" style="border-color:var(--blue);font-size:32px">评论区打「蓝」</span>', { left: '0', right: '0', top: '760px', textAlign: 'center' });
+  const d = el(R, '本期只做行业信息整理，不构成任何投资建议', { left: '0', right: '0', top: '860px', textAlign: 'center', fontSize: '26px', color: 'var(--muted)' });
+  return t => {
+    const tA = c('长鑫是导火索');
+    cards.forEach(([e, a], i) => {
+      show(e, t, s + i * 0.25);
+      const k = clamp((t - tA - i * 0.6) / 0.4);
+      e.style.transform = `rotateY(${k < 0.5 ? k * 180 : (1 - k) * 180}deg)`;
+      if (k >= 0.5 && !e.dataset.flip) { e.querySelector('.qq').innerHTML = a; e.querySelector('.qq').style.color = 'var(--amber)'; e.dataset.flip = 1; }
+      if (k < 0.5 && e.dataset.flip) { e.querySelector('.qq').innerHTML = Q[i][0]; e.querySelector('.qq').style.color = ''; delete e.dataset.flip; }
+    });
+    show(ask, t, c('你觉得这一周')); show(chips, t, c('评论区打')); show(d, t, c('不构成'));
+  };
+};
+
 // 6 多空总账（v3 新增，待样片确认后细化）
 const SUMMARY = (R, s) => {
   const a = el(R, '多空总账', { left: '120px', top: '130px', fontSize: '52px', fontWeight: 900 });
@@ -466,10 +658,9 @@ const SUMMARY = (R, s) => {
 };
 
 // v3 段落顺序：0 冷开场 / 1 片头 / 2 五刀 / 3 长鑫 / 4 钱 / 5 周期 / 6 总账 / 7 开关 / 8 收尾
-// 3、4、5、7、8 沿用 v2 场景，关键词待样片确认后按 v3 口播改
 const OLD = BUILD.slice();
 BUILD.length = 0;
-BUILD.push(COLD3, IDENT, KNIVES3, OLD[3], OLD[5], OLD[4], SUMMARY, OLD[6], OLD[7]);
+BUILD.push(COLD3, IDENT, KNIVES3, V3_CX, V3_MONEY, V3_CYCLE, V3_SUM, V3_SW, V3_END);
 
 // ---------- 主控 ----------
 const sub = document.getElementById('sub'), chip = document.getElementById('chip');
@@ -478,7 +669,7 @@ window.setup = async tl => {
   const n = Math.max(...TL.lines.map(l => l.sec)) + 1;
   for (let i = 0; i < n; i++) {
     const R = el($s, '', {}, 'scene');
-    SC.push({ R, title: TL.lines.find(l => l.sec === i).title.replace(/^\[[^\]]*\]\s*/, ''), up: BUILD[i] ? BUILD[i](R, secStart(i)) : () => {} });
+    SC.push({ R, title: TL.lines.find(l => l.sec === i).title.replace(/^\[[^\]]*\]\s*/, ''), up: BUILD[i] ? BUILD[i](R, secStart(i), i) : () => {} });
   }
   // 预载所有字形
   el(document.body, TL.lines.map(l => l.text).join(''), { opacity: 0, fontWeight: 700 });
