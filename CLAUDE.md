@@ -11,4 +11,5 @@
 7. **网站和服务端保持零依赖。** 网站是原生 HTML / CSS / ES Module，服务端只用 Node 内置模块。`playwright-core` 只用于 `npm run notes` 和 `npm run video` 生成素材；视频配音用的 Python 依赖只在 `factory/` 里。
 9. **大陆合规优先。** 笔记、商品页、段位卡上不放链接、二维码、微信；网址只能出现在付款后的自动发货内容里。改了文案要跑 `npm run notes`，看高危词提醒。
 10. **数据结构变更**要同时改 `db/schema.sql`、`server/db.mjs` 和 `server/admin.mjs`。
+11. **视频出片前必须过质检。** 用 `factory/` 做视频时按 `.claude/skills/video-qc` 走：`质检报告.md` 全部通过、读音表审完才出片，不用 `--force` 绕过。写脚本按 `.claude/skills/viral-script`。
 8. 文案用中文，代码注释简短、用中文。

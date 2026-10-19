@@ -10,7 +10,8 @@
     "notes": "node scripts/notes.mjs",
     "build:preview": "node scripts/build-preview.mjs",
     "codes:static": "node --no-warnings scripts/codes-static.mjs",
-    "video": "node factory/video/build.mjs"
+    "video": "node factory/video/build.mjs",
+    "video:letters": "cd factory/video && python3 letters_check.py"
   },
   "engines": {
     "node": ">=22.13"

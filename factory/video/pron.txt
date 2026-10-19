@@ -157,3 +157,19 @@
 地方 di4 fang5
 稳固地 wen3 gu4 de5
 视频为 shi4 pin2 wei2
+
+# ── 人工审过、确认无误的词（001 期）──
+流传 liu2 chuan2
+为你 wei4 ni3
+在为 zai4 wei4
+看得懂 kan4 de5 dong3
+到不了 dao4 bu4 liao3
+转向 zhuan3 xiang4
+数字 shu4 zi4
+少数 shao3 shu4
+不差 bu2 cha4
+强调 qiang2 diao4
+不得不 bu4 de2 bu4
+赢得 ying2 de2
+行动 xing2 dong4
+值得 zhi2 de5

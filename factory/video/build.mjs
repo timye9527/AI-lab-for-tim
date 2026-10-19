@@ -1,13 +1,14 @@
 // 一期视频的完整生产：脚本文档 → 配音 → 字幕 → 逐帧渲染 → 合成 mp4。
 // 用法：node factory/video/build.mjs <期目录> [--check] [--stills] [--no-video]
-//   --check     配音后用语音识别回听，列出可能读错的句子
 //   --stills    只导出几张关键帧，用来快速看版式
-//   --no-video  只出配音、字幕和脚本文档
+//   --no-video  只出配音、字幕、脚本文档和质检报告
+//   --force     质检没通过也出片
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join, resolve, dirname, basename } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from 'playwright-core';
+import { runQC } from './qc.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '../..');
@@ -102,6 +103,7 @@ const desc = (el) => {
     case 'note': return `解读卡「${el.text}」`;
     case 'agenda': return `章节预告：${el.items.map((x) => x.n + ' ' + x.title).join('，')}（随口播逐个点亮，顶部章节栏同步高亮）`;
     case 'profile': return `人物卡「${el.name}｜${el.role}」：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
+    case 'house': return '房子线条画出，随后房价线一路下行，标出「约 −40%」';
     case 'timeline': return `时间线：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
     case 'stats': return `数据卡：${el.items.map((x) => x.value + ' ' + x.label).join('；')}`;
     case 'grid': return `卡片网格（当前一条红框）：${el.items.map((x) => x.n + '. ' + x.title + (x.from ? `（${x.from}）` : '')).join('；')}`;
@@ -130,7 +132,6 @@ ep.scenes.forEach((s, si) => {
 md += `\n## 来源\n\n${ep.sources.map((x) => `- ${x}`).join('\n')}\n\n${ep.disclaimer}\n`;
 writeFileSync(join(epDir, '脚本.md'), md);
 console.log(`脚本：${join(epDir, '脚本.md')}\n字幕：${join(out, 'subs.srt')}\n时长：${mmss(duration)}`);
-if (flag('--no-video')) process.exit(0);
 
 // 5. 渲染
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || '/opt/pw-browsers/chromium' });
@@ -143,6 +144,16 @@ await page.evaluate(async () => {
   for (const w of [700, 900]) await document.fonts.load(`${w} 40px Serif`, '中');
   await document.fonts.ready;
 });
+
+// 5.5 出片前质检
+const qc = await runQC({ page, ep, scenes, subs, beats, out, epDir });
+writeFileSync(join(epDir, '质检报告.md'), qc.report);
+console.log(`质检：${qc.hard.length ? `不通过，${qc.hard.length} 项必须修` : '自动检查全部通过'}，${qc.soft.length} 项提醒 → ${join(epDir, '质检报告.md')}`);
+for (const x of qc.hard) console.log(`  ✗ ${x}`);
+if (flag('--no-video')) {
+  await browser.close();
+  process.exit(qc.hard.length ? 1 : 0);
+}
 
 if (flag('--stills')) {
   // 每页取中间一帧，拼成一张总览图
@@ -160,6 +171,11 @@ if (flag('--stills')) {
   process.exit(0);
 }
 
+if (qc.hard.length && !flag('--force')) {
+  await browser.close();
+  console.log('质检没通过，不出片。修完再跑；确认要强行出片加 --force');
+  process.exit(1);
+}
 const mp4 = join(out, `${ep.id}.mp4`);
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
   '-i', join(out, 'voice.wav'), '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
@@ -188,4 +204,7 @@ if (wall >= 0) {
 ff.stdin.end();
 await new Promise((r) => ff.on('close', r));
 await browser.close();
+// 出片后复核：从成片逐句再听一遍
+const fc = spawnSync('python3', [join(HERE, 'final_check.py'), out], { stdio: 'inherit', cwd: HERE });
+if (fc.status !== 0) console.log('成片复核有句子没听对：改写这些句子后重新出片');
 console.log(`完成：${mp4}（${mmss(duration)}，截图 ${shots} 张，用时 ${Math.round((Date.now() - t0) / 1000)} 秒）`);

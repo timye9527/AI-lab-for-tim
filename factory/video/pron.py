@@ -1,7 +1,8 @@
 """读音模块：把口播稿转成「每个字读什么」，由我们决定，不交给配音模型去猜。
 
-流程：读法替换（英文缩写、符号）→ 数字转中文读法 → 覆盖词表优先 → 其余用 pypinyin 按词取音
-→「一」「不」变调 → 生成附加词典条目，让模型逐字照读。
+流程：读法替换（符号、个别英文）→ 英文缩写转字母读法 → 数字转中文读法 → 覆盖词表优先
+→ 其余用 pypinyin 按词取音 →「一」「不」变调 → 生成附加词典条目，让模型逐字照读。
+缩写里的字母换成私有区字符（U+E000 起）嵌进中文词条，读法见 letters.txt。
 """
 import os, re
 from pypinyin import pinyin, lazy_pinyin, Style
@@ -9,8 +10,6 @@ from pypinyin import pinyin, lazy_pinyin, Style
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIGITS = '零一二三四五六七八九'
 NUMCHARS = set('零一二三四五六七八九十百千万亿两点')
-# 英文字母读字母名，用英文单词写出来交给 espeak（单个大写字母会和模型的音素符号撞车）
-LETTERS = dict(zip('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'ay bee see dee ee eff gee aitch eye jay kay el em en oh pee queue ar ess tee you vee double-you ex why zee'.split()))
 
 
 def _load(name):
@@ -31,6 +30,46 @@ for row in _load('read.txt'):
     a, b = [x.strip() for x in row.split('=>')]
     READS.append((a, b))
 MAXW = max(len(w) for w in OVERRIDES)
+
+# 字母：拼音（中文音节读）、英文单词（英文引擎读）或 None（读不准）
+LETTER_PY, LETTER_WORD, ACRONYMS = {}, {}, {}
+for row in _load('letters.txt'):
+    k, rest = row.split(None, 1)
+    if len(k) == 1:
+        if rest == '✗':
+            LETTER_PY[k] = None
+        elif rest.startswith('='):
+            LETTER_WORD[k] = rest[1:]
+        else:
+            LETTER_PY[k] = rest
+    else:
+        ACRONYMS[k] = [x.strip() for x in rest.split('/')]
+PUA = 0xE000
+WORD_LETTER = {w: k for k, w in LETTER_WORD.items()}
+ZH = r'\u4e00-\u9fff\ue000-\ue0ff'
+
+
+def pua(c):
+    return chr(PUA + ord(c) - 65)
+
+
+def is_pua(c):
+    return PUA <= ord(c) < PUA + 26
+
+
+def unpua(c):
+    return chr(ord(c) - PUA + 65)
+
+
+def _acronym(m):
+    word = m.group(0)
+    bad = [c for c in word if LETTER_PY.get(c, '') is None]
+    if bad:
+        raise ValueError(f'「{word}」里的字母 {"、".join(bad)} 配音读不准，请改写（例如写中文全称）')
+    out = ''
+    for c in word:
+        out += f' {LETTER_WORD[c]} ' if c in LETTER_WORD else pua(c)
+    return out
 
 
 def int_cn(n):
@@ -78,9 +117,8 @@ def normalize(text):
     """只影响配音的读法：缩写、符号、数字。"""
     for a, b in READS:
         text = text.replace(a, b)
-    # 全大写缩写拆成字母名
-    text = re.sub(r'(?<![A-Za-z])[A-Z]{2,}(?![A-Za-z])', lambda m: ' '.join(LETTERS[c] for c in m.group(0)), text)
-    text = re.sub(r'(?<![A-Za-z])([A-Z])(?![A-Za-z])', lambda m: LETTERS[m.group(1)], text)
+    # 全大写缩写和单个大写字母，按字母读
+    text = re.sub(r'(?<![A-Za-z])[A-Z]+(?![a-z])', _acronym, text)
     # 年份逐位读：带「年」的四位数，以及「中国制造2025」这类编号。其他四位数按数值读
     text = re.sub(r'(?<=制造)(\d{4})(?!\d)', lambda m: ''.join(DIGITS[int(c)] for c in m.group(1)), text)
     text = re.sub(r'(\d{4})(?=\s*年)', lambda m: ''.join(DIGITS[int(c)] for c in m.group(1)), text)
@@ -95,7 +133,7 @@ def normalize(text):
     text = re.sub(r'[·《》“”"‘’（）()]', '', text)
     text = text.replace('、', '，').replace('—', '，').replace('…', '。')
     # 中英文之间留空格，英文按词读
-    text = re.sub(r'(?<=[一-鿿])(?=[A-Za-z])|(?<=[A-Za-z])(?=[一-鿿])', ' ', text)
+    text = re.sub(rf'(?<=[{ZH}])(?=[A-Za-z])|(?<=[A-Za-z])(?=[{ZH}])', ' ', text)
     return re.sub(r'[ \t]+', ' ', text).strip()
 
 
@@ -104,9 +142,18 @@ def _tone(s):
 
 
 def g2p_run(run):
-    """一段纯汉字 → [(字, 拼音, 来源)]。来源：词表 / 词典 / 变调。"""
+    """一段汉字（可夹缩写字母）→ [(字, 拼音, 来源)]。来源：词表 / 词典 / 变调 / 字母。"""
     out, i = [], 0
     while i < len(run):
+        if is_pua(run[i]):
+            j = i
+            while j < len(run) and is_pua(run[j]):
+                j += 1
+            word = ''.join(unpua(c) for c in run[i:j])
+            pys = ACRONYMS.get(word) or [LETTER_PY[c] for c in word]
+            out += [(c, p, '字母') for c, p in zip(run[i:j], pys)]
+            i = j
+            continue
         for L in range(min(MAXW, len(run) - i), 0, -1):
             w = run[i:i + L]
             if w in OVERRIDES:
@@ -116,7 +163,7 @@ def g2p_run(run):
         else:
             # 到下一个覆盖词之前的一段交给 pypinyin 按词取音
             j = i + 1
-            while j < len(run) and not any(run[j:j + L] in OVERRIDES for L in range(1, MAXW + 1)):
+            while j < len(run) and not is_pua(run[j]) and not any(run[j:j + L] in OVERRIDES for L in range(1, MAXW + 1)):
                 j += 1
             seg = run[i:j]
             pys = lazy_pinyin(seg, style=Style.TONE3, neutral_tone_with_five=True)
@@ -126,7 +173,7 @@ def g2p_run(run):
     for k, (c, p, src) in enumerate(out):
         if src == '词表' or c not in '一不':
             continue
-        nxt = out[k + 1][1] if k + 1 < len(out) else None
+        nxt = out[k + 1][1].split()[0] if k + 1 < len(out) else None
         prev = out[k - 1][0] if k else ''
         if c == '一' and 0 < k < len(out) - 1 and out[k - 1][0] == out[k + 1][0]:
             np = 'yi5'  # 看一看、想一想
@@ -149,14 +196,14 @@ def analyze(text):
     """口播稿 → (配音用文本, 附加词典条目 {词: 拼音}, 逐字读音)。"""
     norm = normalize(text)
     entries, chars = {}, []
-    for run in re.findall(r'[一-鿿]+', norm):
+    for run in re.findall(rf'[{ZH}]+', norm):
         res = g2p_run(run)
         chars += res
         # 每 10 个字一条（模型最长按 10 字匹配），保证整段按我们的读音走
         for s in range(0, len(res), 10):
             part = res[s:s + 10]
             w = ''.join(c for c, _, _ in part)
-            py = [p for _, p, _ in part]
+            py = [x for _, p, _ in part for x in p.split()]
             if w in entries and entries[w] != py:
                 raise ValueError(f'同一串字在不同句子里读音不同：{w} {entries[w]} / {py}，请在 pron.txt 里加词')
             entries[w] = py
@@ -166,8 +213,29 @@ def analyze(text):
 MARKS = {'a': 'āáǎà', 'o': 'ōóǒò', 'e': 'ēéěè', 'i': 'īíǐì', 'u': 'ūúǔù', 'v': 'ǖǘǚǜ'}
 
 
+def expect(norm, chars):
+    """预期听到的音节序列（不带声调），给回听比对用：汉字是拼音，字母是小写字母，英文单词拆成字母。"""
+    out, k = [], 0
+    for tok in re.findall(rf'[{ZH}]|[A-Za-z][A-Za-z\-]*', norm):
+        if re.match(rf'[{ZH}]', tok):
+            c, p, _ = chars[k]
+            k += 1
+            out.append(unpua(c).lower() if is_pua(c) else re.sub(r'\d', '', p))
+        elif tok in WORD_LETTER:
+            out.append(WORD_LETTER[tok].lower())
+        else:
+            out += list(tok.lower().replace('-', ''))
+    return out
+
+
+def show(c):
+    return unpua(c) if is_pua(c) else c
+
+
 def mark(p):
-    """yi2 → yí，方便人看。"""
+    """yi2 → yí，方便人看；多音节逐个转。"""
+    if ' ' in p:
+        return ' '.join(mark(x) for x in p.split())
     t = _tone(p)
     s = p.rstrip('12345')
     if t == 5:
@@ -183,6 +251,17 @@ def mark(p):
 
 # 词典最容易在上下文里取错音的字，读音表里单独列出来重点审
 RISKY = set('得了着量冲转还行长重调差数处为地和便降空给传')
+# 这些读法是绝大多数情况，不再列出，免得噪音盖住真问题
+USUAL = {'了': 'le5', '和': 'he2', '给': 'gei3', '还': 'hai2', '地': 'di4'}
+
+
+def risky(c, py, prev=''):
+    """需要人工重点审的字：高风险字里，读法不是最常见的那种；或「了」前面是「不」「得」（可能该读 liǎo）。"""
+    if c not in RISKY:
+        return False
+    if c == '了' and prev in '不得':
+        return True
+    return USUAL.get(c) != py
 
 
 def is_poly(c):
