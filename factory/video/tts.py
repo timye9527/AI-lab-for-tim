@@ -159,12 +159,15 @@ def main():
 
     # 1. 读音分析，汇总附加词典
     tokens = {l.split()[0] for l in open(D + 'tokens.txt', encoding='utf-8') if l.strip()}
-    entries, plans = {}, []
+    entries, plans, weak_hits = {}, [], []
     for i, b in enumerate(spec['beats']):
         try:
             norm, ent, chars = pron.analyze(b['text'])
         except ValueError as e:
             raise SystemExit(f'第 {i + 1} 句：{e}\n  {b["text"]}')
+        weak = [(c, pron.WEAK[re.sub(r'\d', '', p)]) for c, p, _ in chars if re.sub(r'\d', '', p) in pron.WEAK]
+        if weak:
+            weak_hits.append(f'第 {i + 1} 句「{b["text"]}」：{weak[0][1]}')
         for w, py in ent.items():
             bad = [p for p in py if p not in tokens]
             if bad:
@@ -241,9 +244,11 @@ def main():
     fails = [(i + 1, p['result']) for i, p in enumerate(plans) if p['result']['errs']]
     minors = [(i + 1, p['result']) for i, p in enumerate(plans) if not p['result']['errs'] and p['result'].get('minor')]
     retried = sum(1 for p in plans if p['result']['tries'] > 1)
-    json.dump({'total': len(plans), 'retried': retried, 'fails': [{'beat': i, **r} for i, r in fails],
+    json.dump({'total': len(plans), 'retried': retried, 'weak': weak_hits, 'fails': [{'beat': i, **r} for i, r in fails],
                'minor': [{'beat': i, 'minor': r['minor']} for i, r in minors]},
               open(os.path.join(out, 'qc-voice.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    for w in weak_hits:
+        print(f'  ✗ 弱音节：{w}')
     print(f'配音 {len(timeline)} 句，总长 {t:.1f} 秒；回听质检：{len(plans) - len(fails)} 句通过，{retried} 句经过重读，{len(fails)} 句仍有问题')
     if sheet:
         write_sheet(sheet, spec['beats'], plans)

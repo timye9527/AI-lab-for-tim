@@ -61,7 +61,12 @@ export async function runQC({ page, ep, scenes, subs, beats, out, epDir }) {
   // 1. 配音回听
   const v = JSON.parse(readFileSync(join(out, 'qc-voice.json'), 'utf8'));
   sec.push('## 1. 配音回听（自动）', '',
-    `两个识别模型逐音节比对：${v.total} 句中 ${v.total - v.fails.length} 句通过，其中 ${v.retried} 句是重读后才通过的。`, '');
+    `两个识别模型逐音节比对：${v.total} 句中 ${v.total - v.fails.length} 句通过，其中 ${v.retried} 句是重读后才通过的。`,
+    '注意：识别模型输出的是汉字，同一个字的不同读音（得 de / děi）它分不出来，所以多音字读得对不对，回听不能作数。模型发不出的音节另由「弱音节」规则拦截。', '');
+  for (const w of v.weak || []) {
+    hard.push(`模型弱音节：${w}`);
+    sec.push(`- ✗ 模型弱音节：${w}`);
+  }
   for (const f of v.fails) {
     hard.push(`配音第 ${f.beat} 句：${f.issues.join('；')}`);
     sec.push(`- ✗ 第 ${f.beat} 句（${f.by} 听到：${f.heard}）：${f.issues.join('；')}`);
@@ -70,7 +75,7 @@ export async function runQC({ page, ep, scenes, subs, beats, out, epDir }) {
     soft.push(`配音第 ${m.beat} 句：${m.minor.join('；')}`);
     sec.push(`- △ 第 ${m.beat} 句：${m.minor.join('；')}（轻声虚词，人工听一下是否吞字）`);
   }
-  if (!v.fails.length && !v.minor.length) sec.push('- 全部通过');
+  if (!v.fails.length && !v.minor.length && !(v.weak || []).length) sec.push('- 全部通过');
   sec.push('');
 
   // 2. 读音（声调要人工）
