@@ -3,7 +3,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* 布局：一本登记簿。顶部是总账，下面按类型分册，每条成果一行 */
+/* 布局：一本登记簿。顶部是主线判断和本周检查，中间是闭环地图和资产缺口，下面是全部条目 */
 :root {
   --bg: #f3f4f1;
   --sheet: #fbfbf9;
@@ -16,6 +16,8 @@
   --ok-soft: #e1efe6;
   --warn: #9a6512;
   --warn-soft: #f5ead6;
+  --bad: #a3392b;
+  --bad-soft: #f6e2de;
   --c-invest: #23517a;
   --c-report: #6a4c93;
   --c-product: #2f7a4f;
@@ -29,7 +31,7 @@
   :root:not([data-theme="light"]) {
     --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
     --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
-    --warn: #e0b064; --warn-soft: #2e2618;
+    --warn: #e0b064; --warn-soft: #2e2618; --bad: #ec8b7c; --bad-soft: #33201c;
     --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
     color-scheme: dark;
   }
@@ -37,16 +39,20 @@
 :root[data-theme="dark"] {
   --bg: #121519; --sheet: #191d22; --ink: #e4e7ea; --muted: #97a1ab; --rule: #2c3238;
   --accent: #7fb0dc; --accent-soft: #1e2b38; --ok: #74c190; --ok-soft: #1a2c22;
-  --warn: #e0b064; --warn-soft: #2e2618;
+  --warn: #e0b064; --warn-soft: #2e2618; --bad: #ec8b7c; --bad-soft: #33201c;
   --c-invest: #7fb0dc; --c-report: #b39ade; --c-product: #74c190; --c-content: #e39373; --c-media: #d6c46c;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; }
-.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 28px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 64px; display: grid; gap: 32px; }
 a { color: var(--accent); }
 button, input, select, textarea { font: inherit; color: inherit; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h2.sec { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0; }
+.sec-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
+.sec-h .d { color: var(--muted); font-size: 13px; }
+.sec-h .c { margin-left: auto; font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
 /* 抬头 */
 header.top { display: grid; gap: 18px; }
@@ -55,6 +61,50 @@ header.top { display: grid; gap: 18px; }
 .mast p { margin: 6px 0 0; color: var(--muted); max-width: 46em; }
 .mast .side { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .stamp { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+
+/* 两条主线 */
+.lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0; border-block: 2px solid var(--ink); }
+.lines > div { padding: 14px 18px 14px 0; display: grid; gap: 4px; }
+.lines > div + div { border-left: 1px solid var(--rule); padding-left: 18px; }
+@media (max-width: 600px) { .lines > div + div { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; } }
+.lines .k { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+.lines strong { font-family: var(--display); font-size: 18px; }
+.lines p { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* 本周检查 */
+.review { display: grid; gap: 12px; }
+.review .sum { margin: 0; max-width: 62ch; }
+.acts-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.acts-list li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.acts-list .kind { font-size: 12px; padding: 1px 0; text-align: center; border-radius: 4px; height: fit-content; }
+.kind.k-decide { background: var(--accent-soft); color: var(--accent); }
+.kind.k-fix { background: var(--bad-soft); color: var(--bad); }
+.kind.k-keep { background: var(--ok-soft); color: var(--ok); }
+
+/* 闭环地图 */
+.loop { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; position: relative; }
+.stage { padding: 14px 16px 16px; border: 1px solid var(--rule); background: var(--sheet); display: grid; gap: 10px; align-content: start; min-width: 0; }
+.stage + .stage { border-left: 0; }
+.stage h3 { margin: 0; font-size: 15px; display: flex; align-items: baseline; gap: 8px; }
+.stage h3 .arrow { color: var(--muted); font-family: var(--mono); font-size: 13px; }
+.stage .what { margin: 0; font-size: 12.5px; color: var(--muted); }
+.stage .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage.weak { box-shadow: inset 0 3px 0 var(--bad); }
+.stage .flag { font-size: 12.5px; color: var(--bad); margin: 0; }
+.chip { font-size: 13px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--rule); background: var(--bg); }
+.chip.p-main { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+@media (max-width: 720px) {
+  .loop { grid-template-columns: minmax(0, 1fr); }
+  .stage + .stage { border-left: 1px solid var(--rule); border-top: 0; }
+}
+
+/* 资产缺口 */
+.gaps { display: grid; gap: 0; }
+.gap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; padding: 12px 0; border-bottom: 1px solid var(--rule); align-items: start; }
+.gap h4 { margin: 0; font-size: 15px; font-weight: 600; }
+.gap p { margin: 0; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.gap .badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.gaps .sub { font-size: 13px; color: var(--muted); padding: 14px 0 4px; }
 
 /* 总账：每类数量 */
 .ledger { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-block: 2px solid var(--ink); }
@@ -75,18 +125,20 @@ header.top { display: grid; gap: 18px; }
 .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .tools input[type=search] { flex: 1 1 220px; min-width: 0; padding: 9px 12px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; }
 .tools select { padding: 9px 10px; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; }
+.seg button { all: unset; cursor: pointer; padding: 8px 12px; font-size: 14px; background: var(--sheet); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .btn { border: 1px solid var(--ink); background: var(--ink); color: var(--bg); border-radius: 6px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
 .btn.danger { background: transparent; color: var(--warn); border-color: var(--warn); }
 .btn:hover { filter: brightness(1.08); }
+.sr { position: absolute; left: -9999px; }
 
 /* 分册 */
+.listing { display: grid; gap: 28px; }
 section.book { display: grid; gap: 0; }
-.book-h { display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--ink); }
-.book-h h2 { font-family: var(--display); font-weight: 600; font-size: 21px; margin: 0; color: var(--ink); }
-.book-h h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--cat); margin-right: 10px; vertical-align: 2px; }
-.book-h .d { color: var(--muted); font-size: 13px; }
-.book-h .c { margin-left: auto; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.book .sec-h h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--cat, var(--ink)); margin-right: 10px; vertical-align: 2px; }
 
 /* 条目行 */
 .row { display: grid; grid-template-columns: 92px minmax(0, 1fr) auto; gap: 6px 20px; padding: 16px 0; border-bottom: 1px solid var(--rule); align-items: start; }
@@ -94,18 +146,31 @@ section.book { display: grid; gap: 0; }
 .row .main { min-width: 0; display: grid; gap: 6px; }
 .row h3 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.4; text-wrap: balance; }
 .row .sum { margin: 0; color: var(--muted); max-width: 62ch; }
+.row .why { margin: 0; font-size: 13.5px; max-width: 62ch; padding-left: 10px; border-left: 2px solid var(--rule); }
+.row .why b { font-weight: 600; }
 .row .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 12px; color: var(--muted); }
 .row .tag { border: 1px solid var(--rule); border-radius: 4px; padding: 0 6px; }
 .row .src { font-family: var(--mono); font-size: 11.5px; overflow-wrap: anywhere; }
 .row .links { display: flex; flex-wrap: wrap; gap: 6px; }
 .row .links a { text-decoration: none; font-size: 13px; padding: 3px 10px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
 .row .links a:hover { text-decoration: underline; }
-.row .right { display: grid; justify-items: end; gap: 8px; }
+.row .right { display: grid; justify-items: end; gap: 6px; }
 .pill { font-size: 12px; padding: 1px 8px; border-radius: 99px; white-space: nowrap; border: 1px solid transparent; }
 .pill.s-run { background: var(--ok-soft); color: var(--ok); }
 .pill.s-live { background: var(--accent-soft); color: var(--accent); }
 .pill.s-done { border-color: var(--rule); color: var(--muted); }
 .pill.s-todo { background: var(--warn-soft); color: var(--warn); }
+.pr { font-size: 12px; padding: 1px 8px; border-radius: 4px; white-space: nowrap; border: 1px solid var(--rule); color: var(--muted); }
+.pr.p-main { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.pr.p-keep { color: var(--ink); }
+.pr.p-down { color: var(--warn); border-color: var(--warn); border-style: dashed; }
+.pr.p-shelf { color: var(--muted); border-style: dotted; }
+.as { font-size: 12px; white-space: nowrap; }
+.as::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+.as.a-ok { color: var(--ok); } .as.a-ok::before { background: var(--ok); }
+.as.a-branch { color: var(--warn); } .as.a-branch::before { background: var(--warn); }
+.as.a-part { color: var(--warn); } .as.a-part::before { background: transparent; border: 2px solid var(--warn); width: 6px; height: 6px; }
+.as.a-none { color: var(--bad); } .as.a-none::before { background: var(--bad); }
 .edit { all: unset; cursor: pointer; font-size: 12px; color: var(--muted); text-decoration: underline; }
 .edit:focus-visible { outline: 2px solid var(--accent); }
 @media (max-width: 720px) {
@@ -113,10 +178,9 @@ section.book { display: grid; gap: 0; }
   .row .date { grid-column: 1 / -1; padding: 0; }
   .row .right { grid-column: 2; grid-row: 2; }
 }
-
 .empty { padding: 28px 0; color: var(--muted); border-bottom: 1px solid var(--rule); }
 
-/* 收录规则 */
+/* 规则 */
 details.rules { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 0 16px; }
 details.rules summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
 .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; padding-bottom: 16px; }
@@ -125,20 +189,21 @@ details.rules summary { cursor: pointer; padding: 12px 0; font-weight: 600; }
 .rules-grid code { font-family: var(--mono); font-size: 12.5px; background: var(--bg); padding: 0 4px; border-radius: 3px; overflow-wrap: anywhere; }
 
 /* 编辑抽屉 */
-dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); color: var(--ink); padding: 0; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog { border: 1px solid var(--rule); border-radius: 10px; background: var(--sheet); color: var(--ink); padding: 0; width: min(580px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
 dialog::backdrop { background: rgba(10, 14, 18, .45); }
 dialog form { display: grid; gap: 12px; padding: 20px; }
 dialog h2 { margin: 0; font-family: var(--display); font-size: 20px; }
 dialog label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
-dialog input, dialog select, dialog textarea { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
-dialog textarea { resize: vertical; min-height: 64px; }
+dialog input:not([type=checkbox]), dialog select, dialog textarea { padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg); color: var(--ink); width: 100%; }
+dialog textarea { resize: vertical; min-height: 60px; }
 dialog .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+dialog fieldset { border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; margin: 0; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
+dialog fieldset legend { padding: 0 4px; }
+dialog fieldset label { display: inline-flex; gap: 4px; align-items: center; color: var(--ink); }
 dialog .acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
 dialog .acts .btn.danger { margin-right: auto; }
 dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
-.hint { font-size: 12px; color: var(--muted); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 8px 16px; border-radius: 6px; font-size: 14px; }
-@media (prefers-reduced-motion: no-preference) { .row { transition: background .15s; } }
 </style>
 
 <div class="wrap">
@@ -146,63 +211,98 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
     <div class="mast">
       <div>
         <h1>成果中台</h1>
-        <p>做出来、能打开、能复用的东西都登记在这里。过程类的检索和没有交付物的对话不收。</p>
+        <p>登记做出来的东西，按两条主线判断该加码、维持、降级还是封存，并检查每项是不是已经存进 GitHub、以后能复现。</p>
       </div>
       <div class="side">
         <span class="stamp" id="stamp">正在读取登记簿…</span>
         <button class="btn" id="addBtn" type="button" hidden>登记新成果</button>
       </div>
     </div>
-    <nav class="ledger" id="ledger" aria-label="按类型筛选"></nav>
-    <div class="tools">
-      <label for="q" class="hint" style="position:absolute;left:-9999px">搜索成果</label>
-      <input id="q" type="search" placeholder="搜标题、简介、标签、仓库">
-      <label for="statusSel" class="hint" style="position:absolute;left:-9999px">按状态筛选</label>
-      <select id="statusSel">
-        <option value="">全部状态</option>
-        <option>运行中</option>
-        <option>已上线</option>
-        <option>已交付</option>
-        <option>待完善</option>
-      </select>
+    <div class="lines" aria-label="两条主线">
+      <div>
+        <span class="k">主线一</span>
+        <strong>表达与影响力资产</strong>
+        <p>以你的名义对外输出的作品和能力：视频、演讲、文章、作品集，越积越值钱。</p>
+      </div>
+      <div>
+        <span class="k">主线二</span>
+        <strong>内容生产闭环</strong>
+        <p>上游筛选信息、选题，中游写稿、配音、出片，下游分发、看数据、改下一期，整条链跑通。</p>
+      </div>
     </div>
   </header>
 
-  <main id="books"></main>
+  <section class="review" id="review" aria-labelledby="reviewH">
+    <div class="sec-h"><h2 class="sec" id="reviewH">本周检查</h2><span class="d" id="reviewDate">等待周检数据</span></div>
+    <p class="sum" id="reviewSum">周检结论会显示在这里：该你拍板的事、闭环里断掉的环节、需要补进 GitHub 的成果。</p>
+    <ul class="acts-list" id="reviewActs"></ul>
+  </section>
+
+  <section aria-labelledby="loopH" style="display:grid;gap:12px">
+    <div class="sec-h"><h2 class="sec" id="loopH">闭环地图</h2><span class="d">主线和维持的成果落在哪个环节</span></div>
+    <div class="loop" id="loop"></div>
+  </section>
+
+  <section aria-labelledby="gapH" style="display:grid;gap:4px">
+    <div class="sec-h"><h2 class="sec" id="gapH">资产化缺口</h2><span class="d">告诉我先补哪几项，我把它们整理进 GitHub</span><span class="c" id="gapCount"></span></div>
+    <div class="gaps" id="gaps"></div>
+  </section>
+
+  <section style="display:grid;gap:16px" aria-labelledby="allH">
+    <div class="sec-h"><h2 class="sec" id="allH">全部成果</h2></div>
+    <nav class="ledger" id="ledger" aria-label="按类型筛选"></nav>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="排列方式">
+        <button type="button" id="byPr" aria-pressed="true">按优先级</button>
+        <button type="button" id="byCat" aria-pressed="false">按类型</button>
+      </div>
+      <label for="q" class="sr">搜索成果</label>
+      <input id="q" type="search" placeholder="搜标题、简介、判断理由、仓库">
+      <label for="assetSel" class="sr">按资产状态筛选</label>
+      <select id="assetSel">
+        <option value="">全部资产状态</option>
+        <option>已入库</option><option>在分支</option><option>部分缺失</option><option>未入库</option>
+      </select>
+    </div>
+    <div class="listing" id="books"></div>
+  </section>
 
   <details class="rules">
-    <summary>收录规则和登记方法</summary>
+    <summary>判断规则和登记方法</summary>
     <div class="rules-grid">
       <div>
-        <h4>收录</h4>
+        <h4>四档优先级</h4>
         <ul>
-          <li>能打开的页面、看板、网站</li>
-          <li>成型的研究报告、案例库</li>
-          <li>能用的产品、工具、游戏</li>
-          <li>可直接发布的内容素材、出图模板</li>
-          <li>视频、短片、PPT 讲稿</li>
+          <li><strong>主线</strong>：直接推进两条主线、能复用，投主要精力</li>
+          <li><strong>维持</strong>：有用，但自动跑或按需做，不加投入</li>
+          <li><strong>降级</strong>：周期长或和主线关系弱，只修必须修的</li>
+          <li><strong>封存</strong>：一次性的，做完存档，不再投入</li>
         </ul>
       </div>
       <div>
-        <h4>不收</h4>
+        <h4>判断时问三件事</h4>
         <ul>
-          <li>只做了搜索和资料整理、没有落成文件的对话</li>
-          <li>中间过程、草稿片段、调试记录</li>
-          <li>空仓库、没开工的会话</li>
-          <li>已经并入其他成果的旧版本（在新条目里写一句来源即可）</li>
+          <li>它在给你积累对外的作品和影响力吗</li>
+          <li>它补上了闭环的哪一环，下一期还能接着用吗</li>
+          <li>它要你持续投入多少时间，换来的是不是复利</li>
         </ul>
       </div>
       <div>
-        <h4>五种类型</h4>
-        <ul id="catList"></ul>
+        <h4>四种资产状态</h4>
+        <ul>
+          <li><span class="as a-ok">已入库</span>：在仓库默认分支，有说明，能复现</li>
+          <li><span class="as a-branch">在分支</span>：推上了 GitHub，但还在工作分支，没进 main</li>
+          <li><span class="as a-part">部分缺失</span>：主体在，成品、素材或关键版本不在</li>
+          <li><span class="as a-none">未入库</span>：只在页面或本机，GitHub 上没有</li>
+        </ul>
       </div>
       <div>
-        <h4>以后怎么登记</h4>
+        <h4>收录和登记</h4>
         <ul>
-          <li>项目交付后，让 Claude 往本页数据集 <code>items</code> 写一条，文档 id 用英文短名</li>
-          <li>字段：<code>title</code> <code>cat</code> <code>status</code> <code>date</code> <code>summary</code> <code>tags</code> <code>source</code> <code>links</code></li>
-          <li>也可以自己点右上角「登记新成果」</li>
-          <li>备份在仓库 <code>AI-lab-for-tim/hub/items.json</code></li>
+          <li>收：页面、报告、产品、素材、视频、PPT。不收：只做检索、没有交付物的对话</li>
+          <li>每周一自动周检一次，更新条目、重估优先级、检查资产</li>
+          <li>数据集 <code>items</code>，周检结论在 <code>meta/review</code></li>
+          <li>备份和规则在 <code>AI-lab-for-tim/hub/</code></li>
         </ul>
       </div>
     </div>
@@ -217,6 +317,14 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
       <label>类型<select id="f-cat"></select></label>
       <label>状态<select id="f-status"><option>运行中</option><option>已上线</option><option>已交付</option><option>待完善</option></select></label>
     </div>
+    <div class="two">
+      <label>优先级<select id="f-priority"><option>主线</option><option>维持</option><option>降级</option><option>封存</option></select></label>
+      <label>资产状态<select id="f-asset"><option>已入库</option><option>在分支</option><option>部分缺失</option><option>未入库</option></select></label>
+    </div>
+    <fieldset id="f-line"><legend>服务哪条主线</legend></fieldset>
+    <fieldset id="f-stage"><legend>闭环环节</legend></fieldset>
+    <label>判断理由<textarea id="f-why" maxlength="200"></textarea></label>
+    <label>资产说明（在哪、缺什么）<input id="f-assetNote" maxlength="160"></label>
     <div class="two">
       <label>日期<input id="f-date" type="date" required></label>
       <label>来源（仓库 / 分支）<input id="f-source" maxlength="120"></label>
@@ -234,39 +342,109 @@ dialog .err { color: var(--warn); font-size: 13px; min-height: 1em; margin: 0; }
 </dialog>
 
 <script>
-// 类型定义：新增类型只改这里
+// 类型、优先级、资产状态定义：新增只改这里
 const CATS = [
   { id: "invest",  name: "投研系统",   desc: "持续更新的看板和投研工具", color: "--c-invest" },
   { id: "report",  name: "研究报告",   desc: "一次成型的报告和案例",     color: "--c-report" },
   { id: "product", name: "产品与工具", desc: "能用、能卖、能玩的东西",   color: "--c-product" },
-  { id: "content", name: "内容运营",   desc: "账号、周报、笔记素材",     color: "--c-content" },
-  { id: "media",   name: "影像与演示", desc: "短片、视频流程、PPT",      color: "--c-media" },
+  { id: "content", name: "内容运营",   desc: "账号、周报、选题、素材",   color: "--c-content" },
+  { id: "media",   name: "影像与演示", desc: "视频、短片、PPT",          color: "--c-media" },
+];
+const PRIORITY = [
+  { id: "主线", cls: "p-main",  desc: "投主要精力" },
+  { id: "维持", cls: "p-keep",  desc: "自动跑或按需做" },
+  { id: "降级", cls: "p-down",  desc: "只修必须修的" },
+  { id: "封存", cls: "p-shelf", desc: "做完存档" },
+];
+const ASSET = { "已入库": "a-ok", "在分支": "a-branch", "部分缺失": "a-part", "未入库": "a-none" };
+const LINES = ["影响力", "闭环"];
+const STAGES = [
+  { id: "上游", name: "上游 · 筛选", what: "信息源、证据、观点、选题" },
+  { id: "中游", name: "中游 · 制作", what: "脚本、配音、画面、成片" },
+  { id: "分发", name: "下游 · 分发复盘", what: "发布、看数据、改下一期" },
 ];
 const STATUS_CLASS = { "运行中": "s-run", "已上线": "s-live", "已交付": "s-done", "待完善": "s-todo" };
+const KIND_CLASS = { "拍板": "k-decide", "补齐": "k-fix", "保持": "k-keep" };
 
-const state = { items: [], cat: "", q: "", status: "", loaded: false, canWrite: false, editing: null };
-try { state.cat = localStorage.getItem("hub.cat") || ""; } catch (e) {}
+const state = { items: [], review: null, cat: "", q: "", asset: "", view: "pr", loaded: false, canWrite: false, editing: null };
+try { state.cat = localStorage.getItem("hub.cat") || ""; state.view = localStorage.getItem("hub.view") || "pr"; } catch (e) {}
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 const safeUrl = (u) => { try { const x = new URL(u); return x.protocol === "https:" || x.protocol === "http:" ? x.href : null; } catch (e) { return null; } };
+const prRank = (p) => { const i = PRIORITY.findIndex(x => x.id === p); return i < 0 ? 9 : i; };
+const prCls = (p) => (PRIORITY.find(x => x.id === p) || {}).cls || "p-keep";
+const byPrDate = (a, b) => prRank(a.priority) - prRank(b.priority) || String(b.date).localeCompare(String(a.date));
 
 function matches(it) {
   if (state.cat && it.cat !== state.cat) return false;
-  if (state.status && it.status !== state.status) return false;
+  if (state.asset && it.asset !== state.asset) return false;
   if (state.q) {
-    const hay = [it.title, it.summary, it.source, ...(it.tags || [])].join(" ").toLowerCase();
+    const hay = [it.title, it.summary, it.why, it.source, it.assetNote, ...(it.tags || [])].join(" ").toLowerCase();
     if (!hay.includes(state.q.toLowerCase())) return false;
   }
   return true;
 }
 
+function renderReview() {
+  const r = state.review;
+  const acts = $("reviewActs"); acts.textContent = "";
+  if (!r) return;
+  $("reviewDate").textContent = r.date ? `${r.date} 检查` : "";
+  if (r.summary) $("reviewSum").textContent = r.summary;
+  for (const a of r.actions || []) {
+    const li = el("li");
+    li.append(el("span", "kind " + (KIND_CLASS[a.kind] || "k-decide"), a.kind || "拍板"));
+    const t = el("div"); t.append(el("strong", null, a.title || ""));
+    if (a.text) { t.append(document.createElement("br")); t.append(el("span", null, a.text)); t.lastChild.style.color = "var(--muted)"; t.lastChild.style.fontSize = "14px"; }
+    li.append(t); acts.append(li);
+  }
+}
+
+function renderLoop() {
+  const root = $("loop"); root.textContent = "";
+  const active = state.items.filter(i => i.priority === "主线" || i.priority === "维持");
+  // 主线成果最少的一环标为薄弱环节
+  const mainCount = STAGES.map(s => active.filter(i => i.priority === "主线" && (i.stage || []).includes(s.id)).length);
+  const minMain = Math.min(...mainCount);
+  const weakIdx = mainCount.filter(n => n === minMain).length === 1 ? mainCount.indexOf(minMain) : -1;
+  STAGES.forEach((s, idx) => {
+    const box = el("div", "stage");
+    const h = el("h3"); h.append(el("span", null, s.name)); if (idx < 2) h.append(el("span", "arrow", "→"));
+    box.append(h, el("p", "what", s.what));
+    const list = active.filter(i => (i.stage || []).includes(s.id)).sort(byPrDate);
+    const chips = el("div", "chips");
+    for (const it of list) { const c = el("span", "chip" + (it.priority === "主线" ? " p-main" : ""), it.title.replace(/[《「].*$/, "").replace(/\s·.*$/, "")); c.title = `${it.priority}：${it.title}`; chips.append(c); }
+    if (!list.length) chips.append(el("span", "what", "还没有成果落在这一环"));
+    box.append(chips);
+    const mains = mainCount[idx];
+    if (state.loaded && (idx === weakIdx || mains === 0)) { box.classList.add("weak"); box.append(el("p", "flag", mains ? `主线成果最少（${mains} 项），是闭环里最弱的一环` : "没有主线成果，闭环在这里断了")); }
+    root.append(box);
+  });
+}
+
+function renderGaps() {
+  const root = $("gaps"); root.textContent = "";
+  const gaps = state.items.filter(i => i.asset && i.asset !== "已入库").sort(byPrDate);
+  $("gapCount").textContent = state.loaded ? `${gaps.length} 项` : "";
+  if (!state.loaded) return;
+  if (!gaps.length) { root.append(el("div", "empty", "所有成果都已经进了 GitHub 默认分支。")); return; }
+  const urgent = gaps.filter(i => i.priority === "主线" || i.priority === "维持");
+  const rest = gaps.filter(i => !urgent.includes(i));
+  const add = (it) => {
+    const g = el("div", "gap");
+    const m = el("div"); m.append(el("h4", null, it.title)); if (it.assetNote) m.append(el("p", null, it.assetNote));
+    const b = el("div", "badges"); b.append(el("span", "pr " + prCls(it.priority), it.priority || "未判断"), el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset));
+    g.append(m, b); root.append(g);
+  };
+  if (urgent.length) { root.append(el("div", "sub", `建议先补：主线和维持的 ${urgent.length} 项`)); urgent.forEach(add); }
+  if (rest.length) { root.append(el("div", "sub", `可以晚点补：降级和封存的 ${rest.length} 项`)); rest.forEach(add); }
+}
+
 function renderLedger() {
   const nav = $("ledger"); nav.textContent = "";
-  const all = [{ id: "", name: "全部", color: null }, ...CATS];
-  for (const c of all) {
-    const b = el("button");
-    b.type = "button";
+  for (const c of [{ id: "", name: "全部", color: null }, ...CATS]) {
+    const b = el("button"); b.type = "button";
     b.setAttribute("aria-pressed", String(state.cat === c.id));
     if (c.color) b.style.setProperty("--cat", `var(${c.color})`);
     const n = c.id ? state.items.filter(i => i.cat === c.id).length : state.items.length;
@@ -274,7 +452,7 @@ function renderLedger() {
     b.addEventListener("click", () => {
       state.cat = state.cat === c.id ? "" : c.id;
       try { localStorage.setItem("hub.cat", state.cat); } catch (e) {}
-      render();
+      renderLedger(); renderBooks();
     });
     nav.append(b);
   }
@@ -286,91 +464,99 @@ function renderRow(it) {
   const main = el("div", "main");
   main.append(el("h3", null, it.title || "未命名"));
   if (it.summary) main.append(el("p", "sum", it.summary));
+  if (it.why) { const w = el("p", "why"); w.append(el("b", null, "判断："), document.createTextNode(it.why)); main.append(w); }
   const meta = el("div", "meta");
+  for (const s of it.stage || []) meta.append(el("span", "tag", s));
   for (const t of it.tags || []) meta.append(el("span", "tag", t));
   if (it.source) meta.append(el("span", "src", it.source));
   if (meta.childNodes.length) main.append(meta);
   const links = el("div", "links");
   for (const l of it.links || []) {
     const href = safeUrl(l.url); if (!href) continue;
-    const a = el("a", null, l.label || "打开");
-    a.href = href; a.target = "_blank"; a.rel = "noopener";
+    const a = el("a", null, l.label || "打开"); a.href = href; a.target = "_blank"; a.rel = "noopener";
     links.append(a);
   }
   if (links.childNodes.length) main.append(links);
   row.append(main);
   const right = el("div", "right");
+  if (it.priority) right.append(el("span", "pr " + prCls(it.priority), it.priority));
   right.append(el("span", "pill " + (STATUS_CLASS[it.status] || "s-done"), it.status || "已交付"));
-  if (state.canWrite) {
-    const e = el("button", "edit", "编辑"); e.type = "button";
-    e.addEventListener("click", () => openForm(it));
-    right.append(e);
-  }
+  if (it.asset) { const a = el("span", "as " + (ASSET[it.asset] || "a-none"), it.asset); if (it.assetNote) a.title = it.assetNote; right.append(a); }
+  if (state.canWrite) { const e = el("button", "edit", "编辑"); e.type = "button"; e.addEventListener("click", () => openForm(it)); right.append(e); }
   row.append(right);
   return row;
+}
+
+function book(name, desc, color, list) {
+  const sec = el("section", "book");
+  if (color) sec.style.setProperty("--cat", `var(${color})`);
+  const h = el("div", "sec-h");
+  const t = el("h2", "sec", name); h.append(t);
+  if (desc) h.append(el("span", "d", desc));
+  h.append(el("span", "c", list.length + " 项"));
+  sec.append(h); list.forEach(it => sec.append(renderRow(it)));
+  return sec;
 }
 
 function renderBooks() {
   const root = $("books"); root.textContent = "";
   if (!state.loaded) { root.append(el("div", "empty", "正在读取登记簿…")); return; }
-  if (!state.items.length) {
-    root.append(el("div", "empty", "登记簿还是空的。让 Claude 往数据集 items 写入成果，或点右上角「登记新成果」。"));
-    return;
+  if (!state.items.length) { root.append(el("div", "empty", "登记簿还是空的。让 Claude 往数据集 items 写入成果，或点右上角「登记新成果」。")); return; }
+  const pool = state.items.filter(matches);
+  if (!pool.length) { root.append(el("div", "empty", "没有符合条件的成果。换个关键词或清掉筛选试试。")); return; }
+  if (state.view === "pr") {
+    for (const p of PRIORITY) {
+      const list = pool.filter(i => i.priority === p.id).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      if (list.length) root.append(book(p.id, p.desc, null, list));
+    }
+    const un = pool.filter(i => prRank(i.priority) === 9);
+    if (un.length) root.append(book("未判断", "下次周检补上", null, un));
+  } else {
+    for (const c of CATS) {
+      const list = pool.filter(i => i.cat === c.id).sort(byPrDate);
+      if (list.length) root.append(book(c.name, c.desc, c.color, list));
+    }
+    const orphan = pool.filter(i => !CATS.some(c => c.id === i.cat));
+    if (orphan.length) root.append(book("未分类", "", null, orphan));
   }
-  let shown = 0;
-  for (const c of CATS) {
-    if (state.cat && state.cat !== c.id) continue;
-    const list = state.items.filter(i => i.cat === c.id && matches(i))
-      .sort((a, b) => String(b.date).localeCompare(String(a.date)));
-    if (!list.length) continue;
-    shown += list.length;
-    const sec = el("section", "book");
-    sec.style.setProperty("--cat", `var(${c.color})`);
-    const h = el("div", "book-h");
-    h.append(el("h2", null, c.name), el("span", "d", c.desc), el("span", "c", list.length + " 项"));
-    sec.append(h);
-    for (const it of list) sec.append(renderRow(it));
-    root.append(sec);
-  }
-  // 类型不在列表里的条目放到最后，避免丢失
-  const orphan = state.items.filter(i => !CATS.some(c => c.id === i.cat) && !state.cat && matches(i));
-  if (orphan.length) {
-    const sec = el("section", "book");
-    const h = el("div", "book-h"); h.append(el("h2", null, "未分类"), el("span", "c", orphan.length + " 项"));
-    sec.append(h); orphan.forEach(it => sec.append(renderRow(it))); root.append(sec);
-    shown += orphan.length;
-  }
-  if (!shown) root.append(el("div", "empty", "没有符合条件的成果。换个关键词或清掉筛选试试。"));
 }
 
 function render() {
-  renderLedger();
-  renderBooks();
+  renderReview(); renderLoop(); renderGaps(); renderLedger(); renderBooks();
   const newest = state.items.map(i => i.date).filter(Boolean).sort().pop();
   $("stamp").textContent = state.loaded ? `共 ${state.items.length} 项 · 最近一次 ${newest || "—"}` : "正在读取登记簿…";
   $("addBtn").hidden = !state.canWrite;
+  $("byPr").setAttribute("aria-pressed", String(state.view === "pr"));
+  $("byCat").setAttribute("aria-pressed", String(state.view === "cat"));
 }
 
-// 规则面板里的类型说明
-for (const c of CATS) { const li = el("li"); const b = el("strong", null, c.name); li.append(b, document.createTextNode("：" + c.desc)); $("catList").append(li); }
 for (const c of CATS) { const o = el("option", null, c.name); o.value = c.id; $("f-cat").append(o); }
+const boxes = (fs, names) => names.forEach(n => { const l = el("label"); const i = el("input"); i.type = "checkbox"; i.value = n; i.id = fs + "-" + n; l.append(i, document.createTextNode(n)); $(fs).append(l); });
+boxes("f-line", LINES); boxes("f-stage", STAGES.map(s => s.id));
+const checked = (fs) => [...$(fs).querySelectorAll("input:checked")].map(i => i.value);
+const setChecked = (fs, vals) => $(fs).querySelectorAll("input").forEach(i => { i.checked = (vals || []).includes(i.value); });
 
 $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); renderBooks(); });
-$("statusSel").addEventListener("change", (e) => { state.status = e.target.value; renderBooks(); });
+$("assetSel").addEventListener("change", (e) => { state.asset = e.target.value; renderBooks(); });
+const setView = (v) => { state.view = v; try { localStorage.setItem("hub.view", v); } catch (e) {} render(); };
+$("byPr").addEventListener("click", () => setView("pr"));
+$("byCat").addEventListener("click", () => setView("cat"));
 
 // 编辑表单
 let db = null;
 function toast(msg) { const t = el("div", "toast", msg); document.body.append(t); setTimeout(() => t.remove(), 2200); }
-function slug(s) {
-  const base = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-  return (base || "item") + "-" + Date.now().toString(36);
-}
+function slug(s) { const base = s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); return (base || "item") + "-" + Date.now().toString(36); }
 function openForm(it) {
   state.editing = it || null;
   $("dlgTitle").textContent = it ? "编辑成果" : "登记新成果";
   $("f-title").value = it?.title || "";
   $("f-cat").value = it?.cat || state.cat || CATS[0].id;
   $("f-status").value = it?.status || "已交付";
+  $("f-priority").value = it?.priority || "维持";
+  $("f-asset").value = it?.asset || "在分支";
+  setChecked("f-line", it?.line); setChecked("f-stage", it?.stage);
+  $("f-why").value = it?.why || "";
+  $("f-assetNote").value = it?.assetNote || "";
   $("f-date").value = it?.date || new Date().toISOString().slice(0, 10);
   $("f-source").value = it?.source || "";
   $("f-summary").value = it?.summary || "";
@@ -395,17 +581,18 @@ $("form").addEventListener("submit", async (e) => {
   }
   const body = {
     title, cat: $("f-cat").value, status: $("f-status").value, date: $("f-date").value,
+    priority: $("f-priority").value, asset: $("f-asset").value,
+    line: checked("f-line"), stage: checked("f-stage"),
+    why: $("f-why").value.trim(), assetNote: $("f-assetNote").value.trim(),
     source: $("f-source").value.trim(), summary: $("f-summary").value.trim(),
     tags: $("f-tags").value.split(/[,，、]/).map(s => s.trim()).filter(Boolean), links,
+    reviewed: new Date().toISOString().slice(0, 10),
   };
   const id = state.editing?.id || slug(title);
   $("saveBtn").disabled = true;
-  try {
-    await db.collection("items").doc(id).set(body);
-    $("dlg").close(); toast("已保存");
-  } catch (err) {
-    $("f-err").textContent = err?.code === "invalid_argument" ? "你没有这个登记簿的写入权限。" : "保存失败，稍后再试。";
-  } finally { $("saveBtn").disabled = false; }
+  try { await db.collection("items").doc(id).set(body); $("dlg").close(); toast("已保存"); }
+  catch (err) { $("f-err").textContent = err?.code === "invalid_argument" ? "你没有这个登记簿的写入权限。" : "保存失败，稍后再试。"; }
+  finally { $("saveBtn").disabled = false; }
 });
 $("delBtn").addEventListener("click", async () => {
   const b = $("delBtn");
@@ -418,20 +605,16 @@ $("dlg").addEventListener("close", () => { const b = $("delBtn"); b.dataset.arme
 
 render();
 
-// 读取登记簿
+// 读取登记簿和周检结论
 (async () => {
   db = window.claude ? await window.claude.use("db") : null;
-  if (!db) {
-    state.loaded = true; render();
-    $("stamp").textContent = "登录 claude.ai 后可查看登记簿";
-    return;
-  }
+  if (!db) { state.loaded = true; render(); $("stamp").textContent = "登录 claude.ai 后可查看登记簿"; return; }
   const user = await window.claude.use("user");
-  state.canWrite = user ? !!(user.isOwner && await user.isOwner()) : false;
+  state.canWrite = user ? !!(await user.isOwner()) : false;
   db.collection("items").onSnapshot((snap) => {
     state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    state.loaded = true;
-    render();
+    state.loaded = true; render();
   }, () => { state.loaded = true; render(); $("stamp").textContent = "登记簿暂时读不到，刷新试试"; });
+  db.doc("meta/review").onSnapshot((d) => { state.review = d.exists ? d.data() : null; renderReview(); }, () => {});
 })();
 </script>
