@@ -1,0 +1,8 @@
+# 读法替换：只改配音，不改字幕。格式「原文 => 读法」，按顺序替换。
+# 全大写缩写会自动拆成字母读（AI → A I），不用写在这里。
+
+OpenAI => Open A I
+ChatGPT => Chat G P T
+13F => 十三 F
+A股 => A 股
+Token => token

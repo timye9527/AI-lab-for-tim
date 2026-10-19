@@ -75,6 +75,11 @@
         }
         return w;
       }
+      case 'timeline': {
+        const w = $('div', 'profile timeline');
+        for (const it of el.items) w.appendChild(unit($('div', 'row', `<span class="y">${esc(it.y)}</span><span class="tx">${esc(it.text)}</span>`), T(it.at)));
+        return w;
+      }
       case 'stats': {
         const w = $('div', 'stats' + (el.big ? ' big' : ''));
         for (const it of el.items) w.appendChild(unit($('div', 'it', `<span class="v">${esc(it.value)}</span><span class="l">${esc(it.label)}</span>`), T(it.at)));

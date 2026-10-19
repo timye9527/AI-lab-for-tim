@@ -1,0 +1,159 @@
+# 读音覆盖表：词 + 每个字的拼音（数字标调，5 为轻声，ü 写 v）。
+# 这里的词优先于 pypinyin；「一」「不」写在这里就不再自动变调。
+# 新人名、新术语、读错过的词都加在这里。
+
+# ── 财经术语里的多音字 ──
+看空 kan4 kong1
+看多 kan4 duo1
+做空 zuo4 kong1
+卖空 mai4 kong1
+空仓 kong1 cang1
+空头 kong1 tou2
+多头 duo1 tou2
+重仓 zhong4 cang1
+加仓 jia1 cang1
+调仓 tiao2 cang1
+调研 diao4 yan2
+调整 tiao2 zheng3
+调控 tiao2 kong4
+行情 hang2 qing2
+行业 hang2 ye4
+银行 yin2 hang2
+行长 hang2 zhang3
+发行 fa1 xing2
+供给 gong1 ji3
+给予 ji3 yu3
+收益率 shou1 yi4 lv4
+汇率 hui4 lv4
+利率 li4 lv4
+回报率 hui2 bao4 lv4
+率先 shuai4 xian1
+涨幅 zhang3 fu2
+涨停 zhang3 ting2
+增长 zeng1 zhang3
+成长 cheng2 zhang3
+长期 chang2 qi1
+长线 chang2 xian4
+长远 chang2 yuan3
+差价 cha1 jia4
+差距 cha1 ju4
+差额 cha1 e2
+差不多 cha4 bu5 duo1
+处于 chu3 yu2
+处理 chu3 li3
+着眼 zhuo2 yan3
+着手 zhuo2 shou3
+着急 zhao2 ji2
+连着 lian2 zhe5
+角色 jue2 se4
+证券 zheng4 quan4
+债券 zhai4 quan4
+参与 can1 yu4
+估值 gu1 zhi2
+市值 shi4 zhi2
+解套 jie3 tao4
+降息 jiang4 xi1
+降低 jiang4 di1
+份额 fen4 e2
+分化 fen1 hua4
+能力圈 neng2 li4 quan1
+购买力 gou4 mai3 li4
+零和 ling2 he2
+复利 fu4 li4
+投机 tou2 ji1
+安全边际 an1 quan2 bian1 ji4
+数据 shu4 ju4
+大量 da4 liang4
+量化 liang4 hua4
+冲击 chong1 ji1
+落地 luo4 di4
+落后 luo4 hou4
+模型 mo2 xing2
+模式 mo2 shi4
+重要 zhong4 yao4
+重新 chong2 xin1
+重组 chong2 zu3
+只有 zhi3 you3
+应该 ying1 gai1
+供应 gong1 ying4
+称为 cheng1 wei2
+结果 jie2 guo3
+尽管 jin3 guan3
+
+# ── 口语常用 ──
+总得 zong3 dei3
+还是 hai2 shi4
+为了 wei4 le5
+因为 yin1 wei4
+作为 zuo4 wei2
+认为 ren4 wei2
+似乎 si4 hu1
+一点点 yi4 dian3 dian3
+一场 yi4 chang3
+一段一段 yi2 duan4 yi2 duan4
+一层一层 yi4 ceng2 yi4 ceng2
+一轮一轮 yi4 lun2 yi4 lun2
+
+# ── 人名、机构、地名 ──
+李录 li3 lu4
+段永平 duan4 yong3 ping2
+张磊 zhang1 lei3
+邓晓峰 deng4 xiao3 feng1
+冯柳 feng2 liu3
+邱国鹭 qiu1 guo2 lu4
+杨东 yang2 dong1
+宁泉 ning2 quan2
+张坤 zhang1 kun1
+付鹏 fu4 peng2
+洪灏 hong2 hao4
+李迅雷 li3 xun4 lei2
+朱啸虎 zhu1 xiao4 hu3
+陆奇 lu4 qi2
+沈南鹏 shen3 nan2 peng2
+李开复 li3 kai1 fu4
+芒格 mang2 ge2
+巴菲特 ba1 fei1 te4
+格雷厄姆 ge2 lei2 e4 mu3
+多德 duo1 de2
+塔诺 ta3 nuo4
+桑托斯 sang1 tuo1 si1
+阿贝尔 a1 bei4 er3
+伯克希尔 bo2 ke4 xi1 er3
+霍华德 huo4 hua2 de2
+马克斯 ma3 ke4 si1
+黄仁勋 huang2 ren2 xun1
+马斯克 ma3 si1 ke4
+喜马拉雅 xi3 ma3 la1 ya3
+哥伦比亚 ge1 lun2 bi3 ya4
+哥大 ge1 da4
+唐山 tang2 shan1
+华尔街 hua2 er3 jie1
+奥马哈 ao4 ma3 ha1
+橡树资本 xiang4 shu4 zi1 ben3
+高瓴 gao1 ling2
+高毅 gao1 yi4
+芒格书院 mang2 ge2 shu1 yuan4
+硅谷 gui1 gu3
+
+# ── 高风险字：得（děi 必须 / de 补语 / dé 得到）、了、量、冲、转 ──
+就得 jiu4 dei3
+还得 hai2 dei3
+你得 ni3 dei3
+你得到 ni3 de2 dao4
+得到 de2 dao4
+传得 chuan2 de5
+涨得 zhang3 de5
+离得开 li2 de5 kai1
+到得了 dao4 de5 liao3
+付了 fu4 le5
+去量 qu4 liang2
+他量的 ta1 liang2 de5
+量完 liang2 wan2
+量美股 liang2 mei3 gu3
+量中国 liang2 zhong1 guo2
+量世界 liang2 shi4 jie4
+冲着 chong4 zhe5
+运转 yun4 zhuan3
+地方 di4 fang5
+稳固地 wen3 gu4 de5
+视频为 shi4 pin2 wei2

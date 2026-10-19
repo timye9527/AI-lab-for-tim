@@ -29,7 +29,7 @@ ep.scenes.forEach((s, si) => s.beats.forEach((b, bi) => {
   beats.push({ si, bi, say: o.say, text: o.tts || o.say, gap: last ? (s.gap ?? 0.7) : 0.34 });
 }));
 writeFileSync(join(out, 'beats.json'), JSON.stringify({ voice: ep.voice, beats }, null, 1));
-const py = spawnSync('python3', [join(HERE, 'tts.py'), join(out, 'beats.json'), out, ...(flag('--check') ? ['--check'] : [])], { stdio: 'inherit' });
+const py = spawnSync('python3', [join(HERE, 'tts.py'), join(out, 'beats.json'), out, join(epDir, '读音表.md'), ...(flag('--check') ? ['--check'] : [])], { stdio: 'inherit' });
 if (py.status !== 0) process.exit(1);
 const tl = JSON.parse(readFileSync(join(out, 'timeline.json'), 'utf8'));
 tl.beats.forEach((t, i) => Object.assign(beats[i], t));
@@ -102,6 +102,7 @@ const desc = (el) => {
     case 'note': return `解读卡「${el.text}」`;
     case 'agenda': return `章节预告：${el.items.map((x) => x.n + ' ' + x.title).join('，')}（随口播逐个点亮，顶部章节栏同步高亮）`;
     case 'profile': return `人物卡「${el.name}｜${el.role}」：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
+    case 'timeline': return `时间线：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
     case 'stats': return `数据卡：${el.items.map((x) => x.value + ' ' + x.label).join('；')}`;
     case 'grid': return `卡片网格（当前一条红框）：${el.items.map((x) => x.n + '. ' + x.title + (x.from ? `（${x.from}）` : '')).join('；')}`;
     case 'ladder': return `阶梯图：${el.items.map((x) => x.title).join(' → ')}`;
@@ -162,7 +163,7 @@ if (flag('--stills')) {
 const mp4 = join(out, `${ep.id}.mp4`);
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
   '-i', join(out, 'voice.wav'), '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
-  '-c:a', 'aac', '-b:a', '160k', '-af', 'apad', '-shortest', '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
+  '-c:a', 'aac', '-b:a', '160k', '-ar', '44100', '-af', 'loudnorm=I=-16:TP=-1.5,apad', '-shortest', '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
 const frames = Math.ceil(duration * FPS);
 let lastSig = null, lastBuf = null, shots = 0;
 const t0 = Date.now();
