@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+<!-- 示範用主持人形象（佔位）：正式版換成節目自己嘅角色圖，閉嘴 / 張嘴各一張，其餘部分要完全一樣 -->
+<path d="M60,400 C60,320 110,285 200,285 C290,285 340,320 340,400 Z" fill="#33508f" stroke="#1d2433" stroke-width="5"/>
+<path d="M170,288 L200,340 L230,288 Z" fill="#fff" stroke="#1d2433" stroke-width="4"/>
+<path d="M193,300 L207,300 L212,372 L200,385 L188,372 Z" fill="#e8590c" stroke="#1d2433" stroke-width="3"/>
+<rect x="178" y="250" width="44" height="42" fill="#f6c9a5" stroke="#1d2433" stroke-width="4"/>
+<ellipse cx="200" cy="170" rx="110" ry="118" fill="#f9d4b4" stroke="#1d2433" stroke-width="5"/>
+<ellipse cx="88" cy="182" rx="18" ry="26" fill="#f6c9a5" stroke="#1d2433" stroke-width="4"/>
+<ellipse cx="312" cy="182" rx="18" ry="26" fill="#f6c9a5" stroke="#1d2433" stroke-width="4"/>
+<path d="M88,150 C80,60 150,30 205,38 C275,30 330,80 312,152 C300,120 280,98 250,100 C230,82 190,80 170,96 C140,92 110,110 88,150 Z" fill="#3b2a24" stroke="#1d2433" stroke-width="5"/>
+<path d="M150,60 C170,40 200,30 240,42" fill="none" stroke="#5a4036" stroke-width="6" stroke-linecap="round"/>
+<circle cx="155" cy="178" r="34" fill="#fff" stroke="#1d2433" stroke-width="7"/>
+<circle cx="245" cy="178" r="34" fill="#fff" stroke="#1d2433" stroke-width="7"/>
+<line x1="189" y1="178" x2="211" y2="178" stroke="#1d2433" stroke-width="6"/>
+<circle cx="160" cy="182" r="11" fill="#1d2433"/><circle cx="250" cy="182" r="11" fill="#1d2433"/>
+<circle cx="164" cy="178" r="3.5" fill="#fff"/><circle cx="254" cy="178" r="3.5" fill="#fff"/>
+<path d="M128,132 Q155,120 180,132" fill="none" stroke="#3b2a24" stroke-width="7" stroke-linecap="round"/>
+<path d="M220,132 Q245,120 272,132" fill="none" stroke="#3b2a24" stroke-width="7" stroke-linecap="round"/>
+<ellipse cx="130" cy="222" rx="16" ry="9" fill="#f4a3a3" opacity=".6"/><ellipse cx="270" cy="222" rx="16" ry="9" fill="#f4a3a3" opacity=".6"/>
+<path d="M176,234 Q200,232 224,234 Q222,270 200,272 Q178,270 176,234 Z" fill="#7a2e2e" stroke="#1d2433" stroke-width="5"/><path d="M186,258 Q200,250 214,258 Q208,268 200,268 Q192,268 186,258 Z" fill="#e57373"/>
+</svg>

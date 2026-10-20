@@ -9,12 +9,16 @@
     "admin": "node --no-warnings server/admin.mjs",
     "notes": "node scripts/notes.mjs",
     "build:preview": "node scripts/build-preview.mjs",
-    "codes:static": "node --no-warnings scripts/codes-static.mjs"
+    "codes:static": "node --no-warnings scripts/codes-static.mjs",
+    "video": "node scripts/video.mjs",
+    "video:teardown": "node scripts/video-teardown.mjs",
+    "video:draft": "node scripts/video-draft.mjs"
   },
   "engines": {
     "node": ">=22.13"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "0.135",
     "playwright-core": "1.56"
   }
 }

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+<!-- 示範用插畫（佔位）：正式版用 AI 出圖，提示詞見 video/prompts/image.md。圖入面唔好有字，文字由引擎疊上去 -->
+<rect width="1600" height="900" fill="#fffdf7"/>
+<g stroke="#2b2b2b" stroke-width="6" stroke-linejoin="round" stroke-linecap="round">
+  <!-- 左：晶片 -->
+  <rect x="190" y="300" width="300" height="300" rx="26" fill="#6ee7b7"/>
+  <rect x="250" y="360" width="180" height="180" rx="14" fill="#1f2937"/>
+  <g fill="none">
+    <path d="M230,300 v-50 M290,300 v-50 M350,300 v-50 M410,300 v-50 M460,300 v-50"/>
+    <path d="M230,600 v50 M290,600 v50 M350,600 v50 M410,600 v50 M460,600 v50"/>
+    <path d="M190,340 h-50 M190,410 h-50 M190,480 h-50 M190,550 h-50"/>
+    <path d="M490,340 h50 M490,410 h50 M490,480 h50 M490,550 h50"/>
+  </g>
+  <!-- 中上：銀行 -->
+  <path d="M640,250 L800,150 L960,250 Z" fill="#fcd34d"/>
+  <rect x="660" y="250" width="280" height="30" fill="#fde68a"/>
+  <rect x="680" y="280" width="34" height="140" fill="#fff"/><rect x="752" y="280" width="34" height="140" fill="#fff"/>
+  <rect x="824" y="280" width="34" height="140" fill="#fff"/><rect x="896" y="280" width="34" height="140" fill="#fff"/>
+  <rect x="640" y="420" width="320" height="34" fill="#fde68a"/>
+  <!-- 右：伺服器 -->
+  <rect x="1130" y="260" width="300" height="420" rx="18" fill="#93c5fd"/>
+  <rect x="1160" y="300" width="240" height="70" rx="8" fill="#e0f2fe"/><rect x="1160" y="400" width="240" height="70" rx="8" fill="#e0f2fe"/>
+  <rect x="1160" y="500" width="240" height="70" rx="8" fill="#e0f2fe"/>
+  <circle cx="1370" cy="335" r="10" fill="#22c55e"/><circle cx="1370" cy="435" r="10" fill="#22c55e"/><circle cx="1370" cy="535" r="10" fill="#ef4444"/>
+  <!-- 右上：烏雲 -->
+  <path d="M1150,200 C1120,150 1190,110 1230,140 C1250,90 1340,90 1360,140 C1410,120 1460,160 1430,200 Z" fill="#9ca3af"/>
+  <path d="M1290,205 L1265,250 L1295,250 L1270,295" fill="none" stroke="#f59e0b" stroke-width="8"/>
+  <!-- 中下：錢袋 -->
+  <path d="M720,640 C690,700 690,780 800,780 C910,780 910,700 880,640 Z" fill="#fde68a"/>
+  <path d="M740,600 L860,600 L840,640 L760,640 Z" fill="#fcd34d"/>
+  <circle cx="800" cy="710" r="34" fill="#fbbf24"/>
+  <!-- 循環箭咀 -->
+  <g fill="none" stroke="#e8590c" stroke-width="12">
+    <path d="M520,250 C560,170 610,150 640,170"/><path d="M965,190 C1030,160 1090,190 1120,240"/>
+    <path d="M1240,700 C1170,800 1000,820 915,760"/><path d="M690,760 C560,800 430,740 380,650"/>
+  </g>
+  <g fill="#e8590c" stroke="none">
+    <path d="M640,170 l-38,-10 l14,32 z"/><path d="M1120,240 l-4,-38 l-28,22 z"/>
+    <path d="M915,760 l40,4 l-20,-32 z"/><path d="M380,650 l2,40 l28,-26 z"/>
+  </g>
+</g>
+</svg>
