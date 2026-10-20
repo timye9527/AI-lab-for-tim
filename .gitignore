@@ -12,3 +12,5 @@ data/
 out/
 backup/
 *.zip
+# YouTube 后台留存 / 频道数据，只在本地用
+video/episodes/*/stats/

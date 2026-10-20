@@ -13,7 +13,10 @@ export default {
   // 底部常駐免責聲明條（持牌機構嘅節目通常要求）
   disclaimerBar: true,
   // 主持人形象：閉嘴 / 張嘴兩張圖，按配音音量自動切換（假對口型）
-  host: { closed: 'host/closed.svg', open: 'host/open.svg', height: 340 },
+  host: { closed: '@/host/closed.svg', open: '@/host/open.svg', height: 340 },
+  // v1 保持舊做法做對照組：冇鏡頭微推、冇音效（demo-v2 先開）
+  motion: false,
+  sfx: false,
   title: 'AI 算力變按揭？輝達 5,000 億融資 vs 1999 電訊泡沫｜財經浩談',
   // 封面：兩行大字 + 角標 + 大數字，手機上要一眼睇得清
   // img 用 img/ 入面嘅插畫做封面右半邊

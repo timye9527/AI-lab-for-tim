@@ -49,6 +49,13 @@ body.portrait .src { bottom: 500px; font-size: 28px; }
 .sub { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; font-size: 54px; font-weight: 700; line-height: 1.3;
   color: #fff; text-shadow: 0 3px 0 #000, 0 0 18px #000c; padding: 0 160px; z-index: 5; }
 .sub span { background: #000a; padding: 6px 22px; border-radius: 12px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+/* 字幕里的数字和重点词高亮（「划重点」大字幕） */
+.sub b { color: ${th.accent}; font-size: 1.12em; }
+body.paper .sub b { color: #ffd43b; }
+/* 画面一直有轻微推近，避免静止；按 10 步 / 秒取整，省截图 */
+body.motion .stage { animation: drift var(--dur) steps(var(--steps)) both; transform-origin: 50% 45%; }
+@keyframes drift { from { transform: scale(1); } to { transform: scale(1.035); } }
+.by-line { color: ${th.muted}; font-weight: 400; letter-spacing: 1px; margin-left: 18px; font-size: .9em; }
 /* 纸面主题：白字粗黑描边，不要底框 */
 body.paper .sub { font-size: 60px; font-weight: 900; -webkit-text-stroke: 10px ${th.text}; paint-order: stroke fill; text-shadow: 0 4px 0 ${th.text}; }
 body.paper .sub span { background: none; padding: 0; }
@@ -139,6 +146,8 @@ body.portrait .quote { font-size: 80px; }
 
 .cta { font-size: 96px; font-weight: 900; }
 .disc { font-size: 30px; color: ${th.muted}; margin-top: 60px; line-height: 1.6; }
+.opts { display: flex; gap: 40px; margin-top: 50px; justify-content: center; }
+.opts span { font-size: 64px; font-weight: 900; padding: 18px 48px; border-radius: 24px; border: 4px solid ${th.accent}; background: ${th.panel}; }
 `;
 }
 
@@ -171,6 +180,12 @@ function beats(scene, texts, t) {
 
 const d = (s) => `style="animation-delay:${ms(s)}ms"`;
 
+// 数字卡的注释：beats[0] 指定，否则口播讲到就出；讲唔到就喺口播过半时出，避免数字出完之后长时间冇新嘢
+function noteAt(s, t, start) {
+  const p = s.beats?.[0] ?? cuePos(s.say || '', s.note);
+  return Math.max(start + 1.2, p >= 0 ? t.lead + p * t.speech : t.lead + t.speech * 0.55);
+}
+
 // 每个模板：(场景, 时间信息) => HTML
 export const TEMPLATES = {
   hook: (s, t) => `<div class="stage">
@@ -185,7 +200,7 @@ export const TEMPLATES = {
 
   chapter: (s) => `<div class="stage">
     <div class="kicker a left" ${d(0.1)}>CHAPTER ${esc(String(s.no).padStart(2, '0'))}</div>
-    <div class="big a left" ${d(0.3)}>${rich(s.title)}</div>
+    <div class="big a left" ${d(0.3)} style="${[...s.title].length > 8 ? `font-size:${Math.max(84, Math.round(1100 / [...s.title].length))}px` : ''}">${rich(s.title)}</div>
     ${s.lead ? `<div class="lead a up" ${d(0.8)}>${rich(s.lead)}</div>` : ''}</div>`,
 
   bullets: (s, t) => {
@@ -199,7 +214,7 @@ export const TEMPLATES = {
     return `<div class="stage center">
       <div class="label a fade" ${d(0.1)}>${rich(s.label)}</div>
       <div class="num a pop" ${d(start)}>${esc(s.prefix || '')}<span data-count data-to="${s.value}" data-from="${s.from ?? 0}" data-start="${ms(start)}" data-dur="1400" data-dec="${s.decimals ?? 0}">${fmt(s.value, s.decimals ?? 0)}</span><small>${esc(s.unit || '')}</small></div>
-      ${s.note ? `<div class="lead a up" ${d(start + 1.2)}>${rich(s.note)}</div>` : ''}</div>`;
+      ${s.note ? `<div class="lead a up" ${d(noteAt(s, t, start))}>${rich(s.note)}</div>` : ''}</div>`;
   },
 
   bars: (s, t) => {
@@ -234,8 +249,14 @@ export const TEMPLATES = {
 
   compare: (s, t) => {
     const at = beats(s, [s.left.title, s.right.title], t);
-    const col = (c, hi, a) => `<div class="col${hi ? ' hi' : ''} a up" ${d(a)}><h3>${esc(c.title)}</h3>${c.items.map((x) => `<p>${rich(x)}</p>`).join('')}</div>`;
-    return `<div class="stage"><div class="h a up" ${d(0.1)}>${rich(s.heading)}</div><div class="cols">${col(s.left, false, at[0])}${col(s.right, true, at[1])}</div></div>`;
+    // 栏里的条目在本栏出现到下一栏出现（或场景结束）之间逐个出现
+    const col = (c, hi, a, until) => {
+      const n = c.items.length;
+      const step = Math.max(0.5, (until - a) / (n + 0.5));
+      return `<div class="col${hi ? ' hi' : ''} a up" ${d(a)}><h3>${esc(c.title)}</h3>${c.items.map((x, i) => `<p class="a fade" ${d(a + 0.3 + i * step)}>${rich(x)}</p>`).join('')}</div>`;
+    };
+    const end = t.lead + t.speech;
+    return `<div class="stage"><div class="h a up" ${d(0.1)}>${rich(s.heading)}</div><div class="cols">${col(s.left, false, at[0], at[1])}${col(s.right, true, at[1], end)}</div></div>`;
   },
 
   // 资金流向 / 因果链：节点围成一圈（loop）或排成一行，依次出现
@@ -270,8 +291,9 @@ export const TEMPLATES = {
   // 手绘插画：先出线稿、再上色，画笔跟着走；镜头按口播推到插画的某一块，文字由引擎叠上去（AI 出图别带字）
   sketch: (s, t, portrait, ep) => {
     const T = Math.max(t.dur, 1);
-    const draw = Math.min(4, Math.max(1.5, T * 0.3));
-    const c0 = 0.15, c1 = c0 + draw;
+    // instant：Shorts 第一个场景，第一帧就要有画面（观众一秒内决定划唔划走），线稿直接出，马上上色
+    const draw = t.instant ? 0.01 : Math.min(4, Math.max(1.5, T * 0.3));
+    const c0 = t.instant ? 0 : 0.15, c1 = c0 + draw;
     const color = Math.min(2.5, Math.max(1, T * 0.2));
     const pct = (x) => `${Math.min(100, Math.max(0, (x / T) * 100)).toFixed(2)}%`;
     // 画笔：线稿阶段来回扫 6 次，上色阶段 4 次，然后离场
@@ -284,6 +306,8 @@ export const TEMPLATES = {
     pen.push(`${pct(c1 + color + 0.4)} { left: 108%; top: 60%; opacity: 0; }`, `100% { left: 108%; top: 60%; opacity: 0; }`);
     // 镜头：focus 里每个点在口播说到 key 时推过去，0.9 秒到位；没有 key 就按 at（0～1）
     const cam = ['0% { transform: none; }'];
+    // 镜头开始移动的时间（秒），渲染脚本用来算画面空档
+    t.camMoves = [];
     let lastTf = 'none';
     for (const f of s.focus || []) {
       const p = f.key ? cuePos(s.say || '', f.key) : f.at ?? 0;
@@ -293,12 +317,14 @@ export const TEMPLATES = {
       const tx = Math.max(-lim, Math.min(lim, 50 - f.x)), ty = Math.max(-lim, Math.min(lim, 50 - f.y));
       const tf = z === 1 ? 'none' : `scale(${z}) translate(${tx.toFixed(1)}%, ${ty.toFixed(1)}%)`;
       cam.push(`${pct(at)} { transform: ${lastTf}; }`, `${pct(at + 0.9)} { transform: ${tf}; }`);
+      t.camMoves.push(+at.toFixed(2));
       lastTf = tf;
     }
     cam.push(`100% { transform: ${lastTf}; }`);
     const labels = (s.labels || []).map((l) => {
       const p = l.key ? cuePos(s.say || '', l.key) : l.at ?? -1;
-      const at = p >= 0 ? t.lead + p * t.speech : c1;
+      let at = p >= 0 ? t.lead + p * t.speech : c1;
+      if (t.instant && at < 1) at = 0;
       return `<div class="lab" style="left:${l.x}%;top:${l.y}%;font-size:${l.size || 64}px;color:${l.color || 'var(--accent)'};--r:${l.rotate ?? -4}deg"><div class="a pop" ${d(at)}>${rich(l.text)}</div></div>`;
     });
     return `<style>
@@ -310,7 +336,7 @@ export const TEMPLATES = {
       body.portrait .sk { top: 520px; height: auto; width: calc(100% - 2 * var(--pad)); }
       .sk .cam { position: absolute; inset: 0; transform-origin: 50% 50%; animation: cam ${ms(T)}ms linear both; }
       .sk img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-      .sk .ln { filter: url(#pencil); clip-path: inset(0 100% 0 0); animation: wipe ${ms(draw)}ms linear ${ms(c0)}ms both; }
+      .sk .ln { filter: url(#pencil); ${t.instant ? '' : `clip-path: inset(0 100% 0 0); animation: wipe ${ms(draw)}ms linear ${ms(c0)}ms both;`} }
       .sk .co { clip-path: inset(0 100% 0 0); animation: wipe ${ms(color)}ms ease-in-out ${ms(c1)}ms both; }
       .sk .lab { position: absolute; transform: translate(-50%, -50%) rotate(var(--r)); font-weight: 900; white-space: nowrap;
         -webkit-text-stroke: 8px #fffdf7; paint-order: stroke fill; }
@@ -331,11 +357,17 @@ export const TEMPLATES = {
     </div></div>`;
   },
 
-  quote: (s) => `<div class="stage"><div class="quote a left" ${d(0.2)}>${rich(s.text)}</div>${s.by ? `<div class="by a fade" ${d(0.9)}>${esc(s.by)}</div>` : ''}</div>`,
+  // 金句逐行出现，跟住口播
+  quote: (s, t) => {
+    const lines = String(s.text).split('\n');
+    const at = beats(s, lines, t);
+    return `<div class="stage">${s.by ? `<div class="by a fade" ${d(0.1)} style="padding:0 0 30px 70px;margin:0">${esc(s.by)}</div>` : ''}<div class="quote">${lines.map((l, i) => `<div class="a left" ${d(at[i])}>${rich(l)}</div>`).join('')}</div></div>`;
+  },
 
   outro: (s, t, portrait, ep) => `<div class="stage center">
     <div class="cta a pop" ${d(0.2)}>${rich(s.cta)}</div>
-    ${s.lead ? `<div class="lead a up" ${d(0.8)}>${rich(s.lead)}</div>` : ''}
+    ${s.options ? `<div class="opts">${s.options.map((o, i) => `<span class="a pop" ${d(beats(s, s.options, t)[i])}>${rich(o)}</span>`).join('')}</div>` : ''}
+    ${s.lead ? `<div class="lead a up" ${d(s.options ? Math.max(0.8, t.lead + t.speech * 0.7) : 0.8)}>${rich(s.lead)}</div>` : ''}
     <div class="disc a fade" ${d(1.2)}>${esc(ep.disclaimer)}</div></div>`,
 };
 
@@ -349,7 +381,8 @@ export const REQUIRED = {
   quote: ['text'], outro: ['cta'], sketch: ['img'],
 };
 
-// 封面图（1280×720）：两行大字 + 角标 + 大数字；有主持人抠图（photo）就放右边，人脸封面点击率通常更高；art 是插画，放右半边
+// 封面图（1280×720）：两行大字 + 角标 + 大数字；有主持人抠图（photo）就放右边，人脸封面点击率通常更高；art 是插画，放右半边；
+// 纯文字封面右边画一条走势线，thumb.chart 用 'up' / 'down' / 'none'
 export function thumbHTML(ep, th, photo, art) {
   const T = ep.thumb;
   return `<!doctype html><html><head><meta charset="utf-8"><style>${css(th)}
@@ -365,7 +398,7 @@ export function thumbHTML(ep, th, photo, art) {
   .art { position: absolute; right: 40px; top: 40px; width: 600px; height: 640px; object-fit: cover; border: 5px solid ${th.text}; border-radius: 36px; background: #fffdf7; }
   </style></head><body${th.paper ? ' class="paper"' : ''}><div class="grid-bg"></div>
   ${art ? `<img class="art" src="${art}">` : ''}
-  ${photo ? `<img class="ph" src="${photo}">` : art ? '' : `<svg class="chart" viewBox="0 0 520 420"><polyline points="0,380 90,330 160,350 240,250 300,270 380,140 430,170 520,20" fill="none" stroke="${th.up}" stroke-width="14" stroke-linejoin="round"/></svg>`}
+  ${photo || art || T.chart === 'none' ? (photo ? `<img class="ph" src="${photo}">` : '') : `<svg class="chart" viewBox="0 0 520 420"><polyline points="${T.chart === 'down' ? '0,20 90,70 160,50 240,150 300,130 380,260 430,230 520,380' : '0,380 90,330 160,350 240,250 300,270 380,140 430,170 520,20'}" fill="none" stroke="${T.chart === 'down' ? th.down : th.up}" stroke-width="14" stroke-linejoin="round"/></svg>`}
   <div class="t">${T.tag ? `<span class="tag">${esc(T.tag)}</span>` : ''}<div class="l1">${esc(T.l1)}</div><div class="l2">${esc(T.l2)}</div></div>
   ${T.num ? `<div class="tn">${esc(T.num)}</div>` : ''}
   <div class="foot"><span class="brand"><i></i>${esc(ep.brand)}</span></div></body></html>`;
@@ -373,9 +406,10 @@ export function thumbHTML(ep, th, photo, art) {
 
 // 一个场景的完整页面；window.__seek(毫秒) 把画面拨到指定时间
 // host：{ closed, open, height } 两张图的 data URL；mouth：每帧张不张嘴（0/1 字符串）
+// chapter：{ no, title, total }；cues 的 html 字段已转义，可直接放进字幕
 export function sceneHTML(ep, th, scene, t, { portrait, cues, chapter, globalStart, total, shortTitle, host, mouth, fps }) {
   const body = TEMPLATES[scene.type](scene, t, portrait, ep);
-  const cls = [portrait && 'portrait', th.paper && 'paper', ep.disclaimerBar && 'bar', host && 'hosted'].filter(Boolean).join(' ');
+  const cls = [portrait && 'portrait', th.paper && 'paper', ep.disclaimerBar && 'bar', host && 'hosted', ep.motion !== false && 'motion'].filter(Boolean).join(' ');
   const frame = th.paper
     ? `<svg class="frame"><filter id="wob"><feTurbulence baseFrequency="0.03" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="7"/></filter>
       <rect x="22" y="22" style="width:calc(100% - 44px);height:calc(100% - 44px)" rx="14" fill="none" stroke="${th.text}" stroke-width="4" filter="url(#wob)"/>
@@ -383,8 +417,8 @@ export function sceneHTML(ep, th, scene, t, { portrait, cues, chapter, globalSta
     : '<div class="grid-bg"></div>';
   const hh = host ? host.height * (portrait ? 0.75 : 1) : 0;
   return `<!doctype html><html><head><meta charset="utf-8"><style>${css(th)}</style></head>
-<body class="${cls}" style="--hostw:${hh}px">${frame}
-<div class="top"><span class="brand"><i></i>${esc(ep.brand)}</span><span>${chapter ? `<span class="chap"><b>${String(chapter.no).padStart(2, '0')}</b>${esc(chapter.title)}</span>` : ''}${ep.date && !portrait ? ` <span class="date">稿件日期：${esc(ep.date)}</span>` : ''}</span></div>
+<body class="${cls}" style="--hostw:${hh}px;--dur:${Math.round(t.dur * 1000)}ms;--steps:${Math.max(1, Math.round(t.dur * 10))}">${frame}
+<div class="top"><span class="brand"><i></i>${esc(ep.brand)}${ep.byline && !portrait ? `<span class="by-line">${esc(ep.byline)}</span>` : ''}</span><span>${chapter ? `<span class="chap"><b>${String(chapter.no).padStart(2, '0')}${chapter.total ? `/${String(chapter.total).padStart(2, '0')}` : ''}</b>${esc(chapter.title)}</span>` : ''}${ep.date && !portrait ? ` <span class="date">稿件日期：${esc(ep.date)}</span>` : ''}</span></div>
 ${shortTitle ? `<div class="ptitle">${rich(shortTitle)}</div>` : ''}
 ${body}
 ${scene.source ? `<div class="src">資料來源：${esc(scene.source)}</div>` : ''}
@@ -405,7 +439,10 @@ const fmt = (v, d) => Number(v).toLocaleString('en-US', { minimumFractionDigits:
 const anims = document.getAnimations();
 anims.forEach((a) => a.pause());
 // 所有入场动画结束的时间，之后画面只随字幕、嘴型、进度条变化
-window.__animEnd = Math.max(0, ...anims.map((a) => { const tm = a.effect.getComputedTiming(); return tm.endTime; }),
+// 元素入场的时间点，用来配音效；镜头微推不算
+window.__reveals = [...new Set(anims.filter((a) => a.animationName !== 'drift' && a.animationName !== 'cam' && a.animationName !== 'pen')
+  .map((a) => Math.round(a.effect.getTiming().delay / 50) * 50))].sort((x, y) => x - y);
+window.__animEnd = Math.max(0, ...anims.filter((a) => a.animationName !== 'drift').map((a) => { const tm = a.effect.getComputedTiming(); return tm.endTime; }),
   ...counters.map((c) => +c.dataset.start + +c.dataset.dur));
 window.__seek = (t) => {
   for (const a of anims) a.currentTime = t;
@@ -417,13 +454,15 @@ window.__seek = (t) => {
   const s = t / 1000;
   const i = CUES.findIndex((c) => s >= c.start && s < c.end);
   const sub = document.getElementById('sub');
-  const txt = i >= 0 ? CUES[i].text : '';
-  if (sub.dataset.t !== txt) { sub.dataset.t = txt; sub.innerHTML = txt ? '<span>' + txt.replace(/[&<>]/g, '') + '</span>' : ''; }
+  const txt = i >= 0 ? CUES[i].html : '';
+  if (sub.dataset.t !== txt) { sub.dataset.t = txt; sub.innerHTML = txt ? '<span>' + txt + '</span>' : ''; }
   const m = MOUTH[Math.round(s * FPS)] === '1';
   if (host) host.classList.toggle('talk', m);
   const px = Math.round(((G0 + s) / TOTAL) * W / 8) * 8;
   document.getElementById('prog').style.width = px + 'px';
-  return i + '|' + px + '|' + (m ? 1 : 0);
+  // 镜头微推每 100 毫秒变一步
+  const ds = document.body.classList.contains('motion') ? Math.floor(t / 100) : 0;
+  return i + '|' + px + '|' + (m ? 1 : 0) + '|' + ds;
 };
 })();
 </script></body></html>`;

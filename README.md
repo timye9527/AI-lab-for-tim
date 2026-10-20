@@ -18,6 +18,7 @@
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | 主理人 | 笔记打法、定价、冷启动两周、看什么数据 |
 | [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
 | [`docs/VIDEO-TEARDOWN.md`](docs/VIDEO-TEARDOWN.md) | 节目团队 | 粤语财经节目「财经浩谈」拆解：形式对标、为什么不够爆、优化优先级 |
+| [`docs/VIDEO-PLAYBOOK.md`](docs/VIDEO-PLAYBOOK.md) | 节目团队 | 爆款打法调研、v2 改了什么、怎么用后台数据迭代 |
 | [`video/README.md`](video/README.md) | 节目团队 | 视频流水线：一篇稿 → 长视频 + Shorts + 封面 + 字幕 |
 
 ## 目录
@@ -42,6 +43,7 @@ scripts/
   video.mjs                 ← 渲染一集视频：长视频 + Shorts + 封面 + 字幕 + 上传文案
   video-draft.mjs           ← AI 把分析师原稿改编成分镜脚本
   video-teardown.mjs        ← 拆解一条现成视频的节奏、响度、语速
+  video-review.mjs          ← 用 YouTube 后台数据复盘：点击、留存、掉人的场景
 video/                      ← 粤语财经视频流水线（和测试产品互不相干）
   engine/scenes.js          ← 场景模板：数据卡、手绘插画、主持人、字幕
   episodes/<集id>/          ← 每集一个目录：episode.js + 插画 + 主持人图 + 录音
@@ -62,6 +64,7 @@ npm run codes:static -- jiucai 500 --prefix JC   # 生成兑换码 + 静态码�
 npm run video -- demo --preview                  # 渲染示范视频到 out/video/demo/（需要 ffmpeg + Chrome）
 npm run video:draft -- 稿件.md <集id>             # AI 改编原稿为分镜脚本（需要 ANTHROPIC_API_KEY）
 npm run video:teardown -- 视频.mp4 [字幕.vtt]     # 拆解一条视频
+npm run video:review -- channel 表格.csv          # 用后台数据复盘（还有 retention / scenes 模式）
 ```
 
 ## 计分规则

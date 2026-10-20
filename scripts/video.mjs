@@ -5,6 +5,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { once } from 'node:events';
+import { normalize } from 'node:path';
 import { IMAGE_STYLE, REQUIRED, TEMPLATES, resolveTheme, sceneHTML, thumbHTML } from '../video/engine/scenes.js';
 
 const argv = process.argv.slice(2);
@@ -21,6 +22,9 @@ const SRC = `video/episodes/${id}`;
 const OUT = `out/video/${id}`;
 const ep = (await import(`../${SRC}/episode.js`)).default;
 const th = resolveTheme(ep.theme || 'dark');
+// 多标题 / 多封面时，第一个当默认
+ep.title ??= ep.titles?.[0];
+ep.thumb ??= ep.thumbs?.[0];
 mkdirSync(`${OUT}/tts`, { recursive: true });
 
 // —— 1. 校验 + 合规词 ——
@@ -41,7 +45,9 @@ if (!th) fail(`未知主題 ${ep.theme}`);
 // 图片素材转成 data URL 塞进页面：插画放 img/，主持人两张图（闭嘴 / 张嘴）
 const MIME = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml' };
 const asset = (name) => {
-  const f = /\.\w+$/.test(name) ? `${SRC}/${name}` : Object.keys(MIME).map((x) => `${SRC}/${name}.${x}`).find(existsSync);
+  // @/ 开头是共用素材（video/assets/），其余相对本集目录
+  const base = name.startsWith('@/') ? `video/assets/${name.slice(2)}` : `${SRC}/${name}`;
+  const f = /\.\w+$/.test(name) ? normalize(base) : Object.keys(MIME).map((x) => normalize(`${base}.${x}`)).find(existsSync);
   if (!f || !existsSync(f)) return null;
   return `data:${MIME[f.split('.').pop().toLowerCase()]};base64,${readFileSync(f).toString('base64')}`;
 };
@@ -52,7 +58,7 @@ if (sketches.length) {
 }
 for (const [i, s] of ep.scenes.entries()) {
   if (s.type !== 'sketch') continue;
-  s._src = asset(`img/${s.img}`);
+  s._src = asset(s.img.startsWith('@/') ? s.img : `img/${s.img}`);
   if (!s._src) fail(`第 ${i + 1} 個場景搵唔到插畫 ${SRC}/img/${s.img}.*（提示詞見 ${OUT}/image-prompts.txt）`);
 }
 let host = null;
@@ -65,6 +71,23 @@ const allText = JSON.stringify(ep);
 const hits = RISKY.filter((w) => allText.includes(w));
 if (hits.length) console.log(`⚠️ 含高危說法：${hits.join('、')}（發布前人工確認）`);
 if (allText.includes('發布前核對')) console.log('⚠️ 有數據標住「發布前核對」，出街前要逐個核實');
+
+// 打法检查（docs/VIDEO-PLAYBOOK.md）：只提醒，不拦
+{
+  const tips = [];
+  const first = ep.scenes[0];
+  const firstLine = (first.say || '').split(/[。！？]/)[0];
+  if (!/[0-9零一二三四五六七八九十百千萬億]{2,}|？|\?/.test(firstLine)) tips.push('第一句冇數字亦冇問題，開頭較難留人');
+  if ([...(first.say || '')].length > 45) tips.push('第一個場景口播超過 45 字，鉤子要再短啲');
+  if (ep.scenes.slice(0, 3).some((x) => x.type === 'title')) tips.push('頭三個場景有標題卡，考慮刪走，直接入正題');
+  const chaps = ep.scenes.filter((x) => x.type === 'chapter');
+  if (chaps.length && chaps.some((c) => !/[？?]$/.test(c.title))) tips.push('有章節標題唔係問題句，可以改成問題，用「但係 / 所以」接');
+  if (!ep.scenes.some((x) => x.type === 'outro')) tips.push('冇 outro，結尾冇留言引導');
+  if ((ep.titles || []).length < 3) tips.push('少過 3 個標題，冇得用「測試與比較」');
+  if ((ep.thumbs || []).length < 3) tips.push('少過 3 張封面，冇得用「測試與比較」');
+  if (!ep.byline) tips.push('冇署名（byline），觀眾睇唔出係邊個嘅觀點');
+  if (tips.length) console.log(`ℹ️ 打法檢查：\n${tips.map((x) => `   · ${x}`).join('\n')}`);
+}
 
 // —— 2. 配音：真人录音 > edge-tts > 按字数估时长（静音）——
 const probe = (f) => parseFloat(spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', f], { encoding: 'utf8' }).stdout) || 0;
@@ -135,12 +158,22 @@ function cuesFor(item, maxLen) {
     if (prev && [...p].length <= 3 && [...prev].length + [...p].length + 1 <= maxLen) merged[merged.length - 1] = `${prev} ${p}`;
     else merged.push(p);
   }
+  // 高亮：画面上 *星号* 标过的词 + 数字（阿拉伯数字或两个字以上的中文数字）
+  const emph = [...JSON.stringify(item.s).matchAll(/\*([^*"\\]{1,12})\*/g)].map((m) => m[1].trim()).filter((x) => x.length >= 2);
+  const NUM = /[0-9][0-9,.%]*|[零一二三四五六七八九十百千萬億兩]{2,}/g;
+  const hl = (txt) => {
+    let h = txt.replace(/[&<>"]/g, '');
+    for (const e of emph) if (h.includes(e)) h = h.split(e).join(`\u0001${e}\u0002`);
+    h = h.replace(/[^\u0001\u0002]+|\u0001[^\u0002]*\u0002/g, (seg) => (seg.startsWith('\u0001') ? seg : seg.replace(NUM, '\u0001$&\u0002')));
+    return h.replace(/\u0001/g, '<b>').replace(/\u0002/g, '</b>');
+  };
   const w = merged.map((p) => speechChars(p) + 1);
   const sum = w.reduce((a, b) => a + b, 0);
   let t = item.lead;
   return merged.map((text, k) => {
     const len = (w[k] / sum) * item.speech;
-    const c = { start: +t.toFixed(3), end: +(t + len).toFixed(3), text: text.replace(/[、，]/g, ' ') };
+    const shown = text.replace(/[、，]/g, ' ');
+    const c = { start: +t.toFixed(3), end: +(t + len).toFixed(3), text: shown, html: hl(shown) };
     t += len;
     return c;
   });
@@ -148,8 +181,9 @@ function cuesFor(item, maxLen) {
 
 // 场景所属章节（长视频右上角显示）
 let chap = null;
+const chapTotal = timeline.filter((it) => it.s.type === 'chapter').length;
 for (const it of timeline) {
-  if (it.s.type === 'chapter') chap = { no: it.s.no, title: it.s.title };
+  if (it.s.type === 'chapter') chap = { no: it.s.no, title: it.s.title, total: chapTotal };
   it.chapter = chap;
 }
 
@@ -218,6 +252,7 @@ async function renderFrames(items, { portrait, file, shortTitle }) {
     await page.setContent(sceneHTML(ep, th, it.s, it, { portrait, cues, chapter: portrait ? null : it.chapter, globalStart: g, total, shortTitle, host, mouth, fps: FPS }), { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     const animEnd = await page.evaluate(() => window.__animEnd);
+    it.reveals = await page.evaluate(() => window.__reveals);
     let lastKey = null;
     let buf = null;
     for (let f = 0; f < n; f++) {
@@ -244,6 +279,33 @@ async function renderFrames(items, { portrait, file, shortTitle }) {
 }
 
 // —— 5. 音轨：每段配音按场景对齐，可选背景音乐自动闪避，响度统一到 -14 LUFS（YouTube 标准）——
+// 音效：换场景一声「嗖」，元素入场一声轻「啵」；用 ffmpeg 现场合成，不需要素材文件
+const SR = 48000;
+function synth(src) {
+  const buf = spawnSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', src, '-ac', '1', '-ar', String(SR), '-f', 'f32le', '-'], { maxBuffer: 1 << 26 }).stdout;
+  return new Float32Array(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.length - (buf.length % 4)));
+}
+let SFX = null;
+function sfxTrack(items, file) {
+  SFX ??= {
+    whoosh: synth('anoisesrc=d=0.45:c=pink:a=0.6,bandpass=f=1400:width_type=o:w=2,afade=t=in:d=0.18,afade=t=out:st=0.2:d=0.25'),
+    pop: synth('sine=f=1250:d=0.07,afade=t=out:st=0.01:d=0.06,volume=0.5'),
+  };
+  const total = items.reduce((a, it) => a + it.dur, 0);
+  const out = new Float32Array(Math.ceil(total * SR) + SR);
+  const add = (clip, at, vol) => {
+    const o = Math.round(at * SR);
+    for (let k = 0; k < clip.length && o + k < out.length; k++) out[o + k] += clip[k] * vol;
+  };
+  let g = 0;
+  items.forEach((it, i) => {
+    if (i > 0) add(SFX.whoosh, Math.max(0, g - 0.12), 0.5);
+    for (const r of it.reveals || []) if (r > 80) add(SFX.pop, g + r / 1000, 0.35);
+    g += it.dur;
+  });
+  writeFileSync(file, Buffer.from(out.buffer));
+}
+
 async function renderAudio(items, file) {
   const args = [];
   const fl = [];
@@ -267,6 +329,13 @@ async function renderAudio(items, file) {
       '[voice]asplit[v1][v2]', '[bg][v2]sidechaincompress=threshold=0.03:ratio=6:attack=20:release=400[bgd]',
       '[v1][bgd]amix=inputs=2:duration=first:normalize=0[mix]');
     last = 'mix';
+  }
+  if (ep.sfx !== false) {
+    const f = file.replace(/\.\w+$/, '.sfx.f32');
+    sfxTrack(items, f);
+    args.push('-f', 'f32le', '-ar', String(SR), '-ac', '1', '-i', f);
+    fl.push(`[${n++}:a]aformat=channel_layouts=stereo,volume=${ep.sfxVolume ?? 0.6}[sfx]`, `[${last}][sfx]amix=inputs=2:duration=first:normalize=0[withsfx]`);
+    last = 'withsfx';
   }
   if (items.some((it) => it.audio) || bgm) {
     fl.push(`[${last}]loudnorm=I=-14:TP=-1.5:LRA=11[out]`);
@@ -307,9 +376,11 @@ if (only.includes('long')) {
   const tooShort = chapters.some((c, i) => (chapters[i + 1]?.t ?? TOTAL) - c.t < 10);
   if (chapters.length < 3 || tooShort) console.log('⚠️ 章節少過 3 個或者有章節短過 10 秒，YouTube 唔會顯示章節');
   const tags = ep.tags || [];
-  writeFileSync(`${OUT}/youtube.txt`, `【標題】（${[...ep.title].length} 字，建議 40 字內，關鍵詞放最前）
-${ep.title}
-
+  const titles = ep.titles || [ep.title];
+  for (const t of titles) if ([...t].length > 40) console.log(`⚠️ 標題超過 40 字：${t}`);
+  writeFileSync(`${OUT}/youtube.txt`, `【標題】${titles.length > 1 ? '（YouTube Studio「測試與比較」可以同時測 3 個標題，按觀看時間份額揀贏家）' : ''}
+${titles.map((t, i) => `${titles.length > 1 ? `${'ABC'[i]}. ` : ''}${t}（${[...t].length} 字）`).join('\n')}
+${(ep.thumbs || []).length > 1 ? `\n【封面】thumb.png / thumb-b.png / thumb-c.png，同樣用「測試與比較」\n` : ''}
 【說明】
 ${ep.description || ''}
 
@@ -322,13 +393,24 @@ ${ep.disclaimer}
 【標籤】
 ${tags.join(',')}
 `);
-  writeFileSync(`${OUT}/timeline.json`, JSON.stringify(timeline.map((it) => ({ key: it.key, type: it.s.type, start: +it.start.toFixed(2), dur: +it.dur.toFixed(2), voice: it.audio || '估算' })), null, 2));
+  // 画面空档：场景开头 + 每个元素入场 + 镜头移动都算「新东西」，字幕不算；超过 6 秒冇新东西就提醒
+  const events = timeline.flatMap((it) => [it.start, ...(it.reveals || []).map((r) => it.start + r / 1000), ...(it.camMoves || []).map((c) => it.start + c)]).sort((a, b) => a - b);
+  const gaps = [];
+  for (let i = 1; i <= events.length; i++) {
+    const a = events[i - 1], b = events[i] ?? TOTAL;
+    if (b - a > 6) gaps.push({ at: a, len: b - a, scene: timeline.findLast((it) => it.start <= a + 0.01)?.key });
+  }
+  const longest = Math.max(0, ...events.map((t, i) => (events[i + 1] ?? TOTAL) - t));
+  console.log(`畫面節奏：${events.length} 次新元素，平均 ${(TOTAL / events.length).toFixed(1)} 秒一次，最長空檔 ${longest.toFixed(1)} 秒`);
+  for (const g of gaps) console.log(`⚠️ 第 ${g.scene} 段 ${tc(g.at)} 起 ${g.len.toFixed(1)} 秒冇新元素（加 beats、拆場景或者刪口播）`);
+  writeFileSync(`${OUT}/timeline.json`, JSON.stringify(timeline.map((it) => ({ key: it.key, type: it.s.type, start: +it.start.toFixed(2), dur: +it.dur.toFixed(2), voice: it.audio || '估算', reveals: it.reveals })), null, 2));
 }
 
 // —— Shorts ——
 if (only.includes('shorts')) {
   for (const [name, cfg] of Object.entries(ep.shorts || {})) {
-    const items = timeline.filter((it) => it.s.short === name);
+    // 复制一份，第一个场景标 instant（第一帧就要有画面），唔影响长视频
+    const items = timeline.filter((it) => it.s.short === name).map((it, i) => ({ ...it, instant: i === 0 }));
     if (!items.length) continue;
     const len = items.reduce((a, it) => a + it.dur, 0);
     if (len > 60) console.log(`⚠️ Short ${name} 有 ${len.toFixed(0)} 秒，超過 60 秒完播率會跌`);
@@ -338,15 +420,20 @@ if (only.includes('shorts')) {
   }
 }
 
-// —— 封面 ——
+// —— 封面：thumbs 里每个版本出一张，配合 YouTube「測試與比較」——
 if (only.includes('thumb')) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
   const page = await ctx.newPage();
   const ph = ['png', 'webp'].map((x) => `${SRC}/host.${x}`).find(existsSync);
   const photo = ph && `data:image/${ph.split('.').pop()};base64,${readFileSync(ph).toString('base64')}`;
-  await page.setContent(thumbHTML(ep, th, photo, ep.thumb.img && asset(`img/${ep.thumb.img}`)), { waitUntil: 'load' });
-  await page.evaluate(() => document.fonts.ready);
-  await page.screenshot({ path: `${OUT}/thumb.png` });
+  const variants = ep.thumbs || [ep.thumb];
+  for (const [i, T] of variants.entries()) {
+    const art = T.img && asset(`img/${T.img}`);
+    const face = T.host && host ? host[T.host] : photo;
+    await page.setContent(thumbHTML({ ...ep, thumb: T }, th, face, art), { waitUntil: 'load' });
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({ path: `${OUT}/${i ? `thumb-${'abc'[i]}` : 'thumb'}.png` });
+  }
   await ctx.close();
 }
 

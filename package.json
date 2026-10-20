@@ -12,7 +12,8 @@
     "codes:static": "node --no-warnings scripts/codes-static.mjs",
     "video": "node scripts/video.mjs",
     "video:teardown": "node scripts/video-teardown.mjs",
-    "video:draft": "node scripts/video-draft.mjs"
+    "video:draft": "node scripts/video-draft.mjs",
+    "video:review": "node scripts/video-review.mjs"
   },
   "engines": {
     "node": ">=22.13"

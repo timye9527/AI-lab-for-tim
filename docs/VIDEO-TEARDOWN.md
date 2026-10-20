@@ -10,6 +10,8 @@
 
 整套流程已经做成脚本，一篇稿子进去，长视频、Shorts、封面、字幕、上传文案一起出来，见 [`video/README.md`](../video/README.md)。
 
+**后续**：按头部团队的打法重做的 v2、以及怎么用后台数据迭代，见 [`VIDEO-PLAYBOOK.md`](VIDEO-PLAYBOOK.md)。
+
 ---
 
 ## 1. 现在的节目是什么样

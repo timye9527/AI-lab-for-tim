@@ -1,14 +1,17 @@
 // 把分析师原稿改编成分镜脚本 video/episodes/<集id>/episode.js（AI 整理，出片前必须人工逐句审）
-// 用法：npm run video:draft -- <原稿.md|.txt> <集id> [--force]
+// 用法：npm run video:draft -- <原稿.md|.txt> <集id> [--byline 署名] [--force]
 // 需要 Anthropic API 密钥：export ANTHROPIC_API_KEY=...
 import Anthropic from '@anthropic-ai/sdk';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { REQUIRED } from '../video/engine/scenes.js';
 
-const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const argv = process.argv.slice(2);
+const byIdx = argv.indexOf('--byline');
+const byline = byIdx >= 0 ? argv[byIdx + 1] : '';
+const args = argv.filter((a, i) => !a.startsWith('--') && argv[i - 1] !== '--byline');
 const [src, id] = args;
 if (!src || !id || !existsSync(src)) {
-  console.log('用法：npm run video:draft -- <原稿.md|.txt> <集id> [--force]');
+  console.log('用法：npm run video:draft -- <原稿.md|.txt> <集id> [--byline 署名] [--force]');
   process.exit(1);
 }
 const dir = `video/episodes/${id}`;
@@ -18,8 +21,8 @@ if (existsSync(out) && !process.argv.includes('--force')) {
   process.exit(1);
 }
 
-// 系统提示词固定不变（规矩 + 示范集），开启缓存，连续改编多篇时便宜很多
-const system = readFileSync('video/prompts/draft.md', 'utf8').replace('{{EXAMPLE}}', '```js\n' + readFileSync('video/episodes/demo/episode.js', 'utf8') + '\n```');
+// 系统提示词固定不变（规矩 + 示范集 v2），开启缓存，连续改编多篇时便宜很多
+const system = readFileSync('video/prompts/draft.md', 'utf8').replace('{{EXAMPLE}}', '```js\n' + readFileSync('video/episodes/demo-v2/episode.js', 'utf8') + '\n```');
 const article = readFileSync(src, 'utf8');
 
 const client = new Anthropic();
@@ -35,7 +38,7 @@ try {
     betas: ['server-side-fallback-2026-07-01'],
     fallbacks: 'default',
     system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
-    messages: [{ role: 'user', content: `集 id：${id}\n\n原稿：\n\n${article}` }],
+    messages: [{ role: 'user', content: `集 id：${id}\n署名：${byline || '（未提供）'}\n\n原稿：\n\n${article}` }],
   });
   msg = await stream.finalMessage();
 } catch (e) {

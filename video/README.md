@@ -2,7 +2,9 @@
 
 把分析师的一篇稿子，变成一集 YouTube 长视频 + 2 条 Shorts + 封面 + 字幕 + 上传文案。画面、配音、字幕、嘴型全部由脚本生成，人只做两件事：**审稿**和**出插画**。
 
-为什么这样做、现有节目的问题和优化方向，见 [`docs/VIDEO-TEARDOWN.md`](../docs/VIDEO-TEARDOWN.md)。
+为什么这样做：现有节目的拆解见 [`docs/VIDEO-TEARDOWN.md`](../docs/VIDEO-TEARDOWN.md)，爆款打法和数据迭代见 [`docs/VIDEO-PLAYBOOK.md`](../docs/VIDEO-PLAYBOOK.md)。
+
+两个示范集：`demo`（v1，复刻现有节目的做法，作对照）和 `demo-v2`（按手册重做，**新集以它为模板**）。
 
 ## 一次性准备
 
@@ -17,14 +19,14 @@
 
 节目形象（一次做好，以后每集复用）：
 
-- **主持人两张图**：同一个角色，一张闭嘴、一张张嘴，其他地方完全一样，透明背景 PNG，放到 `video/episodes/<集id>/host/`。脚本按配音音量逐帧切换，就是「对口型」的效果。
+- **主持人两张图**：同一个角色，一张闭嘴、一张张嘴，其他地方完全一样，透明背景 PNG，放到共用目录 `video/assets/host/`，在 episode.js 里写 `host: { closed: '@/host/closed.png', open: '@/host/open.png' }`（`@/` 指 `video/assets/`）。脚本按配音音量逐帧切换，就是「对口型」的效果。
 - **主题**：`theme: 'paper'` 是纸面手绘风（和现在的节目一致），`'dark'` 是深色数据卡风。也可以写 `{ base: 'paper', accent: '#c92a2a' }` 改个别颜色。
 
 ## 每集流程
 
 ```bash
-# 1. AI 把原稿改编成分镜脚本（粤语口播 + 画面 + 插画提示词）
-npm run video:draft -- 稿件/1016.md 1016
+# 1. AI 把原稿改编成分镜脚本（粤语口播 + 画面 + 插画提示词 + 3 个标题 + 3 张封面）
+npm run video:draft -- 稿件/1016.md 1016 --byline "主筆：XXX"
 
 # 2. 人工审 video/episodes/1016/episode.js（清单见下）
 
@@ -44,8 +46,8 @@ npm run video -- 1016
 |---|---|
 | `long.mp4` | 横屏长视频，1920×1080，响度统一到 -14 LUFS |
 | `short-a.mp4`、`short-b.mp4` | 竖屏 Shorts，1080×1920 |
-| `thumb.png` | 封面，1280×720 |
-| `youtube.txt` | 标题、说明（带章节时间码）、标签，直接复制 |
+| `thumb.png`、`thumb-b.png`、`thumb-c.png` | 封面，1280×720；多张时上传到「测试与比较」 |
+| `youtube.txt` | 标题（多个时列出 A/B/C）、说明（带章节时间码）、标签，直接复制 |
 | `long.srt` | 字幕文件，上传到 YouTube 当 CC 字幕（有利搜索） |
 | `image-prompts.txt` | 这一集插画的提示词 |
 | `timeline.json` | 每个场景的起止时间，排查用 |
@@ -78,14 +80,14 @@ npm run video -- 1016
 | `title` | 节目标题卡 | `title`、`lead` |
 | `chapter` | 章节分隔，同时生成 YouTube 章节 | `no`、`title` |
 | `bullets` | 2～3 个要点，跟着口播逐个出现 | `heading`、`items` |
-| `number` | 一个大数字，从 0 数上去 | `label`、`value`、`unit`、`note` |
+| `number` | 一个大数字，从 0 数上去；注释跟口播出现 | `label`、`value`、`unit`、`note`（`beats: [0.5]` 指定注释时间） |
 | `bars` | 横向柱状对比 | `heading`、`items[{label, value, show, hi}]`、`unit` |
 | `line` | 折线走势 | `heading`、`points[[标签, 数值]]`、`mark{at, text}` |
-| `compare` | 两栏对比 | `heading`、`left{title, items}`、`right{title, items}` |
+| `compare` | 两栏对比，栏内条目逐个出现 | `heading`、`left{title, items}`、`right{title, items}` |
 | `flow` | 资金流 / 因果链，`loop: true` 围成圈 | `heading`、`nodes[{name, note}]` |
 | `sketch` | 手绘插画：线稿 → 上色 → 镜头推移 | `img`、`prompt`、`labels`、`focus` |
-| `quote` | 金句 | `text`、`by` |
-| `outro` | 结尾互动 + 免责声明 | `cta`、`lead` |
+| `quote` | 金句，按 `\n` 逐行出现 | `text`、`by` |
+| `outro` | 结尾互动 + 免责声明 | `cta`、`options`（如 `['A 泡沫', 'B 新时代']`）、`lead` |
 
 **元素什么时候出现**：引擎在 `say` 里找每个要点的开头几个字，口播说到哪个就出哪个；找不到就均匀错开。对不准时，用 `beats: [0.05, 0.5, 0.8]` 手动指定（0～1，口播进度）。
 
@@ -97,14 +99,32 @@ npm run video -- 1016
 
 **Shorts**：给场景加 `short: 'a'`，同一个字母的场景按顺序剪成一条竖屏短片；在 `shorts` 里给每条写标题。每条控制在 55 秒内。
 
-**节目级字段**：`brand`、`title`、`description`、`tags`、`thumb{tag, l1, l2, num, img}`、`theme`、`date`（显示「稿件日期」）、`disclaimerBar`（底部常驻免责条）、`host{closed, open, height}`、`voice`、`rate`、`disclaimer`。
+**节目级字段**：
+- 包装：`titles`（最多 3 个）、`thumbs`（最多 3 张，每张 `{tag, l1, l2, num, img, host, chart}`，`host: 'open'` 用主持人表情，纯文字封面的走势线 `chart: 'up' / 'down' / 'none'`）、`description`、`tags`。只有一个时也可以写 `title`、`thumb`。
+- 画面：`brand`、`byline`（署名，显示在节目名旁边）、`theme`、`date`（「稿件日期」）、`disclaimerBar`（底部常驻免责条）、`host{closed, open, height}`、`motion`（画面轻微推近，默认开）、`sfx`（入场音效，默认开）、`sfxVolume`。
+- 声音：`voice`、`rate`、`bgmVolume`；`disclaimer`。
+
+字幕会自动高亮：画面上用 `*星号*` 标过的词，以及数字。
 
 ## 渲染脚本会提醒的事
+
+- **画面空档**：每次出片都会算「新元素」（场景切换、元素入场、镜头移动，不含字幕）的间隔，超过 6 秒没新东西就指出是哪一段。处理办法：用 `beats` 让元素出得更早、拆场景、删口播。
+- **打法检查**：第一句没有数字或问题、开头有标题卡、章节标题不是问题句、少于 3 个标题或封面、没有署名。
 
 - 某个场景太长（数据卡超过 12 秒、逐个出现的场景超过 20 秒）：观众容易在这里走掉，建议拆开。
 - 章节少于 3 个或有章节短于 10 秒：YouTube 不会显示章节。
 - 标题超过 40 字、Short 超过 60 秒。
 - 命中高危说法、还有没核对的数据。
+
+## 看后台数据复盘
+
+```bash
+npm run video:review -- channel 表格.csv     # Studio 导出的内容表格：每条片对比频道中位数，判断问题在点击还是留存
+npm run video:review -- retention 1016       # 这一集的留存曲线落到每个场景（曲线放 video/episodes/1016/stats/retention.csv）
+npm run video:review -- scenes               # 所有集合起来，哪种场景类型最掉人
+```
+
+`stats/` 已被 git 忽略。每集复盘结果记到 [`experiments.md`](experiments.md)。方法见 `docs/VIDEO-PLAYBOOK.md` 第 5 节。
 
 ## 拆解别人的视频
 
