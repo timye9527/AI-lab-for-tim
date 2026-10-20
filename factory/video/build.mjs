@@ -108,7 +108,8 @@ const desc = (el) => {
     case 'stats': return `数据卡：${el.items.map((x) => x.value + ' ' + x.label).join('；')}`;
     case 'grid': return `卡片网格（当前一条红框）：${el.items.map((x) => x.n + '. ' + x.title + (x.from ? `（${x.from}）` : '')).join('；')}`;
     case 'ladder': return `阶梯图：${el.items.map((x) => x.title).join(' → ')}`;
-    case 'fork': return `分叉图：造神的故事 → ${el.left.title} / ${el.right.title}`;
+    case 'fork': return `分叉图：${el.root || '造神的故事'} → ${el.left.title} / ${el.right.title}`;
+    case 'vs': return `柱状对比（柱子长高、数字滚动）：${el.items.map((x) => x.label + ' ' + x.value + (el.unit || '')).join(' vs ')}`;
     case 'compare': return `左右对比：${el.left.title}（${el.left.items.join('，')}） vs ${el.right.title}（${el.right.items.join('，')}）`;
     case 'flow': return `流向图：${el.left} →（${el.mid}）→ ${el.right}`;
     case 'bars': return '柱状示意：少数头部公司高高在上，大量企业被冷落';

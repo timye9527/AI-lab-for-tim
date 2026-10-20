@@ -4,7 +4,7 @@
 beats.json：{"voice": {"speed"}, "beats": [{"text", "gap"}]}
 
 读音由 pron.py 决定：每句生成附加词典条目，模型逐字照读，不靠它自己猜多音字。
-质检：SenseVoice 和 Paraformer 两个识别模型各转写一遍，转成不带声调的拼音，和稿子逐音节比对。
+质检：SenseVoice 和 Paraformer 两个识别模型各转写一遍，转成不带声调的拼音，和稿子逐音节比对；以 SenseVoice 为准（和成片复核同一标准），Paraformer 只作参考。
 多字、漏字、读成别的音（比如「套利」读成「套号利」）都会被抓到；同音字不算错。
 不合格就换手法重新合成（原样 → 微调语速 → 拆短句），最多 MAX_TRY 次，取错得最少的一次。声调对不对识别模型听不出来，靠读音表人工审。
 --recheck：之前重试用完仍不合格的句子，再试一轮。
@@ -178,7 +178,7 @@ def main():
         disp = []
         for tok in re.findall(rf'[{pron.ZH}]|[A-Za-z][A-Za-z\-]*', norm):
             disp += [pron.show(tok)] if re.match(rf'[{pron.ZH}]', tok) else ([pron.WORD_LETTER[tok]] if tok in pron.WORD_LETTER else list(tok.replace('-', '')))
-        key = hashlib.md5(json.dumps([norm, ent, voice, 'matcha-zh-en', NOISE], ensure_ascii=False).encode()).hexdigest()[:12]
+        key = hashlib.md5(json.dumps([norm, ent, voice, 'matcha-zh-en', NOISE, 'qc-sv'], ensure_ascii=False).encode()).hexdigest()[:12]
         plans.append({'norm': norm, 'chars': chars, 'expect': pron.expect(norm, chars), 'disp': disp,
                       'path': os.path.join(cache, key + '.wav'), 'qc': os.path.join(cache, key + '.json')})
     lex = os.path.join(cache, 'lexicon.txt')
@@ -212,9 +212,11 @@ def main():
                 st.accept_waveform(16000, y)
                 r.decode_stream(st)
                 heard[name] = st.result.text
-            # 两个识别模型取错得少的那个：只要有一个完整听对，说明音频本身没问题
-            scored = [(diff(p['expect'], p['disp'], heard_tokens(h), heard_chars(h)), n) for n, h in heard.items()]
-            (errs, issues, minor), name = min(scored, key=lambda z: (z[0][0], len(z[0][2])))
+            # 以 SenseVoice 为准（和成片复核同一个标准）；它没听对时，问题描述取两个模型里错得少的那个，方便判断
+            scored = {n: diff(p['expect'], p['disp'], heard_tokens(h), heard_chars(h)) for n, h in heard.items()}
+            errs = scored['SenseVoice'][0]
+            name = 'SenseVoice' if errs == 0 else min(scored, key=lambda n: scored[n][0])
+            issues, minor = scored[name][1], scored['SenseVoice'][2]
             if best is None or errs < best['errs']:
                 best = {'errs': errs, 'issues': issues, 'minor': minor, 'heard': heard[name], 'by': name}
                 sf.write(p['path'], x, sr)

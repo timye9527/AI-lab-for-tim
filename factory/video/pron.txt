@@ -176,3 +176,42 @@
 赢得 ying2 de2
 行动 xing2 dong4
 值得 zhi2 de5
+
+# ── 002 期新词 ──
+彭博 peng2 bo2
+纳斯达克 na4 si1 da2 ke4
+标普 biao1 pu3
+浑然不觉 hun2 ran2 bu4 jue2
+孤注一掷 gu1 zhu4 yi2 zhi4
+置身事外 zhi4 shen1 shi4 wai4
+均值回归 jun1 zhi2 hui2 gui1
+拐点 guai3 dian3
+备忘录 bei4 wang4 lu4
+摧毁 cui1 hui3
+杠杆 gang4 gan3
+市盈率 shi4 ying2 lv4
+回本 hui2 ben3
+喊顶 han3 ding3
+高歌猛进 gao1 ge1 meng3 jin4
+迭代 die2 dai4
+过时 guo4 shi2
+站位 zhan4 wei4
+那一批 na4 yi4 pi1
+怕泡沫 pa4 pao4 mo4
+吹泡沫 chui1 pao4 mo4
+撑得住 cheng1 de5 zhu4
+
+# ── 人工审过、确认无误的词（002 期）──
+到处 dao4 chu4
+看着 kan4 zhe5
+当了 dang1 le5
+觉得 jue2 de5
+看重 kan4 zhong4
+当年 dang1 nian2
+为将来 wei4 jiang1 lai2
+成为 cheng2 wei2
+打转 da3 zhuan4
+执行 zhi2 xing2
+得出 de2 chu1
+紧接着 jin3 jie1 zhe5
+为什么 wei4 shen2 me5

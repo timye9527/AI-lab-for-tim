@@ -20,23 +20,48 @@ function inspectScene() {
     if (r.top < 350) issues.push(`「${name(el)}」顶到章节栏`);
     if (el.scrollWidth > el.clientWidth + 2 && getComputedStyle(el).overflow !== 'visible') issues.push(`「${name(el)}」文字被裁掉`);
   }
-  // 孤字：一段文字的最后一行只剩一个字（标点不算字）
-  const leaves = [...content.querySelectorAll('div, span, li, b')].filter((el) => !el.closest('svg') && [...el.childNodes].every((c) => c.nodeType === 3) && el.textContent.trim().length >= 4);
-  for (const el of leaves) {
-    const node = el.childNodes[0];
-    const txt = node.textContent.replace(/\s+$/, '');
-    const chars = [...txt];
-    if (chars.length < 4) continue;
-    const pos = (i) => {
-      const r = document.createRange();
-      const off = [...txt].slice(0, i).join('').length;
-      r.setStart(node, off);
-      r.setEnd(node, off + chars[i].length);
-      return r.getBoundingClientRect().top;
-    };
-    let last = chars.length - 1;
-    while (last > 0 && /[，。！？；：、）」』,.!?%]/.test(chars[last])) last--;
-    if (last > 0 && pos(last) - pos(last - 1) > 5) issues.push(`「${txt.slice(0, 14)}」最后一行只剩「${chars.slice(last).join('')}」`);
+  // 逐字取位置（文字可以分散在多个行内元素里，比如带红色强调词的引文）
+  const charTops = (el) => {
+    const tops = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      const t = n.textContent;
+      for (let i = 0; i < t.length; i++) {
+        if (/\s/.test(t[i])) continue;
+        const r = document.createRange();
+        r.setStart(n, i);
+        r.setEnd(n, i + 1);
+        const b = r.getBoundingClientRect();
+        if (b.height) tops.push({ ch: t[i], top: b.top, bottom: b.bottom });
+      }
+    }
+    return tops;
+  };
+  // 文字块：自己有文字、里面没有块级元素
+  const blocks = [...content.querySelectorAll('div, span, li, b')].filter((el) => !el.closest('svg') && el.textContent.trim()
+    && [...el.children].every((c) => getComputedStyle(c).display.startsWith('inline')));
+  for (const el of blocks) {
+    if (el.parentElement && blocks.includes(el.parentElement)) continue;
+    const tops = charTops(el);
+    if (!tops.length) continue;
+    const text = tops.map((x) => x.ch).join('');
+    // 上下有重叠就算同一行（字号不同的字顶边高度不一样）
+    const lineOf = [];
+    let line = 0;
+    tops.forEach((x, i) => {
+      if (i && x.top >= tops[i - 1].bottom - 2) line++;
+      lineOf.push(line);
+    });
+    const lines = line + 1;
+    // 短标签（6 个字以内）不该折行
+    if (text.length <= 6 && lines > 1) {
+      issues.push(`短标签「${text}」被折成了 ${lines} 行`);
+      continue;
+    }
+    // 孤字：最后一行只剩一个字（标点不算字）
+    let last = tops.length - 1;
+    while (last > 0 && /[，。！？；：、）」』,.!?%]/.test(tops[last].ch)) last--;
+    if (tops.length >= 4 && last > 0 && lineOf[last] !== lineOf[last - 1]) issues.push(`「${text.slice(0, 14)}」最后一行只剩「${text.slice(last)}」`);
   }
   return [...new Set(issues)];
 }

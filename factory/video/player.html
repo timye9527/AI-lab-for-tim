@@ -75,7 +75,7 @@ body {
 .profile .name { font: 900 120px/1 Serif; }
 .profile .role { font: 500 38px/1.3 Sans; color: var(--sub); }
 .profile .row { display: flex; gap: 34px; align-items: baseline; padding: 20px 0; border-top: 2px solid var(--line); }
-.profile .y { font: 900 46px/1.2 Serif; color: var(--red); width: 120px; flex: none; }
+.profile .y { font: 900 46px/1.2 Serif; color: var(--red); min-width: 120px; flex: none; white-space: nowrap; }
 .profile .tx { font: 500 38px/1.45 Sans; }
 .timeline .row:last-child .tx { font-weight: 700; color: var(--red); }
 
@@ -151,6 +151,15 @@ body {
 .church .b .ti { font: 900 58px/1.2 Serif; margin-top: 18px; }
 .church .b .su { font: 500 31px/1.4 Sans; color: var(--sub); margin-top: 8px; }
 
+.vs { width: 100%; display: flex; justify-content: center; gap: 120px; align-items: flex-end; }
+.vs .col { width: 260px; text-align: center; }
+.vs .num { font: 900 96px/1 Serif; color: #8a847c; margin-bottom: 18px; }
+.vs .col.last .num { color: var(--red); }
+.vs .num small { font-size: 40px; margin-left: 6px; }
+.vs .track { height: 420px; display: flex; align-items: flex-end; justify-content: center; border-bottom: 3px solid var(--line); }
+.vs .track i { display: block; width: 150px; background: #cfc6b9; border-radius: 8px 8px 0 0; transform-origin: bottom; }
+.vs .col.last .track i { background: var(--red); }
+.vs .lb { font: 500 34px/1.4 Sans; margin-top: 18px; }
 .wall { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .wall .w { background: var(--card); border-radius: 10px; padding: 20px 22px; display: flex; gap: 16px; align-items: baseline;
   border: 3px solid transparent; min-height: 136px; }

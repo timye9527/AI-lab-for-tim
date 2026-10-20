@@ -136,7 +136,7 @@
       }
       case 'fork': {
         const w = $('div', 'fork');
-        w.appendChild(unit($('div', 'root', '造神的故事'), T(0)));
+        w.appendChild(unit($('div', 'root', esc(el.root || '造神的故事')), T(0)));
         w.appendChild(draws(unit($('div', '', drawable(svg.arrowDown)), T(0) + 0.3), T(0) + 0.3, 0.8));
         const legs = $('div', 'legs');
         legs.appendChild(unit($('div', 'leg', `<div class="ti">${esc(el.left.title)}</div><div class="su">${esc(el.left.sub)}</div>`), t0));
@@ -201,6 +201,23 @@
         unit(g('.price'), T(el.lineAt), 'draw', 1.6);
         unit(g('.ref'), T(el.lineAt) + 1.2, 'in', 0.5);
         unit(g('.drop'), T(el.lineAt) + 1.5, 'pop', 0.5);
+        return w;
+      }
+      case 'vs': {
+        // 柱状对比：柱子长高，数字滚动
+        const w = $('div', 'vs');
+        const max = Math.max(...el.items.map((x) => x.value));
+        el.items.forEach((it, i) => {
+          const col = $('div', 'col' + (i === el.items.length - 1 ? ' last' : ''));
+          const num = $('div', 'num', `<span>${it.value}</span><small>${esc(el.unit || '')}</small>`);
+          const bar = $('i');
+          bar.style.height = Math.round((it.value / max) * 100) + '%';
+          col.append(num, $('div', 'track'), $('div', 'lb', esc(it.label)));
+          col.querySelector('.track').appendChild(bar);
+          w.appendChild(unit(col, T(it.at)));
+          unit(bar, T(it.at) + 0.1, 'grow', 0.9);
+          unit(num.querySelector('span'), T(it.at) + 0.1, 'count', 0.9);
+        });
         return w;
       }
       case 'wall': {

@@ -6,3 +6,4 @@ ChatGPT => Chat GPT
 13F => 十三 F
 A股 => A 股
 Token => token
+泡沫.com => 泡沫点 com
