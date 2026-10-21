@@ -37,7 +37,8 @@ ARRANGEMENT = [
     ("主歌一", "G C", "闷", {}, [(0, "挂了挂了｜没啥好聊")]),
     ("主歌一", "G C", "扫", {}, [(0, "这一次呢｜我偏偏没挂")]),
     ("主歌一", "G C G C G C", "轻扫", {}, [(0, "我妈咧嘴｜笑着看我"), (2, "好了好了｜好了好了"), (4, "今年股票｜赚了多少啊")]),
-    ("连接段一", "G C G C", "扫", {}, [(0, "我说股票没赚啥｜不过"), (2, "生活挺丰富｜赚钱的本事在涨")]),
+    # 连接段对应原曲「…再一次 回到那个美丽世界里」：Am 一直到「回到」，之后进 C
+    ("连接段一", "Am Am Am C", "扫", {}, [(0, "我说股票没赚啥｜不过"), (2, "生活挺丰富｜赚钱的本事在涨")]),
     ("连接段一", "- -", "停", {}, [(0, "（说）那对象？"), (1, "（说）找了没？")]),
     ("副歌一", "G C G C G C", "切", {}, [(0, "妈妈妈妈妈妈｜聊完股票"), (2, "妈妈妈妈妈妈｜又聊对象"), (4, "妈妈妈妈妈妈｜同学要当爸")]),
     ("副歌一", "G C G C", "轻扫", {}, [(0, "讲工作｜她只会｜嗯嗯嗯嗯"), (2, "讲到去读书｜她只会｜放空")]),
@@ -48,7 +49,7 @@ ARRANGEMENT = [
     ("主歌二", "G C G C G C", "扫", {}, [(0, "我家隔壁｜就是麻将馆"), (2, "我说妈这｜就像打牌啊"), (4, "手里只有｜一个炸咋办")]),
     ("主歌二", "G C", "扫", {"rest": {1: 2}}, [(0, "要是三个｜炸在手上")]),
     ("主歌二", "G C G C", "重扫", {}, [(0, "她眼一亮｜对对对对对"), (2, "讲规划没话｜讲打牌抢答")]),
-    ("连接段二", "G C G C", "扫", {}, [(0, "她又说起那同学｜可是"), (2, "日子紧｜家里都在｜替他担心呀")]),
+    ("连接段二", "Am Am Am C", "扫", {}, [(0, "她又说起那同学｜可是"), (2, "日子紧｜家里都在｜替他担心呀")]),
     ("连接段二", "- -", "停", {}, [(0, "（说）我一愣"), (1, "（说）Hold on, please")]),
     ("副歌二", "G C G C G C", "切", {}, [(0, "妈妈妈妈妈妈｜同一个人"), (2, "妈妈妈妈妈妈｜刚才榜样"), (4, "妈妈妈妈妈妈｜现在要操心")]),
     ("副歌二", "G C G C", "轻扫", {}, [(0, "人没换｜事没变｜换了说法"), (2, "难处你都懂｜刚才就｜没讲")]),
@@ -141,8 +142,9 @@ def build_events():
         row_start = (1 + bar_no) * BAR
         row_len = len(chords) * BAR
         vol = opts.get("vol", 1.0)
-        for i, text in lyrics:
-            cues.append((row_start + i * BAR, bar_no + i + 1, section, chords[i], style, text))
+        for k, (i, text) in enumerate(lyrics):
+            nxt = lyrics[k + 1][0] if k + 1 < len(lyrics) else len(chords)
+            cues.append((row_start + i * BAR, bar_no + i + 1, section, " ".join(chords[i:nxt]), style, text))
 
         def gain_at(t):
             if "ramp" in opts:
@@ -244,14 +246,14 @@ def write_cues(path, cues):
         f"BPM {BPM}（暂定）· {BEATS_PER_BAR}/4 · 夹 {CAPO} 品（C 调指法）· 每小节 {BAR:.2f} 秒 · 共 {N_BARS} 小节",
         f"0:00.0 起是 1 小节预备拍（4 下滴答），第 1 小节从 {fmt(BAR)} 开始，全长约 {fmt(SONG_END + TAIL_SEC)}",
         "",
-        "时间     小节  段落      和弦  弹法  歌词",
+        "时间     小节  段落      和弦（本句每小节）  弹法  歌词",
     ]
     prev = None
     for t, bar, section, chord, style, text in cues:
         if section != prev:
             lines.append(f"\n【{section}】")
             prev = section
-        lines.append(f"{fmt(t):<8} {bar:>3}   {section:<6}{chord:<5}{style:<4}{text}")
+        lines.append(f"{fmt(t):<8} {bar:>3}   {section:<6}{chord:<12}{style:<4}{text}")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
