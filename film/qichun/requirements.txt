@@ -10,3 +10,5 @@ misaki[zh]
 kokoro-onnx
 # tinysoundfont 需单独装：pip install --no-deps tinysoundfont（它声明的 pyaudio 依赖用不到）
 sherpa-onnx
+noisereduce
+pyworld
