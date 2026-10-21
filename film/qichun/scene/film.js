@@ -143,8 +143,10 @@ function makeBuildings(A, U) {
         vec3 ghost = vec3(.86, .76, .60) * l;
         vec3 col = mix(ghost, white, vG);
         col += vec3(1., .75, .4) * vG * (1. - vG) * 2.2;
-        float a = mix(uGhost, 1., vG);
-        gl_FragColor = vec4(finish(col, distance(cameraPosition, vW)), a);
+        float dd = distance(cameraPosition, vW);
+        // 历史段的暗影只在近景里看得见，远景淡掉，留给「今天」
+        float a = mix(uGhost * (1. - .85 * smoothstep(12000., 45000., dd)), 1., vG);
+        gl_FragColor = vec4(finish(col, dd), a);
       }`,
     transparent: true, side: THREE.DoubleSide,
   });
@@ -176,7 +178,7 @@ function makePoints(A, U) {
       uniform float uDot; uniform float uGhost; varying float vG; varying float vD;
       void main() {
         vec2 q = gl_PointCoord - .5; float a = 1. - smoothstep(.2, .5, length(q));
-        float lv = mix(uGhost * .5, 1., vG);
+        float lv = mix(.07, 1., vG);
         gl_FragColor = vec4(vec3(1., .82, .55) * a * lv * uDot, 1.);
       }`,
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,

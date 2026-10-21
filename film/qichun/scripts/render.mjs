@@ -8,8 +8,8 @@ import { serve } from './serve.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const scale = Number(arg('scale', 1));
-const port = 8791 + Math.floor(Math.random() * 100);
-const server = await serve(port);
+const server = await serve(0); // 0 = 系统分配空闲端口
+const port = server.address().port;
 const exe = process.env.CHROME || (fs.existsSync('/opt/pw-browsers/chromium') ? undefined : undefined);
 const browser = await chromium.launch({
   executablePath: exe,
