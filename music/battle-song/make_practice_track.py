@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 """《九月九日，与母后Battle》练习伴奏生成器。
 
-只合成吉他和弦 + 节拍器，不含人声和旋律。段落表见同目录「歌词与伴奏规格.md」第三部分。
+只合成吉他和弦 + 节拍器，不含人声和旋律。歌词与段落全部来自同目录 song.txt。
 用法：python3 music/battle-song/make_practice_track.py
-输出（music/battle-song/out/）：practice_track.wav、practice_track_click.wav、cue_sheet.txt
+输出（music/battle-song/out/）：practice_track.wav、practice_track_click.wav、cue_sheet.txt、琴谱.html
 """
 from pathlib import Path
+import sys
 import wave
 
 import numpy as np
 
-# ===== 可改参数 =====
-BPM = 100            # 暂定值，未核对原曲速度
-CAPO = 1             # 和弦按 C 调指法写，整体升 CAPO 个半音
-BEATS_PER_BAR = 4    # 4/4 拍
+sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import songsheet  # noqa: E402
+
+# 歌词、和弦、速度（BPM）、夹品都在 song.txt 里改
+SONG_FILE = Path(__file__).resolve().parent / "song.txt"
 SR = 44100           # 采样率
 SEED = 9             # 随机种子，固定后每次生成结果一样
 
@@ -25,47 +28,18 @@ CHORDS = {
     "C":  [48, 52, 55, 60, 64],      # x32010
     "D":  [50, 57, 62, 66],          # xx0232
     "Am": [45, 52, 57, 60, 64],      # x02210
+    "Em": [40, 47, 52, 55, 59, 64],  # 022000
+    "E":  [40, 47, 52, 56, 59, 64],  # 022100
+    "A":  [45, 52, 57, 61, 64],      # x02220
+    "Dm": [50, 57, 62, 65],          # xx0231
+    "F":  [41, 48, 53, 57, 60, 65],  # 133211
 }
 
-# 段落表：(段落, 和弦（每小节一个，"-" 为停）, 弹法, 选项, 歌词[(行内第几小节, 文本)])
-# 选项：vol 音量倍数；rest {行内第几小节: 该小节末尾停几拍}；ramp (起, 止) 音量渐变
-ARRANGEMENT = [
-    ("前奏", "G C G C", "扫", {}, [(0, "（可选口白）这首歌叫《九月九日，与母后Battle》。")]),
-    ("主歌一", "G C G C G C", "扫", {}, [(0, "那天晚上｜视频电话"), (2, "我妈开口｜又是对象"), (4, "谁谁谁家｜孩子都结婚")]),
-    ("主歌一", "G C G C G C", "重扫", {}, [(0, "我说妈你｜知不知道"), (2, "我为啥｜不爱打电话"), (4, "聊来聊去｜总是相亲啊")]),
-    ("主歌一", "G C", "扫", {}, [(0, "以前吵到｜这个地方")]),
-    ("主歌一", "G C", "闷", {}, [(0, "挂了挂了｜没啥好聊")]),
-    ("主歌一", "G C", "扫", {}, [(0, "这一次呢｜我偏偏没挂")]),
-    ("主歌一", "G C G C G C", "轻扫", {}, [(0, "我妈咧嘴｜笑着看我"), (2, "好了好了｜好了好了"), (4, "今年股票｜赚了多少啊")]),
-    # 连接段对应原曲「…再一次 回到那个美丽世界里」：Am 一直到「回到」，之后进 C
-    ("连接段一", "Am Am Am C", "扫", {}, [(0, "我说股票没赚啥｜不过"), (2, "生活挺丰富｜赚钱的本事在涨")]),
-    ("连接段一", "- -", "停", {}, [(0, "（说）那对象？"), (1, "（说）找了没？")]),
-    ("副歌一", "G C G C G C", "切", {}, [(0, "妈妈妈妈妈妈｜聊完股票"), (2, "妈妈妈妈妈妈｜又聊对象"), (4, "妈妈妈妈妈妈｜同学要当爸")]),
-    ("副歌一", "G C G C", "轻扫", {}, [(0, "讲工作｜她只会｜嗯嗯嗯嗯"), (2, "讲到去读书｜她只会｜放空")]),
-    ("副歌一", "G C", "切", {}, [(0, "妈妈妈妈妈妈｜我越讲越急")]),
-    ("副歌一", "D D", "重扫", {}, [(0, "我差点又说挂了｜挂了")]),
-    ("副歌一", "G G", "重扫", {"rest": {1: 1}}, [(0, "这一次｜我咬着牙｜对自己说啊")]),
-    ("副歌一", "C C", "响", {}, [(0, "先别挂")]),
-    ("主歌二", "G C G C G C", "扫", {}, [(0, "我家隔壁｜就是麻将馆"), (2, "我说妈这｜就像打牌啊"), (4, "手里只有｜一个炸咋办")]),
-    ("主歌二", "G C", "扫", {"rest": {1: 2}}, [(0, "要是三个｜炸在手上")]),
-    ("主歌二", "G C G C", "重扫", {}, [(0, "她眼一亮｜对对对对对"), (2, "讲规划没话｜讲打牌抢答")]),
-    ("连接段二", "Am Am Am C", "扫", {}, [(0, "她又说起那同学｜可是"), (2, "日子紧｜家里都在｜替他担心呀")]),
-    ("连接段二", "- -", "停", {}, [(0, "（说）我一愣"), (1, "（说）Hold on, please")]),
-    ("副歌二", "G C G C G C", "切", {}, [(0, "妈妈妈妈妈妈｜同一个人"), (2, "妈妈妈妈妈妈｜刚才榜样"), (4, "妈妈妈妈妈妈｜现在要操心")]),
-    ("副歌二", "G C G C", "轻扫", {}, [(0, "人没换｜事没变｜换了说法"), (2, "难处你都懂｜刚才就｜没讲")]),
-    ("副歌二", "G C", "切", {}, [(0, "妈妈妈妈妈妈｜你接着讲啊")]),
-    ("副歌二", "D D G G", "扫", {"rest": {3: 1}}, [(0, "这一次换我追问｜追问"), (2, "差一点｜就错过了｜下半段故事")]),
-    ("副歌二", "C C", "响", {"vol": 0.7}, [(0, "先别挂")]),
-    ("桥段", "C Am C Am", "分解", {}, [(0, "有些话要｜聊到后面　喔～"), (2, "有些答案｜在下半场　喔～")]),
-    ("桥段", "-", "停", {}, [(0, "听她说完（半说半唱）")]),
-    ("桥段", "G G", "切", {"ramp": (0.6, 1.3)}, [(0, "先别挂了 先别挂了")]),
-    ("桥段", "C", "响", {}, [(0, "Hold on please")]),
-    ("桥段", "-", "停", {}, [(0, "（说，轻声）Hold on, please.")]),
-    ("尾段", "G C", "轻扫", {}, [(0, "她以后还会催吗")]),
-    ("尾段", "-", "停", {}, [(0, "（说）会啊")]),
-    ("尾段", "G C", "扫", {}, [(0, "这一回｜我们没有｜吵完就挂断")]),
-    ("尾段", "C C", "响", {}, [(0, "先别挂（结束）")]),
-]
+SONG = songsheet.parse(SONG_FILE.read_text(encoding="utf-8"))
+ROWS = [x for x in SONG["items"] if x["type"] == "line"]
+BPM = float(SONG["meta"]["速度"])
+CAPO = int(SONG["meta"]["夹品"])     # 和弦按 C 调指法写，整体升 CAPO 个半音
+BEATS_PER_BAR = int(SONG["meta"]["拍号"].split("/")[0])
 
 STYLE_GAIN = {"扫": 1.0, "重扫": 1.3, "轻扫": 0.6}
 STRUM_PATTERN = [(0, "下"), (2, "下"), (3, "上"), (5, "上"), (6, "下"), (7, "上")]  # 八分音符位置
@@ -76,7 +50,7 @@ FADE = int(0.015 * SR)
 
 BEAT = 60 / BPM
 BAR = BEAT * BEATS_PER_BAR
-N_BARS = sum(len(row[1].split()) for row in ARRANGEMENT)
+N_BARS = sum(len(row["chords"]) for row in ROWS)
 SONG_END = (1 + N_BARS) * BAR  # 含 1 小节预备拍
 PLUCK_SEC = 2 * BAR + TAIL_SEC + 0.5  # 单个音最长要响多久
 
@@ -137,28 +111,27 @@ def build_events():
     """返回 (事件列表, 制动时间点, 歌词时间表)。事件 end 为 None 表示响到下一个声音或制动点。"""
     events, damps, cues = [], [], []
     bar_no = 0
-    for section, chords, style, opts, lyrics in ARRANGEMENT:
-        chords = chords.split()
+    for row in ROWS:
+        chords, style, vol, ramp = row["chords"], row["style"], row["vol"], row["ramp"]
         row_start = (1 + bar_no) * BAR
         row_len = len(chords) * BAR
-        vol = opts.get("vol", 1.0)
-        for k, (i, text) in enumerate(lyrics):
-            nxt = lyrics[k + 1][0] if k + 1 < len(lyrics) else len(chords)
-            cues.append((row_start + i * BAR, bar_no + i + 1, section, " ".join(chords[i:nxt]), style, text))
+        cues.append((row_start, bar_no + 1, row["section"], " ".join(chords), style, row["lyric"]))
 
         def gain_at(t):
-            if "ramp" in opts:
-                a, b = opts["ramp"]
+            if ramp:
+                a, b = ramp
                 return vol * (a + (b - a) * (t - row_start) / row_len)
             return vol
 
         for j, name in enumerate(chords):
             t0 = row_start + j * BAR
-            if style == "停":
+            if style == "停" or name == "-":
                 damps.append(t0)
                 continue
+            if name not in CHORDS:
+                raise ValueError(f"song.txt 第 {row['line_no']} 行：还没有 {name} 和弦的音位，请加到 CHORDS")
             notes = CHORDS[name]
-            rest = opts.get("rest", {}).get(j, 0)
+            rest = row["rest"] if j == len(chords) - 1 else 0
             stop = t0 + (BEATS_PER_BAR - rest) * BEAT
             if rest:
                 damps.append(stop)
@@ -242,8 +215,8 @@ def fmt(t):
 
 def write_cues(path, cues):
     lines = [
-        "《九月九日，与母后Battle》练习伴奏 · 歌词时间表",
-        f"BPM {BPM}（暂定）· {BEATS_PER_BAR}/4 · 夹 {CAPO} 品（C 调指法）· 每小节 {BAR:.2f} 秒 · 共 {N_BARS} 小节",
+        f"《{SONG['meta']['标题']}》练习伴奏 · 歌词时间表",
+        f"BPM {BPM:g} · {BEATS_PER_BAR}/4 · 夹 {CAPO} 品（C 调指法）· 每小节 {BAR:.2f} 秒 · 共 {N_BARS} 小节",
         f"0:00.0 起是 1 小节预备拍（4 下滴答），第 1 小节从 {fmt(BAR)} 开始，全长约 {fmt(SONG_END + TAIL_SEC)}",
         "",
         "时间     小节  段落      和弦（本句每小节）  弹法  歌词",
@@ -264,7 +237,8 @@ def main():
     write_wav(OUT_DIR / "practice_track.wav", add_clicks(guitar.copy(), 1))
     write_wav(OUT_DIR / "practice_track_click.wav", add_clicks(guitar.copy(), 1 + N_BARS))
     write_cues(OUT_DIR / "cue_sheet.txt", cues)
-    print(f"BPM {BPM}，夹 {CAPO} 品，{N_BARS} 小节，全长 {fmt(len(guitar) / SR)}，输出到 {OUT_DIR}")
+    (OUT_DIR / "琴谱.html").write_text(songsheet.build_html(SONG_FILE.read_text(encoding="utf-8")), encoding="utf-8")
+    print(f"BPM {BPM:g}，夹 {CAPO} 品，{N_BARS} 小节，全长 {fmt(len(guitar) / SR)}，输出到 {OUT_DIR}")
 
 
 if __name__ == "__main__":

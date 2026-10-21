@@ -1,0 +1,659 @@
+<title>琴谱</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@900&display=swap">
+<style>
+/* 布局：单列提词器。当前行停在屏幕上方约三成处往下滚；底部一条控制栏，播放时自动收起 */
+:root {
+  --bg: #16130f;
+  --fg: #f3ecdf;
+  --dim: #8e8574;
+  --rule: #2e2920;
+  --chord: #f2b544;
+  --talk: #8cc7c1;
+  --hi: rgba(242, 181, 68, 0.11);
+  --panel: #211d17;
+  --warn: #ef8a6b;
+  --f-lyric: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --f-title: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --f-chord: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --size: 48px;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f8f4eb; --fg: #1c1813; --dim: #776d5c; --rule: #e0d7c4; --chord: #a9550a;
+    --talk: #23706a; --hi: rgba(169, 85, 10, 0.09); --panel: #fffdf7; --warn: #b4401f;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f8f4eb; --fg: #1c1813; --dim: #776d5c; --rule: #e0d7c4; --chord: #a9550a;
+  --talk: #23706a; --hi: rgba(169, 85, 10, 0.09); --panel: #fffdf7; --warn: #b4401f;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--f-lyric);
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--bg);
+}
+
+#progress {
+  position: fixed;
+  top: env(safe-area-inset-top, 0px);
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 5;
+  background: var(--rule);
+}
+#progress i { display: block; height: 100%; width: 0; background: var(--chord); }
+
+main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 44px 0;
+}
+.head { display: grid; gap: 10px; padding: 0 0.5rem 0.5rem; }
+.head h1 {
+  margin: 0;
+  font-family: var(--f-title);
+  font-weight: 900;
+  font-size: min(calc(var(--size) * 1.05), 9vw);
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.head p {
+  margin: 0;
+  color: var(--dim);
+  font-size: min(calc(var(--size) * 0.42), 4.4vw);
+  font-variant-numeric: tabular-nums;
+}
+.head .meta b { font-family: var(--f-chord); font-weight: 700; color: var(--chord); font-size: 1.2em; }
+
+.err {
+  margin: 1rem 0.5rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--warn);
+  border-radius: 8px;
+  color: var(--warn);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.sec {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  margin: 1.7em 0.5rem 0.35em;
+  font-size: min(calc(var(--size) * 0.4), 4.2vw);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+}
+.sec::after { content: ""; flex: 1; border-top: 1px solid var(--rule); }
+.note {
+  padding: 0.1em 0.5rem 0.3em;
+  color: var(--dim);
+  font-size: min(calc(var(--size) * 0.4), 4.2vw);
+}
+
+.line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  padding: 0.25em 0.5rem 0.4em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: opacity 0.3s, background-color 0.3s;
+}
+.lyric {
+  font-size: min(var(--size), 8.2vw);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.gap { display: inline-block; width: 0.6em; }
+.chords {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.05em 0.75em;
+  font-family: var(--f-chord);
+  font-weight: 700;
+  font-size: min(calc(var(--size) * 0.68), 6.4vw);
+  line-height: 1.15;
+  color: var(--chord);
+}
+.chords b { font-weight: inherit; padding: 0 0.16em; border-radius: 5px; }
+.chords .style {
+  font-family: var(--f-lyric);
+  font-size: 0.5em;
+  font-weight: 400;
+  color: var(--dim);
+}
+.above .chords { order: -1; }
+.no-style .chords .style, .talk .chords .style { display: none; }
+.no-notes .note { display: none; }
+.talk .lyric { color: var(--talk); font-weight: 400; }
+.talk .chords { color: var(--talk); font-family: var(--f-lyric); font-size: min(calc(var(--size) * 0.42), 4.4vw); }
+.line.past { opacity: 0.38; }
+.line.cur { background: var(--hi); }
+.line.cur .chords b.on { background: var(--chord); color: var(--bg); }
+.line.talk.cur .chords b.on { background: var(--talk); }
+.tail { height: 72vh; }
+
+#countin {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font-family: var(--f-chord);
+  font-weight: 700;
+  font-size: 34vmin;
+  color: var(--chord);
+  text-shadow: 0 0 48px var(--bg), 0 0 12px var(--bg);
+}
+
+#bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: 10px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  border-top: 1px solid var(--rule);
+  backdrop-filter: blur(8px);
+  font-size: 15px;
+  transition: transform 0.35s, opacity 0.35s;
+}
+#bar.away { transform: translateY(100%); opacity: 0; }
+button, .filebtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 12px;
+  font: inherit;
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover, .filebtn:hover { border-color: var(--dim); }
+button:focus-visible, select:focus-visible, input:focus-visible, .filebtn:focus-within {
+  outline: 2px solid var(--chord);
+  outline-offset: 2px;
+}
+button.primary { min-width: 96px; background: var(--chord); border-color: var(--chord); color: var(--bg); font-weight: 700; }
+button[aria-pressed="true"] { border-color: var(--chord); color: var(--chord); }
+.grp { display: inline-flex; align-items: center; gap: 4px; }
+.grp button { min-width: 40px; padding: 0 8px; }
+#bpm {
+  min-width: 4.4em;
+  text-align: center;
+  font-family: var(--f-chord);
+  font-size: 21px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+#clock { margin-left: auto; color: var(--dim); font-variant-numeric: tabular-nums; }
+
+#panel {
+  position: fixed;
+  z-index: 8;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: 76px;
+  width: min(360px, calc(100vw - 32px));
+  max-height: 70vh;
+  overflow: auto;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  font-size: 15px;
+}
+#panel label.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+#panel select {
+  font: inherit;
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+#panel input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--chord); }
+#panel .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.filebtn input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+#panel .keys { margin: 0; color: var(--dim); font-size: 13px; line-height: 1.9; }
+kbd {
+  font-family: var(--f-chord);
+  font-size: 14px;
+  padding: 0 5px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .line, #bar { transition: none; }
+}
+</style>
+
+<div id="progress"><i></i></div>
+<main>
+  <header class="head">
+    <h1 id="title"></h1>
+    <p class="meta" id="meta"></p>
+  </header>
+  <div id="lines"></div>
+  <div class="tail"></div>
+</main>
+<div id="countin" hidden></div>
+
+<nav id="bar" aria-label="播放控制">
+  <button id="play" class="primary" type="button"></button>
+  <button id="restart" type="button" title="回到开头（Home）" aria-label="回到开头">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h2v11H3zM13 2.5v11L6 8z" fill="currentColor"/></svg>
+  </button>
+  <div class="grp" title="速度（[ 和 ] 微调）">
+    <button id="slower" type="button" aria-label="减速">−</button>
+    <span id="bpm"></span>
+    <button id="faster" type="button" aria-label="加速">+</button>
+  </div>
+  <div class="grp" title="字号（- 和 =）">
+    <button id="smaller" type="button" aria-label="字小一点">A−</button>
+    <button id="bigger" type="button" aria-label="字大一点">A+</button>
+  </div>
+  <button id="metro" type="button" aria-pressed="false" title="节拍器（M）">节拍器</button>
+  <span id="clock"></span>
+  <button id="more" type="button" aria-expanded="false" aria-controls="panel">设置</button>
+</nav>
+
+<div id="panel" hidden>
+  <label class="row">和弦写在歌词上方 <input type="checkbox" id="opt-above"></label>
+  <label class="row">显示弹法（扫、切、响…） <input type="checkbox" id="opt-style"></label>
+  <label class="row">显示表演提示 <input type="checkbox" id="opt-notes"></label>
+  <label class="row">开始前数一小节 <input type="checkbox" id="opt-count"></label>
+  <label class="row">滚动方式
+    <select id="opt-mode"><option value="smooth">平滑滚动</option><option value="line">一句一跳</option></select>
+  </label>
+  <label class="row">配色
+    <select id="opt-theme"><option value="auto">跟随系统</option><option value="dark">深色</option><option value="light">浅色</option></select>
+  </label>
+  <div class="btns">
+    <button id="opt-full" type="button">全屏（F）</button>
+    <button id="opt-bpmreset" type="button"></button>
+    <label class="filebtn">打开别的歌谱 .txt<input type="file" id="opt-file" accept=".txt,text/plain"></label>
+    <button id="opt-reset" type="button" hidden>换回原来这首</button>
+  </div>
+  <p class="keys">
+    <kbd>空格</kbd> 开始 / 暂停　<kbd>↓</kbd><kbd>→</kbd><kbd>PgDn</kbd> 下一句　<kbd>↑</kbd><kbd>←</kbd><kbd>PgUp</kbd> 上一句<br>
+    <kbd>[</kbd><kbd>]</kbd> 速度　<kbd>-</kbd><kbd>=</kbd> 字号　<kbd>M</kbd> 节拍器　<kbd>F</kbd> 全屏　<kbd>Home</kbd> 回到开头<br>
+    点哪一句就跳到哪一句；播放中滚动鼠标会暂停。翻页踏板一般发送 PgDn / PgUp，可以直接用。
+  </p>
+</div>
+
+<script type="text/plain" id="song-src"><!--SONG--></script>
+<script>
+(() => {
+  // 歌谱格式和 music/songsheet.py 保持一致
+  const CHORD = /^(?:[A-G][#b]?(?:maj7|m7|m|7|sus2|sus4|add9|dim|aug|6|9)?(?:\/[A-G][#b]?)?|-)$/;
+  const STYLE = /^(重扫|轻扫|分解|扫|闷|切|响|停)((?:·\S+)*)$/;
+  const PLAY = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg>开始';
+  const PAUSE = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" fill="currentColor"/></svg>暂停';
+  const SAMPLE = "标题：把 song.txt 拖进来\n速度：90\n【示例】\nG C  扫  这里是第一句歌词\nAm C  这一句不写弹法，默认是扫\n-  停  （说）这是说话的地方";
+
+  const $ = s => document.querySelector(s);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("songsheet:" + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+    set(k, v) { try { localStorage.setItem("songsheet:" + k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem("songsheet:" + k); } catch {} },
+  };
+
+  function parseSong(text) {
+    const meta = { 标题: "未命名", 说明: "", 速度: "90", 夹品: "0", 拍号: "4/4" };
+    const items = [], errors = [];
+    let section = "", bar = 0;
+    text.split(/\r?\n/).forEach((raw, n) => {
+      const line = raw.trim();
+      if (!line || line.startsWith("#")) return;
+      let m = line.match(/^【(.+)】$/);
+      if (m) { section = m[1]; items.push({ type: "section", name: section }); return; }
+      if (line.startsWith(">")) { items.push({ type: "note", text: line.slice(1).trim() }); return; }
+      const parts = line.split(/\s+/);
+      let k = 0;
+      while (k < parts.length && CHORD.test(parts[k])) k++;
+      if (!k) {
+        m = line.match(/^(\S+?)[：:]\s*(.*)$/);
+        if (m && m[1] in meta) meta[m[1]] = m[2];
+        else errors.push(`第 ${n + 1} 行看不懂：${line}`);
+        return;
+      }
+      let rest = (line + " ").replace(new RegExp("^(?:\\S+\\s+){" + k + "}"), "").trim();
+      let style = "扫", mods = "";
+      const tok = rest.split(/\s+/)[0];
+      const sm = tok.match(STYLE);
+      if (sm) { style = sm[1]; mods = sm[2]; rest = rest.slice(tok.length).trim(); }
+      items.push({ type: "line", section, chords: parts.slice(0, k), style, mods, lyric: rest, bars: k, start: bar });
+      bar += k;
+    });
+    return { meta, items, errors, bars: bar, lines: items.filter(x => x.type === "line") };
+  }
+
+  const prefs = Object.assign(
+    { size: 48, metro: false, above: false, showStyle: false, showNotes: true, countIn: true, mode: "smooth", theme: "auto" },
+    store.get("prefs", {})
+  );
+  const st = { pos: 0, playing: false, countEnd: -Infinity, beat: 0, cur: -1, chord: -1, follow: false, last: performance.now() };
+  let song, defBpm, els = [], tops = [];
+
+  const raw = $("#song-src").textContent.trim();
+  const DEFAULT_SRC = raw === "<!--SONG-->" ? SAMPLE : raw;
+
+  const beats = () => parseInt(song.meta.拍号, 10) || 4;
+  const secPerBar = () => 60 / st.bpm * beats();
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+
+  function load(src) {
+    song = parseSong(src);
+    defBpm = Number(song.meta.速度) || 90;
+    st.bpm = store.get("bpm:" + song.meta.标题, defBpm);
+    st.pos = 0;
+    $("#opt-reset").hidden = src === DEFAULT_SRC;
+    render();
+  }
+
+  function render() {
+    document.title = song.meta.标题;
+    $("#title").textContent = song.meta.标题;
+    const out = [];
+    if (song.errors.length) out.push(`<div class="err">${song.errors.map(esc).join("<br>")}</div>`);
+    let i = 0;
+    for (const it of song.items) {
+      if (it.type === "section") out.push(`<div class="sec">${esc(it.name)}</div>`);
+      else if (it.type === "note") out.push(`<div class="note">${esc(it.text)}</div>`);
+      else {
+        const talk = it.style === "停";
+        const chords = it.chords.map(c => `<b>${c === "-" ? "停 · 说" : esc(c)}</b>`).join("");
+        const lyric = esc(it.lyric).replace(/｜/g, '<span class="gap"></span>');
+        out.push(`<div class="line${talk ? " talk" : ""}" data-i="${i++}"><div class="lyric">${lyric}</div>` +
+          `<div class="chords">${chords}<span class="style">${esc(it.style + it.mods)}</span></div></div>`);
+      }
+    }
+    $("#lines").innerHTML = out.join("");
+    els = [...document.querySelectorAll(".line")];
+    st.cur = st.chord = -1;
+    labels();
+    measure();
+    update(0);
+  }
+
+  function labels() {
+    const m = song.meta, capo = Number(m.夹品) || 0;
+    const parts = [`<b>♩ = ${st.bpm}</b>${st.bpm !== defBpm ? `（原 ${defBpm}）` : ""}`, esc(m.拍号)];
+    if (capo) parts.push(`夹 ${capo} 品`);
+    if (m.说明) parts.push(esc(m.说明));
+    $("#meta").innerHTML = parts.join("　·　");
+    $("#bpm").textContent = `♩ ${st.bpm}`;
+    $("#opt-bpmreset").textContent = `速度恢复 ${defBpm}`;
+    $("#play").innerHTML = st.playing ? PAUSE : PLAY;
+    $("#metro").setAttribute("aria-pressed", String(prefs.metro));
+  }
+
+  function measure() {
+    tops = els.map(e => e.getBoundingClientRect().top + scrollY);
+  }
+
+  function curIndex() {
+    const p = Math.max(st.pos, 0);
+    for (let i = song.lines.length - 1; i > 0; i--) if (song.lines[i].start <= p) return i;
+    return 0;
+  }
+
+  function update(dt) {
+    if (!song.lines.length) return;
+    const i = curIndex(), L = song.lines[i];
+    if (i !== st.cur) {
+      els.forEach((e, k) => { e.classList.toggle("cur", k === i); e.classList.toggle("past", k < i); });
+      st.cur = i;
+      st.chord = -1;
+    }
+    const within = clamp(st.pos - L.start, 0, L.bars - 1e-6);
+    const ci = Math.floor(within);
+    if (ci !== st.chord) {
+      document.querySelectorAll(".chords b.on").forEach(b => b.classList.remove("on"));
+      els[i].querySelectorAll(".chords b")[ci]?.classList.add("on");
+      st.chord = ci;
+    }
+    const total = song.bars || 1;
+    $("#progress i").style.width = `${clamp(st.pos / total, 0, 1) * 100}%`;
+    $("#clock").textContent = `${fmt(Math.max(st.pos, 0) * secPerBar())} / ${fmt(total * secPerBar())}`;
+
+    const counting = st.playing && st.pos < st.countEnd;
+    $("#countin").hidden = !counting;
+    if (counting) $("#countin").textContent = Math.ceil((st.countEnd - st.pos) * beats());
+
+    if (st.follow) {
+      const t0 = tops[i], t1 = i + 1 < tops.length ? tops[i + 1] : t0 + els[i].offsetHeight;
+      const frac = prefs.mode === "smooth" ? within / L.bars : 0;
+      const target = Math.max(0, t0 + (t1 - t0) * frac - innerHeight * 0.3);
+      const diff = target - scrollY;
+      if (Math.abs(diff) > 0.5) scrollTo(0, scrollY + diff * (dt ? Math.min(1, dt * 5) : 1));
+      else if (!st.playing) st.follow = false;
+    }
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.1, (now - st.last) / 1000);
+    st.last = now;
+    if (st.playing) {
+      st.pos += dt * st.bpm / 60 / beats();
+      const b = Math.floor(st.pos * beats());
+      if (b > st.beat) {
+        st.beat = b;
+        if (prefs.metro) tick(((b % beats()) + beats()) % beats() === 0);
+      }
+      if (st.pos >= song.bars) { st.pos = song.bars; setPlaying(false); }
+    }
+    update(dt);
+    requestAnimationFrame(frame);
+  }
+
+  function setPlaying(on) {
+    if (on === st.playing || !song.lines.length) return;
+    st.playing = on;
+    if (on) {
+      if (st.pos >= song.bars) st.pos = 0;
+      const L = song.lines[curIndex()];
+      if (prefs.countIn) { st.countEnd = L.start; st.pos = L.start - 1; } else st.countEnd = -Infinity;
+      st.beat = Math.ceil(st.pos * beats()) - 1;
+      st.follow = true;
+      audio();
+      wake(true);
+      armHide();
+    } else {
+      if (st.pos < st.countEnd) st.pos = st.countEnd;
+      st.countEnd = -Infinity;
+      wake(false);
+      showBar();
+    }
+    labels();
+  }
+
+  function go(i) {
+    if (!song.lines.length) return;
+    st.pos = song.lines[clamp(i, 0, song.lines.length - 1)].start;
+    st.countEnd = -Infinity;
+    st.beat = Math.ceil(st.pos * beats()) - 1;
+    st.follow = true;
+  }
+
+  function setBpm(v) {
+    st.bpm = clamp(Math.round(v), 30, 240);
+    if (st.bpm === defBpm) store.del("bpm:" + song.meta.标题);
+    else store.set("bpm:" + song.meta.标题, st.bpm);
+    labels();
+  }
+
+  function applyPrefs() {
+    const root = document.documentElement, body = document.body;
+    root.style.setProperty("--size", prefs.size + "px");
+    if (prefs.theme === "auto") root.removeAttribute("data-theme");
+    else root.setAttribute("data-theme", prefs.theme);
+    body.classList.toggle("above", prefs.above);
+    body.classList.toggle("no-style", !prefs.showStyle);
+    body.classList.toggle("no-notes", !prefs.showNotes);
+    $("#opt-above").checked = prefs.above;
+    $("#opt-style").checked = prefs.showStyle;
+    $("#opt-notes").checked = prefs.showNotes;
+    $("#opt-count").checked = prefs.countIn;
+    $("#opt-mode").value = prefs.mode;
+    $("#opt-theme").value = prefs.theme;
+    store.set("prefs", prefs);
+    if (song) { labels(); requestAnimationFrame(() => { measure(); st.follow = true; }); }
+  }
+  const setPref = (k, v) => { prefs[k] = v; applyPrefs(); };
+
+  // 节拍器：WebAudio 短促的滴答，第 1 拍高音
+  let ac;
+  function audio() {
+    try { ac = ac || new (window.AudioContext || window.webkitAudioContext)(); ac.resume(); } catch {}
+  }
+  function tick(accent) {
+    if (!ac) return;
+    const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = accent ? 1760 : 1175;
+    g.gain.setValueAtTime(accent ? 0.5 : 0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+    o.connect(g).connect(ac.destination);
+    o.start(t);
+    o.stop(t + 0.06);
+  }
+
+  // 播放时屏幕不熄
+  let lock;
+  async function wake(on) {
+    try {
+      if (on) lock = await navigator.wakeLock?.request("screen");
+      else { await lock?.release(); lock = null; }
+    } catch {}
+  }
+
+  let hideTimer;
+  function armHide() {
+    clearTimeout(hideTimer);
+    if (st.playing && $("#panel").hidden) hideTimer = setTimeout(() => $("#bar").classList.add("away"), 2500);
+  }
+  function showBar() { $("#bar").classList.remove("away"); armHide(); }
+
+  function togglePanel(open = $("#panel").hidden) {
+    $("#panel").hidden = !open;
+    $("#panel").style.bottom = $("#bar").offsetHeight + 8 + "px";
+    $("#more").setAttribute("aria-expanded", String(open));
+    showBar();
+  }
+
+  function fullscreen() {
+    try {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen?.().catch(() => {});
+    } catch {}
+  }
+
+  function openFile(f) {
+    f.text().then(t => { store.set("src", t); load(t); scrollTo(0, 0); });
+  }
+
+  $("#play").addEventListener("click", () => setPlaying(!st.playing));
+  $("#restart").addEventListener("click", () => go(0));
+  $("#slower").addEventListener("click", () => setBpm(st.bpm - 2));
+  $("#faster").addEventListener("click", () => setBpm(st.bpm + 2));
+  $("#smaller").addEventListener("click", () => setPref("size", clamp(prefs.size - 4, 24, 120)));
+  $("#bigger").addEventListener("click", () => setPref("size", clamp(prefs.size + 4, 24, 120)));
+  $("#metro").addEventListener("click", () => { audio(); setPref("metro", !prefs.metro); });
+  $("#more").addEventListener("click", () => togglePanel());
+  $("#opt-above").addEventListener("change", e => setPref("above", e.target.checked));
+  $("#opt-style").addEventListener("change", e => setPref("showStyle", e.target.checked));
+  $("#opt-notes").addEventListener("change", e => setPref("showNotes", e.target.checked));
+  $("#opt-count").addEventListener("change", e => setPref("countIn", e.target.checked));
+  $("#opt-mode").addEventListener("change", e => setPref("mode", e.target.value));
+  $("#opt-theme").addEventListener("change", e => setPref("theme", e.target.value));
+  $("#opt-full").addEventListener("click", fullscreen);
+  $("#opt-bpmreset").addEventListener("click", () => setBpm(defBpm));
+  $("#opt-file").addEventListener("change", e => { const f = e.target.files[0]; if (f) openFile(f); e.target.value = ""; });
+  $("#opt-reset").addEventListener("click", () => { store.del("src"); load(DEFAULT_SRC); scrollTo(0, 0); });
+  $("#lines").addEventListener("click", e => { const el = e.target.closest(".line"); if (el) go(Number(el.dataset.i)); });
+
+  document.addEventListener("pointerdown", e => {
+    if (!$("#panel").hidden && !e.target.closest("#panel, #more")) togglePanel(false);
+  });
+  document.addEventListener("pointerup", e => e.target.closest("button")?.blur());
+  addEventListener("mousemove", showBar);
+  const manual = e => {
+    if (e.target.closest?.("#panel")) return;
+    if (st.playing) setPlaying(false);
+    st.follow = false;
+  };
+  addEventListener("wheel", manual, { passive: true });
+  addEventListener("touchmove", manual, { passive: true });
+  addEventListener("resize", () => requestAnimationFrame(measure));
+  document.fonts?.ready.then(measure);
+  addEventListener("dragover", e => e.preventDefault());
+  addEventListener("drop", e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) openFile(f); });
+
+  addEventListener("keydown", e => {
+    if (e.target.closest("input, select, textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = e.key;
+    if (k === " " && e.target.closest("button")) return;
+    if (k === " ") setPlaying(!st.playing);
+    else if (["ArrowDown", "ArrowRight", "PageDown"].includes(k)) go(st.cur + 1);
+    else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(k)) go(st.cur - 1);
+    else if (k === "Home") go(0);
+    else if (k === "[") setBpm(st.bpm - 1);
+    else if (k === "]") setBpm(st.bpm + 1);
+    else if (k === "-") setPref("size", clamp(prefs.size - 4, 24, 120));
+    else if (k === "=" || k === "+") setPref("size", clamp(prefs.size + 4, 24, 120));
+    else if (k === "m" || k === "M") { audio(); setPref("metro", !prefs.metro); }
+    else if (k === "f" || k === "F") fullscreen();
+    else if (k === "Escape") togglePanel(false);
+    else return;
+    e.preventDefault();
+    showBar();
+  });
+
+  applyPrefs();
+  load(store.get("src", null) || DEFAULT_SRC);
+  requestAnimationFrame(frame);
+})();
+</script>
