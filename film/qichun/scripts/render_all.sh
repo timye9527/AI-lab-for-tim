@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 N=${1:-1}
-DUR=$(node -e "import('./scene/story.js').then(m=>console.log(m.DURATION))")
+DUR=$(node -e "console.log(require('./data/audio/timeline.json').duration)")
 mkdir -p out/parts
 : > out/parts/list.txt
 pids=()
@@ -15,7 +15,8 @@ for i in $(seq 0 $((N - 1))); do
   echo "file 'p$i.mp4'" >> out/parts/list.txt
 done
 for p in "${pids[@]}"; do wait "$p"; done
-[ -f out/music.wav ] || python3 scripts/music.py "$DUR" out/music.wav
-ffmpeg -y -loglevel error -f concat -safe 0 -i out/parts/list.txt -i out/music.wav \
+AUDIO=data/audio/mix.wav
+[ -f "$AUDIO" ] || { echo "缺少 $AUDIO，先跑 npm run audio"; exit 1; }
+ffmpeg -y -loglevel error -f concat -safe 0 -i out/parts/list.txt -i "$AUDIO" \
   -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart out/qichun.mp4
 echo "done out/qichun.mp4"

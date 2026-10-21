@@ -1,65 +1,59 @@
-/* 画面固定 1920×1080，渲染时按这个尺寸截图 */
+/* 画面固定 1920×1080；上下黑边做成 2.35:1 的电影画幅，字幕放在下黑边里 */
 :root {
   --ink: #f4e7cf;
-  --dim: rgba(244, 231, 207, .62);
+  --dim: rgba(244, 231, 207, .6);
   --gold: #ffd89a;
-  --bg: #0c0a08;
+  --bg: #050403;
   --serif: 'Noto Serif SC', serif;
+  --brush: 'Ma Shan Zheng', 'Noto Serif SC', serif;
   --sans: 'Noto Sans SC', 'WenQuanYi Zen Hei', sans-serif;
+  --bar: 132px;
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { background: var(--bg); overflow: hidden; }
-#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; color: var(--ink); font-family: var(--sans); }
-#gl { position: absolute; inset: 0; width: 1920px; height: 1080px; display: block; }
-#vignette { position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(ellipse 75% 70% at 50% 52%, transparent 55%, rgba(8,6,4,.72) 100%),
-              linear-gradient(to bottom, rgba(8,6,4,.55), transparent 16%, transparent 78%, rgba(8,6,4,.7)); }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; color: var(--ink); font-family: var(--sans); background: var(--bg); }
+#layers canvas { position: absolute; inset: 0; width: 1920px; height: 1080px; display: none; }
+#vignette { position: absolute; inset: 0; pointer-events: none; z-index: 20;
+  background: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(5,4,3,.55) 100%); }
+#grain { position: absolute; inset: 0; pointer-events: none; z-index: 40; opacity: .07; mix-blend-mode: overlay; }
 
-/* 片尾压暗，保证署名可读 */
-#endshade { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse 70% 60% at 50% 55%, rgba(8,6,4,.78), rgba(8,6,4,.6)); }
+#lb-top, #lb-bot { position: absolute; left: 0; right: 0; height: var(--bar); background: #000; z-index: 50; }
+#lb-top { top: 0; }
+#lb-bot { bottom: 0; }
+#header { position: absolute; left: 96px; top: 46px; transition: none; }
+#header b { font: 500 24px/1 var(--sans); letter-spacing: .16em; margin-right: 18px; }
+#header span { font: 400 16px/1 var(--sans); color: var(--dim); letter-spacing: .08em; }
+#eras { position: absolute; right: 96px; top: 50px; display: flex; gap: 34px; font: 400 17px/1 var(--serif); color: rgba(244,231,207,.32); letter-spacing: .1em; }
+#eras span.on { color: var(--gold); text-shadow: 0 0 12px rgba(255,216,154,.6); }
 
-#header { position: absolute; left: 96px; top: 70px; }
-#header b { display: block; font: 500 30px/1.2 var(--sans); letter-spacing: .12em; }
-#header span { display: block; margin-top: 8px; font: 400 17px/1 var(--sans); color: var(--dim); letter-spacing: .04em; }
-
-#timeline { position: absolute; left: 700px; right: 300px; top: 64px; height: 70px; }
-#timeline .track { position: absolute; left: 0; right: 0; top: 40px; height: 1px; background: rgba(244,231,207,.35); }
-#timeline .marks span { position: absolute; top: 47px; transform: translateX(-50%); font: 400 15px/1.3 var(--sans); color: var(--dim); text-align: center; white-space: nowrap; }
-#timeline .marks span::before { content: ''; position: absolute; left: 50%; top: -11px; width: 1px; height: 8px; background: rgba(244,231,207,.5); }
-#timeline .cursor { position: absolute; top: 0; transform: translateX(-50%); text-align: center; white-space: nowrap; }
-#timeline .cursor b { display: block; font: 500 22px/1 var(--sans); color: var(--gold); letter-spacing: .1em; }
-#timeline .cursor i { position: absolute; left: 50%; top: 33px; width: 10px; height: 10px; margin-left: -5px; transform: rotate(45deg); background: var(--gold); box-shadow: 0 0 14px var(--gold); }
-#timeline .cursor span { display: none; }
-
-#year { position: absolute; left: 96px; top: 380px; }
-#year b { display: block; font: 600 112px/1 var(--serif); color: var(--ink); text-shadow: 0 4px 30px rgba(0,0,0,.6); letter-spacing: .02em; }
-#year span { display: block; margin-top: 14px; font: 400 22px/1 var(--sans); color: var(--dim); letter-spacing: .08em; }
-
-#title { position: absolute; left: 0; right: 0; top: 330px; text-align: center; }
-#title h1 { font: 600 132px/1 var(--serif); letter-spacing: .32em; text-indent: .32em; text-shadow: 0 6px 40px rgba(0,0,0,.7); }
-#title h2 { margin-top: 26px; font: 400 30px/1 var(--sans); letter-spacing: .3em; color: var(--dim); }
-#title p { margin-top: 40px; font: 500 30px/1 var(--sans); letter-spacing: .3em; }
-#title p.en { margin-top: 14px; font: 400 20px/1 var(--sans); letter-spacing: .1em; color: var(--dim); }
-
-#sub { position: absolute; left: 0; right: 0; bottom: 92px; text-align: center; text-shadow: 0 2px 12px rgba(0,0,0,.85), 0 0 2px rgba(0,0,0,.8); }
-#sub .zh { font: 500 40px/1.3 var(--sans); letter-spacing: .06em; }
-#sub .en { margin-top: 10px; font: 400 23px/1.3 var(--sans); color: rgba(244,231,207,.82); }
-#sub .src { margin-top: 12px; font: 400 16px/1 var(--sans); color: rgba(255,216,154,.7); letter-spacing: .04em; }
+#sub { position: absolute; left: 0; right: 0; top: 18px; text-align: center; }
+#sub .zh { font: 500 33px/1.25 var(--sans); letter-spacing: .06em; }
+#sub .en { margin-top: 7px; font: 400 19px/1.25 var(--sans); color: rgba(244,231,207,.7); }
+#sub .src { margin-top: 7px; font: 400 14px/1 var(--sans); color: rgba(255,216,154,.55); letter-spacing: .04em; }
 #sub .src:empty { display: none; }
 
-#labels { position: absolute; inset: 0; pointer-events: none; }
+#labels { position: absolute; inset: 0; pointer-events: none; z-index: 22; }
 .lab { position: absolute; left: 0; top: 0; }
 .lab .dot { position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 0 4px rgba(255,216,154,.25), 0 0 22px var(--gold); }
 .lab .stem { position: absolute; left: -.5px; bottom: 0; width: 1px; height: 90px; background: linear-gradient(to top, var(--gold), rgba(255,216,154,.2)); }
-.lab .box { position: absolute; left: 14px; bottom: 74px; padding: 10px 16px 11px; background: rgba(14,11,8,.72); border-left: 2px solid var(--gold); white-space: nowrap; backdrop-filter: blur(2px); }
+.lab .box { position: absolute; left: 14px; bottom: 74px; padding: 10px 16px 11px; background: rgba(14,11,8,.72); border-left: 2px solid var(--gold); white-space: nowrap; }
 .lab .box b { display: block; font: 500 26px/1.2 var(--sans); }
 .lab .box span { display: block; margin-top: 4px; font: 400 15px/1.2 var(--sans); color: var(--dim); }
 
-#counter { position: absolute; right: 110px; bottom: 260px; text-align: right; }
-#counter b { display: block; font: 600 92px/1 var(--serif); color: var(--gold); font-variant-numeric: tabular-nums; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+#year { position: absolute; left: 110px; top: 330px; z-index: 23; }
+#year b { display: block; font: 600 120px/1 var(--serif); text-shadow: 0 4px 30px rgba(0,0,0,.6); }
+#year span { display: block; margin-top: 14px; font: 400 22px/1 var(--sans); color: var(--dim); letter-spacing: .1em; }
+#counter { position: absolute; right: 120px; bottom: 210px; text-align: right; z-index: 23; }
+#counter b { display: block; font: 600 96px/1 var(--serif); color: var(--gold); font-variant-numeric: tabular-nums; text-shadow: 0 4px 30px rgba(0,0,0,.6); }
 #counter span { display: block; margin-top: 10px; font: 400 22px/1 var(--sans); color: var(--dim); letter-spacing: .1em; }
 
-#credits { position: absolute; left: 0; right: 0; top: 640px; text-align: center; font: 400 19px/1.9 var(--sans); color: var(--dim); }
-#credits div:first-child { color: var(--ink); font-size: 22px; letter-spacing: .2em; margin-bottom: 8px; }
-
-#datatag { position: absolute; left: 96px; bottom: 34px; font: 400 14px/1 var(--sans); color: rgba(244,231,207,.42); letter-spacing: .03em; }
+/* 片名写在宣纸上，用墨色 */
+#title { position: absolute; left: 0; right: 0; top: 300px; text-align: center; z-index: 30; color: #1b1611; transition: none; }
+#title.up { top: 250px; }
+#title h1 { font: 400 168px/1 var(--brush); letter-spacing: .12em; text-indent: .12em; }
+#title h2 { margin-top: 18px; font: 400 26px/1 var(--serif); letter-spacing: .34em; color: rgba(27,22,17,.6); }
+#title p { margin-top: 30px; font: 400 30px/1 var(--serif); letter-spacing: .5em; text-indent: .5em; color: #9e2c24; }
+#title p.en { margin-top: 12px; font: 400 18px/1 var(--serif); letter-spacing: .2em; color: rgba(27,22,17,.5); }
+#credits { position: absolute; left: 260px; right: 260px; top: 610px; padding: 26px 0 30px; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(236,226,204,.94) 45%, rgba(236,226,204,0) 72%); text-align: center; z-index: 30; font: 400 17px/1.9 var(--serif); color: rgba(27,22,17,.68); }
+#credits div:first-child { color: #1b1611; font-size: 20px; letter-spacing: .3em; margin-bottom: 6px; }

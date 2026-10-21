@@ -5,17 +5,20 @@
   "scripts": {
     "data": "python3 scripts/fetch_overture.py data/raw county water roads rail places buildings && python3 scripts/boundary.py data/raw && python3 scripts/fetch_terrain.py data/raw",
     "assets": "python3 scripts/build_assets.py data/raw data/assets",
-    "music": "python3 scripts/music.py 156 out/music.wav",
     "serve": "node scripts/serve.mjs",
     "stills": "node scripts/render.mjs --still 5,18,33,45,60,72,90,105,118,128,136,142,150",
-    "render": "bash scripts/render_all.sh"
+    "render": "bash scripts/render_all.sh",
+    "voice": "python3 scripts/tts.py data/models/kokoro scene/voiceover.json data/audio/vo && node scripts/timeline.mjs data/audio/vo/vo.json scene/voiceover.json data/audio/timeline.json",
+    "audio": "python3 scripts/score.py data/audio/timeline.json data/audio/GeneralUser-GS.sf2 data/audio && python3 scripts/mix.py data/audio/timeline.json data/audio data/audio/mix.wav"
   },
   "dependencies": {
     "three": "0.169.0"
   },
   "devDependencies": {
+    "@fontsource/ma-shan-zheng": "^5.3.1",
     "@fontsource/noto-sans-sc": "^5.2.5",
     "@fontsource/noto-serif-sc": "^5.2.5",
+    "@fontsource/noto-serif-tc": "^5.3.1",
     "playwright-core": "1.56"
   }
 }

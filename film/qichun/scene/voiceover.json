@@ -1,0 +1,183 @@
+{
+ "voice": "zm_yunjian",
+ "speed": 0.86,
+ "lines": [
+  {
+   "id": "hook1",
+   "text": "有一种草，叫蕲艾。有一条河，叫蕲水。有一个人，叫李时珍。",
+   "sub": "有一种草，叫蕲艾。有一条河，叫蕲水。有一个人，叫李时珍。",
+   "en": "A herb called Qi'ai. A river called the Qi. A man named Li Shizhen."
+  },
+  {
+   "id": "hook2",
+   "text": "他们，都来自湖北蕲春。",
+   "sub": "他们，都来自湖北蕲春。",
+   "en": "All of them come from Qichun, Hubei."
+  },
+  {
+   "id": "geo1",
+   "text": "这里北依大别山，南临长江。两千三百九十八平方公里，山地、丘陵、湖泊，由北向南铺开。",
+   "sub": "北依大别山，南临长江。2398 平方公里，山地、丘陵、湖泊，由北向南铺开。",
+   "en": "Backed by the Dabie Mountains, facing the Yangtze: 2,398 km² of mountains, hills and lakes.",
+   "src": "面积：生态环境部，2023-01"
+  },
+  {
+   "id": "geo2",
+   "text": "蕲水从大别山深处流出，一路向西南，汇入长江。",
+   "sub": "蕲水从大别山深处流出，一路向西南，汇入长江。",
+   "en": "The Qi River leaves the mountains and runs south-west into the Yangtze.",
+   "src": "水系：Overture Maps / OpenStreetMap"
+  },
+  {
+   "id": "zhou1",
+   "text": "三千年前的西周，蕲水岸边，已经立起成片的木构房屋。",
+   "sub": "三千年前的西周，蕲水岸边，已经立起成片的木构房屋。",
+   "en": "Three thousand years ago, in the Western Zhou, timber houses stood along the Qi.",
+   "src": "《考古》1962 年第 1 期《湖北蕲春毛家咀西周木构建筑》"
+  },
+  {
+   "id": "zhou2",
+   "text": "一九五八年，考古工作者在毛家嘴，找到了它们留下的木桩和木板墙。",
+   "sub": "1958 年，考古工作者在毛家咀，找到了它们留下的木桩和木板墙。",
+   "en": "In 1958, archaeologists at Maojiazui uncovered their wooden piles and plank walls.",
+   "src": "毛家咀遗址，第七批全国重点文物保护单位（2013）"
+  },
+  {
+   "id": "han1",
+   "text": "西汉，蕲春二字，写进了《汉书·地理志》。",
+   "sub": "西汉，「蕲春」二字，写进了《汉书·地理志》。",
+   "en": "By the Western Han, the name Qichun was written into the Book of Han.",
+   "src": "《汉书·地理志》江夏郡"
+  },
+  {
+   "id": "tang1",
+   "text": "唐代，这里的竹子名满天下。白居易写下：笛竹出蕲春。",
+   "sub": "唐代，这里的竹子名满天下。白居易写下：「笛竹出蕲春」。",
+   "en": "In the Tang, its bamboo was famed. Bai Juyi wrote: \"Flute bamboo comes from Qichun.\"",
+   "src": "白居易《寄蕲州簟与元九因题六韵》"
+  },
+  {
+   "id": "tang2",
+   "text": "他把蕲竹编成的竹席，寄给远方的好友元稹。",
+   "sub": "他把蕲竹编成的竹席，寄给远方的好友元稹。",
+   "en": "He sent a mat woven from it to his friend Yuan Zhen, far away.",
+   "src": "汉典「蕲簟」"
+  },
+  {
+   "id": "qz1",
+   "text": "长江边的蕲州城，做了一千多年的州治。",
+   "sub": "长江边的蕲州城，做了一千多年的州治。",
+   "en": "Qizhou, on the Yangtze, was a prefectural seat for more than a thousand years.",
+   "src": "蕲州：6 世纪至 1912 年"
+  },
+  {
+   "id": "qz2",
+   "text": "明正统十年，荆王府从江西建昌，迁到这里。",
+   "sub": "明正统十年（1445），荆王府从江西建昌迁到这里。",
+   "en": "In 1445, the Prince of Jing moved his court here from Jianchang.",
+   "src": "《明英宗实录》；CBDB；ctext"
+  },
+  {
+   "id": "li1",
+   "text": "一五一八年，李时珍出生在蕲州。父亲李言闻，是当地有名的医生。",
+   "sub": "1518 年，李时珍出生在蕲州。父亲李言闻，是当地有名的医生。",
+   "en": "In 1518, Li Shizhen was born in Qizhou, son of the noted local physician Li Yanwen.",
+   "src": "UNESCO 世界记忆项目；李言闻：地方文史报道"
+  },
+  {
+   "id": "li2",
+   "text": "他翻检历代典籍，也亲自上山，辨认草木。",
+   "sub": "他翻检历代典籍，也亲自上山，辨认草木。",
+   "en": "He combed through the classics, and went into the hills to know the plants himself."
+  },
+  {
+   "id": "li3",
+   "text": "二十七年，写成《本草纲目》。五十二卷，一千八百九十二种药物。",
+   "sub": "27 年，写成《本草纲目》：52 卷，1892 种药物。",
+   "en": "Twenty-seven years: the Bencao Gangmu. 52 volumes, 1,892 medicinal substances.",
+   "src": "UNESCO；通行统计"
+  },
+  {
+   "id": "li4",
+   "text": "书里写到家乡的艾：自成化以来，则以蕲州者唯胜，天下重之，谓之蕲艾。",
+   "sub": "书里写到家乡的艾：「自成化以来，则以蕲州者为胜……天下重之，谓之蕲艾。」",
+   "en": "Of mugwort he wrote: since the Chenghua era, Qizhou's has been the finest — prized as Qi'ai.",
+   "src": "《本草纲目·草部·艾》"
+  },
+  {
+   "id": "li5",
+   "text": "二零一一年，《本草纲目》入选联合国教科文组织《世界记忆名录》。",
+   "sub": "2011 年，《本草纲目》入选联合国教科文组织《世界记忆名录》。",
+   "en": "In 2011, it entered UNESCO's Memory of the World Register.",
+   "src": "UNESCO Memory of the World, 2011"
+  },
+  {
+   "id": "folk1",
+   "text": "蕲春人说，这里有四宝：蕲艾、蕲竹、蕲蛇、蕲龟。",
+   "sub": "蕲春人说，这里有四宝：蕲艾、蕲竹、蕲蛇、蕲龟。",
+   "en": "Locals speak of four treasures: Qi mugwort, Qi bamboo, Qi snake and Qi turtle.",
+   "src": "民间说法；澎湃新闻 2024"
+  },
+  {
+   "id": "folk2",
+   "text": "端午前后，正是采艾的时节。民谚说：清明插柳，端午插艾。",
+   "sub": "端午前后，正是采艾的时节。民谚说：「清明插柳，端午插艾。」",
+   "en": "Duanwu is mugwort season. As the saying goes: willow at Qingming, mugwort at Duanwu.",
+   "src": "民谚：人民网"
+  },
+  {
+   "id": "folk3",
+   "text": "一根艾条，一缕青烟。二零二一年，蕲春艾灸疗法，列入国家级非物质文化遗产。",
+   "sub": "一根艾条，一缕青烟。2021 年，「蕲春艾灸疗法」列入国家级非物质文化遗产。",
+   "en": "One moxa stick, one wisp of smoke. In 2021, Qichun moxibustion became national intangible heritage.",
+   "src": "中国非物质文化遗产网，第五批国家级名录"
+  },
+  {
+   "id": "folk4",
+   "text": "在管窑镇，拉坯的手艺代代相传。明代洪武年间，这里有大小窑场近百座。",
+   "sub": "在管窑镇，拉坯的手艺代代相传。明代洪武年间，这里有大小窑场近百座。",
+   "en": "In Guanyao, the potter's wheel turns down the generations; in the early Ming, nearly a hundred kilns burned here.",
+   "src": "澎湃新闻；蕲春县文旅"
+  },
+  {
+   "id": "ppl1",
+   "text": "这片土地，也走出了国学大师黄侃，和文艺理论家胡风。",
+   "sub": "这片土地，也走出了国学大师黄侃，和文艺理论家胡风。",
+   "en": "This land also raised the scholar Huang Kan, and the literary theorist Hu Feng.",
+   "src": "Wikipedia「Huang Kan」；汉典「胡风」"
+  },
+  {
+   "id": "now1",
+   "text": "二零二二年，黄黄高铁开通，蕲春迈入高铁时代。",
+   "sub": "2022 年，黄黄高铁开通，蕲春迈入高铁时代。",
+   "en": "In 2022, the Huanggang–Huangmei high-speed line opened, and Qichun joined the bullet-train age.",
+   "src": "中新网 2022-04-22；凤凰网"
+  },
+  {
+   "id": "now2",
+   "text": "一株蕲艾，连起四百多家企业，带动十五万人就业增收。",
+   "sub": "一株蕲艾，连起 400 多家企业，带动 15 万人就业增收。",
+   "en": "One herb now links more than 400 companies and 150,000 livelihoods.",
+   "src": "新华社，2024-10"
+  },
+  {
+   "id": "now3",
+   "text": "卫星影像里，十万多栋房屋，沿着河流与道路铺展开来。",
+   "sub": "卫星影像里，十万多栋房屋，沿着河流与道路铺展开来。",
+   "en": "From orbit, over a hundred thousand buildings spread along its rivers and roads.",
+   "src": "Shi et al. 2023 / Overture Maps，县界内 105,329 栋"
+  },
+  {
+   "id": "end1",
+   "text": "从西周的木构，到今天的高铁。三千年过去，蕲水依旧长流。",
+   "sub": "从西周的木构，到今天的高铁。三千年过去，蕲水依旧长流。",
+   "en": "From Zhou timber halls to high-speed rail: three thousand years on, the Qi still flows."
+  },
+  {
+   "id": "end2",
+   "text": "这里是蕲春。欢迎你来。",
+   "sub": "这里是蕲春。欢迎你来。",
+   "en": "This is Qichun. You are welcome here."
+  }
+ ]
+}

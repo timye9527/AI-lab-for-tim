@@ -3,7 +3,10 @@
 <head>
 <meta charset="utf-8">
 <title>蕲水长流</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/400.css">
 <link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-tc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/ma-shan-zheng/400.css">
 <link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/400.css">
 <link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
 <link rel="stylesheet" href="/scene/style.css">
@@ -11,18 +14,16 @@
 </head>
 <body>
 <div id="stage">
-  <canvas id="gl"></canvas>
+  <div id="layers"></div>
   <div id="vignette"></div>
-  <div id="endshade"></div>
   <div id="labels"></div>
-  <div id="header"><b></b><span></span></div>
-  <div id="timeline"><div class="track"></div><div class="marks"></div><div class="cursor"><i></i><b></b><span></span></div></div>
   <div id="year"><b></b><span></span></div>
+  <div id="counter"><b></b><span>栋建筑 · buildings</span></div>
   <div id="title"><h1></h1><h2></h2><p></p><p class="en"></p></div>
-  <div id="sub"><p class="zh"></p><p class="en"></p><p class="src"></p></div>
-  <div id="counter"><b></b><span></span></div>
   <div id="credits"></div>
-  <div id="datatag">建筑 Shi et al. 2023 · Overture Maps · © OpenStreetMap contributors · AWS Terrain Tiles</div>
+  <div id="grain"></div>
+  <div id="lb-top"><div id="header"><b>湖北 · 蕲春</b><span>大别山南麓 · 长江北岸</span></div><div id="eras"></div></div>
+  <div id="lb-bot"><div id="sub"><p class="zh"></p><p class="en"></p><p class="src"></p></div></div>
 </div>
 <script type="module" src="/scene/film.js"></script>
 </body>
