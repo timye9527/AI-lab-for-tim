@@ -376,6 +376,7 @@ async function main() {
     show('#title', Math.max(tIn, tEnd));
     $('#title').style.top = tEnd > 0 ? '250px' : '330px';
     show('#credits', tEnd);
+    show('#endshade', tEnd);
     show('#header', fade(t, 9.5, 145, 1.0));
     show('#datatag', 1 - tEnd);
 
