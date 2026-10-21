@@ -115,7 +115,7 @@ def build_events():
         chords, style, vol, ramp = row["chords"], row["style"], row["vol"], row["ramp"]
         row_start = (1 + bar_no) * BAR
         row_len = len(chords) * BAR
-        cues.append((row_start, bar_no + 1, row["section"], " ".join(chords), style, row["lyric"]))
+        cues.append((row_start, bar_no + 1, row["section"], " ".join(chords), style, songsheet.plain_lyric(row["lyric"])))
 
         def gain_at(t):
             if ramp:

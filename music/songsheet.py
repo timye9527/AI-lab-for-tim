@@ -59,6 +59,11 @@ def parse(text):
     return {"meta": meta, "items": items}
 
 
+def plain_lyric(lyric):
+    """给表演者看的纯文本：去掉 [和弦] 标记，{提示} 换成（提示）。"""
+    return re.sub(r"\{([^}]*)\}", r"（\1）", re.sub(r"\[[^\]]+\]", "", lyric))
+
+
 def build_html(text, bare=False):
     title = parse(text)["meta"]["标题"]  # 顺便校验格式
     assert "</script" not in text.lower()

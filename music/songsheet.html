@@ -121,40 +121,38 @@ main {
   cursor: pointer;
   transition: opacity 0.3s, background-color 0.3s;
 }
+/* 一句歌词切成若干块，每块上面是和弦、下面是从这个字开始的歌词 */
 .lyric {
   font-size: min(var(--size), 8.2vw);
   font-weight: 700;
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
-.gap { display: inline-block; width: 0.6em; }
-.chords {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.05em 0.75em;
+.ck { display: inline-flex; flex-direction: column; vertical-align: bottom; max-width: 100%; }
+.cd {
+  align-self: flex-start;
+  min-height: 1.15em;
+  padding: 0 0.32em 0 0.06em;
+  border-radius: 5px;
   font-family: var(--f-chord);
   font-weight: 700;
-  font-size: min(calc(var(--size) * 0.68), 6.4vw);
+  font-size: 0.66em;
   line-height: 1.15;
   color: var(--chord);
 }
-.chords b { font-weight: inherit; padding: 0 0.16em; border-radius: 5px; }
-.chords .style {
-  font-family: var(--f-lyric);
-  font-size: 0.5em;
-  font-weight: 400;
-  color: var(--dim);
-}
-.above .chords { order: -1; }
-.no-style .chords .style, .talk .chords .style { display: none; }
-.no-notes .note { display: none; }
-.talk .lyric { color: var(--talk); font-weight: 400; }
-.talk .chords { color: var(--talk); font-family: var(--f-lyric); font-size: min(calc(var(--size) * 0.42), 4.4vw); }
+.no-chords .cd { display: none; }
+.tx:empty { min-width: 1.6em; }
+.gap { display: inline-block; width: 0.6em; }
+.cue, .style { font-weight: 400; color: var(--dim); font-size: 0.5em; }
+.style { margin-left: 0.6em; }
+.no-notes .note, .no-notes .cue, .no-notes .style { display: none; }
+.talk .tx { color: var(--talk); font-weight: 400; }
 .line.past { opacity: 0.38; }
 .line.cur { background: var(--hi); }
-.line.cur .chords b.on { background: var(--chord); color: var(--bg); }
-.line.talk.cur .chords b.on { background: var(--talk); }
+.line.cur .cd.on { background: var(--chord); color: var(--bg); }
+.reveal .later { visibility: hidden; opacity: 0; pointer-events: none; }
+.line, .sec, .note { transition: opacity 0.45s, visibility 0.45s, background-color 0.3s; }
+.instant .line, .instant .sec, .instant .note { transition: none; }
 .tail { height: 72vh; }
 
 #countin {
@@ -299,9 +297,9 @@ kbd {
 </nav>
 
 <div id="panel" hidden>
-  <label class="row">和弦写在歌词上方 <input type="checkbox" id="opt-above"></label>
-  <label class="row">显示弹法（扫、切、响…） <input type="checkbox" id="opt-style"></label>
-  <label class="row">显示表演提示 <input type="checkbox" id="opt-notes"></label>
+  <label class="row">逐行显示（后面的歌词先藏起来） <input type="checkbox" id="opt-reveal"></label>
+  <label class="row">显示和弦 <input type="checkbox" id="opt-chords"></label>
+  <label class="row">显示表演提示（只给自己看） <input type="checkbox" id="opt-notes"></label>
   <label class="row">开始前数一小节 <input type="checkbox" id="opt-count"></label>
   <label class="row">滚动方式
     <select id="opt-mode"><option value="smooth">平滑滚动</option><option value="line">一句一跳</option></select>
@@ -318,7 +316,7 @@ kbd {
   <p class="keys">
     <kbd>空格</kbd> 开始 / 暂停　<kbd>↓</kbd><kbd>→</kbd><kbd>PgDn</kbd> 下一句　<kbd>↑</kbd><kbd>←</kbd><kbd>PgUp</kbd> 上一句<br>
     <kbd>[</kbd><kbd>]</kbd> 速度　<kbd>-</kbd><kbd>=</kbd> 字号　<kbd>M</kbd> 节拍器　<kbd>F</kbd> 全屏　<kbd>Home</kbd> 回到开头<br>
-    点哪一句就跳到哪一句；播放中滚动鼠标会暂停。翻页踏板一般发送 PgDn / PgUp，可以直接用。
+    点哪一句就跳到哪一句；播放中滚动鼠标会暂停。逐行显示时，后面的歌词要播到或按 ↓ 才出现。翻页踏板一般发送 PgDn / PgUp，可以直接用。
   </p>
 </div>
 
@@ -370,11 +368,11 @@ kbd {
   }
 
   const prefs = Object.assign(
-    { size: 48, metro: false, above: false, showStyle: false, showNotes: true, countIn: true, mode: "smooth", theme: "auto" },
-    store.get("prefs", {})
+    { size: 48, metro: false, reveal: true, chords: true, showNotes: false, countIn: true, mode: "smooth", theme: "auto" },
+    store.get("prefs2", {})
   );
   const st = { pos: 0, playing: false, countEnd: -Infinity, beat: 0, cur: -1, chord: -1, follow: false, last: performance.now() };
-  let song, defBpm, els = [], tops = [];
+  let song, defBpm, els = [], blocks = [], tops = [];
 
   const raw = $("#song-src").textContent.trim();
   const DEFAULT_SRC = raw === "<!--SONG-->" ? SAMPLE : raw;
@@ -394,6 +392,69 @@ kbd {
     render();
   }
 
+  // 歌词里：[Am] 指定和弦落在哪个字；{…} 是表演提示；｜ 是换气
+  function tokens(lyric) {
+    const out = [];
+    const re = /\[([^\]]+)\]|\{([^}]*)\}|(｜)|([\s\S])/gu;
+    let m;
+    while ((m = re.exec(lyric))) {
+      if (m[1]) out.push({ chord: m[1] });
+      else if (m[2] != null) out.push({ cue: m[2] });
+      else if (m[3]) out.push({ gap: true });
+      else out.push({ ch: m[4] });
+    }
+    return out;
+  }
+
+  // 没写 [和弦] 的行：同一个和弦连着只写一次，按「｜」分段对齐；段数对不上就按字数比例放
+  function autoChords(toks, chords) {
+    const show = chords.filter((c, k) => c !== "-" && c !== chords[k - 1]);
+    if (!show.length) return toks;
+    const chars = [], starts = [];
+    toks.forEach((t, k) => {
+      if (t.gap) starts.push(chars.length);
+      if (t.ch) chars.push(k);
+    });
+    const segs = [0, ...starts.filter(s => s > 0 && s < chars.length)];
+    const at = [];
+    show.forEach((c, k) => {
+      if (segs.length === show.length) return at.push(segs[k]);
+      const want = Math.floor(k * chars.length / show.length);
+      const near = segs.reduce((a, s) => (Math.abs(s - want) < Math.abs(a - want) ? s : a), segs[0]);
+      const pos = Math.abs(near - want) <= 2 ? near : want;
+      at.push(k && pos <= at[k - 1] ? want : pos);
+    });
+    if (!chars.length) return [...show.map(c => ({ chord: c })), ...toks];
+    const res = [];
+    let ci = 0;
+    toks.forEach(t => {
+      if (t.ch) {
+        show.forEach((c, k) => { if (at[k] === ci) res.push({ chord: c }); });
+        ci++;
+      }
+      res.push(t);
+    });
+    return res;
+  }
+
+  function lyricHTML(it) {
+    let toks = tokens(it.lyric);
+    if (!toks.some(t => t.chord)) toks = autoChords(toks, it.style === "停" ? [] : it.chords);
+    const chunks = [{ chord: "", html: "" }];
+    for (const t of toks) {
+      if (t.chord) chunks.push({ chord: t.chord, html: "" });
+      else {
+        const c = chunks[chunks.length - 1];
+        if (t.cue != null) c.html += `<span class="cue">（${esc(t.cue)}）</span>`;
+        else if (t.gap) c.html += '<span class="gap"></span>';
+        else c.html += esc(t.ch);
+      }
+    }
+    const used = chunks.filter((c, k) => k > 0 || c.html);
+    return used.map(c => `<span class="ck"><b class="cd">${esc(c.chord)}</b><span class="tx">${c.html}</span></span>`).join("") +
+      `<span class="style">${esc(it.style + it.mods)}</span>`;
+  }
+
   function render() {
     document.title = song.meta.标题;
     $("#title").textContent = song.meta.标题;
@@ -401,18 +462,21 @@ kbd {
     if (song.errors.length) out.push(`<div class="err">${song.errors.map(esc).join("<br>")}</div>`);
     let i = 0;
     for (const it of song.items) {
-      if (it.type === "section") out.push(`<div class="sec">${esc(it.name)}</div>`);
-      else if (it.type === "note") out.push(`<div class="note">${esc(it.text)}</div>`);
+      // 段落名和提示归到它后面那一句，逐行显示时一起出现
+      if (it.type === "section") out.push(`<div class="sec" data-at="${i}">${esc(it.name)}</div>`);
+      else if (it.type === "note") out.push(`<div class="note" data-at="${i}">${esc(it.text)}</div>`);
       else {
         const talk = it.style === "停";
-        const chords = it.chords.map(c => `<b>${c === "-" ? "停 · 说" : esc(c)}</b>`).join("");
-        const lyric = esc(it.lyric).replace(/｜/g, '<span class="gap"></span>');
-        out.push(`<div class="line${talk ? " talk" : ""}" data-i="${i++}"><div class="lyric">${lyric}</div>` +
-          `<div class="chords">${chords}<span class="style">${esc(it.style + it.mods)}</span></div></div>`);
+        out.push(`<div class="line${talk ? " talk" : ""}" data-i="${i}" data-at="${i}"><div class="lyric">${lyricHTML(it)}</div></div>`);
+        i++;
       }
     }
+    // 刚渲染时不要淡入淡出，免得后面的歌词闪一下
+    $("#lines").classList.add("instant");
     $("#lines").innerHTML = out.join("");
+    requestAnimationFrame(() => requestAnimationFrame(() => $("#lines").classList.remove("instant")));
     els = [...document.querySelectorAll(".line")];
+    blocks = [...document.querySelectorAll("[data-at]")];
     st.cur = st.chord = -1;
     labels();
     measure();
@@ -446,14 +510,17 @@ kbd {
     const i = curIndex(), L = song.lines[i];
     if (i !== st.cur) {
       els.forEach((e, k) => { e.classList.toggle("cur", k === i); e.classList.toggle("past", k < i); });
+      blocks.forEach(b => b.classList.toggle("later", Number(b.dataset.at) > i));
       st.cur = i;
       st.chord = -1;
     }
     const within = clamp(st.pos - L.start, 0, L.bars - 1e-6);
-    const ci = Math.floor(within);
+    // 高亮当前小节大致对应的那个和弦
+    const cds = [...els[i].querySelectorAll(".cd")].filter(b => b.textContent);
+    const ci = Math.floor(within / L.bars * cds.length);
     if (ci !== st.chord) {
-      document.querySelectorAll(".chords b.on").forEach(b => b.classList.remove("on"));
-      els[i].querySelectorAll(".chords b")[ci]?.classList.add("on");
+      document.querySelectorAll(".cd.on").forEach(b => b.classList.remove("on"));
+      cds[ci]?.classList.add("on");
       st.chord = ci;
     }
     const total = song.bars || 1;
@@ -531,16 +598,16 @@ kbd {
     root.style.setProperty("--size", prefs.size + "px");
     if (prefs.theme === "auto") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", prefs.theme);
-    body.classList.toggle("above", prefs.above);
-    body.classList.toggle("no-style", !prefs.showStyle);
+    body.classList.toggle("reveal", prefs.reveal);
+    body.classList.toggle("no-chords", !prefs.chords);
     body.classList.toggle("no-notes", !prefs.showNotes);
-    $("#opt-above").checked = prefs.above;
-    $("#opt-style").checked = prefs.showStyle;
+    $("#opt-reveal").checked = prefs.reveal;
+    $("#opt-chords").checked = prefs.chords;
     $("#opt-notes").checked = prefs.showNotes;
     $("#opt-count").checked = prefs.countIn;
     $("#opt-mode").value = prefs.mode;
     $("#opt-theme").value = prefs.theme;
-    store.set("prefs", prefs);
+    store.set("prefs2", prefs);
     if (song) { labels(); requestAnimationFrame(() => { measure(); st.follow = true; }); }
   }
   const setPref = (k, v) => { prefs[k] = v; applyPrefs(); };
@@ -603,8 +670,8 @@ kbd {
   $("#bigger").addEventListener("click", () => setPref("size", clamp(prefs.size + 4, 24, 120)));
   $("#metro").addEventListener("click", () => { audio(); setPref("metro", !prefs.metro); });
   $("#more").addEventListener("click", () => togglePanel());
-  $("#opt-above").addEventListener("change", e => setPref("above", e.target.checked));
-  $("#opt-style").addEventListener("change", e => setPref("showStyle", e.target.checked));
+  $("#opt-reveal").addEventListener("change", e => setPref("reveal", e.target.checked));
+  $("#opt-chords").addEventListener("change", e => setPref("chords", e.target.checked));
   $("#opt-notes").addEventListener("change", e => setPref("showNotes", e.target.checked));
   $("#opt-count").addEventListener("change", e => setPref("countIn", e.target.checked));
   $("#opt-mode").addEventListener("change", e => setPref("mode", e.target.value));
@@ -637,8 +704,8 @@ kbd {
     const k = e.key;
     if (k === " " && e.target.closest("button")) return;
     if (k === " ") setPlaying(!st.playing);
-    else if (["ArrowDown", "ArrowRight", "PageDown"].includes(k)) go(st.cur + 1);
-    else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(k)) go(st.cur - 1);
+    else if (["ArrowDown", "ArrowRight", "PageDown"].includes(k)) go(curIndex() + 1);
+    else if (["ArrowUp", "ArrowLeft", "PageUp"].includes(k)) go(curIndex() - 1);
     else if (k === "Home") go(0);
     else if (k === "[") setBpm(st.bpm - 1);
     else if (k === "]") setBpm(st.bpm + 1);
