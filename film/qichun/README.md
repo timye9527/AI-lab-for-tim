@@ -36,7 +36,8 @@ npm run assets      # 加工成渲染素材到 data/assets（约 2 分钟）
 npm run serve       # 浏览器打开 http://127.0.0.1:8790/?t=90 看某一秒；?play 实时播放
 npm run voice       # 本地合成旁白（模型见下）并排时间轴
 npm run audio       # 编曲 + 音效 + 混音，输出 data/audio/mix.wav
-npm run render      # 全片 1080p30，软件渲染约 1–1.5 小时，输出 out/qichun.mp4
+npm run render      # 横版 1080p30，软件渲染约 1–1.5 小时，输出 out/qichun.mp4
+npm run render:v    # 竖版 1080×1920，输出 out/qichun_v.mp4（预览：网址加 ?fmt=v）
 ```
 
 `data/` 和 `out/` 不进仓库。
@@ -49,7 +50,8 @@ npm run render      # 全片 1080p30，软件渲染约 1–1.5 小时，输出 o
 - 县界、水系、道路、铁路：Overture Maps，© OpenStreetMap contributors（ODbL）
 - 地形：AWS Terrain Tiles（Mapzen，SRTM 等）
 - 字体：Noto Serif SC / TC、Noto Sans SC、Ma Shan Zheng（SIL OFL）
-- 配音模型：Kokoro-82M（Apache-2.0）。把 npm 包 `kokoro-q8-shards` 的 6 个分片拼成 `data/models/kokoro/kokoro-q8.onnx`，`kokoro-js` 包里的 `voices/z*.bin` 放到 `data/models/kokoro/voices/`
+- 配音模型（v3）：MeloTTS（MIT），npm 包 `@3sln/donki-lle-voice-zh` 里的分片解出 `model.onnx / lexicon.txt / tokens.txt / *.fst` 放到 `data/models/melo/`；需要 `pip install sherpa-onnx`
+- 配音模型（v2）：Kokoro-82M（Apache-2.0）。把 npm 包 `kokoro-q8-shards` 的 6 个分片拼成 `data/models/kokoro/kokoro-q8.onnx`，`kokoro-js` 包里的 `voices/z*.bin` 放到 `data/models/kokoro/voices/`
 - 音色库：[GeneralUser GS](https://github.com/mrbumpy409/GeneralUser-GS)（可商用），放到 `data/audio/GeneralUser-GS.sf2`
 
 建筑数据没有高度，片中统一按 6 米示意；地形竖向夸张 1.6 倍。
