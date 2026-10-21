@@ -150,7 +150,8 @@ main {
 .line.past { opacity: 0.38; }
 .line.cur { background: var(--hi); }
 .line.cur .cd.on { background: var(--chord); color: var(--bg); }
-.reveal .later { visibility: hidden; opacity: 0; pointer-events: none; }
+.later { visibility: hidden; opacity: 0; pointer-events: none; }
+.line.ahead { opacity: 0.72; }
 .line, .sec, .note { transition: opacity 0.45s, visibility 0.45s, background-color 0.3s; }
 .instant .line, .instant .sec, .instant .note { transition: none; }
 .tail { height: 72vh; }
@@ -297,7 +298,15 @@ kbd {
 </nav>
 
 <div id="panel" hidden>
-  <label class="row">逐行显示（后面的歌词先藏起来） <input type="checkbox" id="opt-reveal"></label>
+  <label class="row">往下提前显示
+    <select id="opt-ahead">
+      <option value="0">只显示当前句</option>
+      <option value="1">多显示 1 句</option>
+      <option value="2">多显示 2 句（一共 3 句）</option>
+      <option value="3">多显示 3 句</option>
+      <option value="-1">全部显示</option>
+    </select>
+  </label>
   <label class="row">显示和弦 <input type="checkbox" id="opt-chords"></label>
   <label class="row">显示表演提示（只给自己看） <input type="checkbox" id="opt-notes"></label>
   <label class="row">开始前数一小节 <input type="checkbox" id="opt-count"></label>
@@ -316,7 +325,7 @@ kbd {
   <p class="keys">
     <kbd>空格</kbd> 开始 / 暂停　<kbd>↓</kbd><kbd>→</kbd><kbd>PgDn</kbd> 下一句　<kbd>↑</kbd><kbd>←</kbd><kbd>PgUp</kbd> 上一句<br>
     <kbd>[</kbd><kbd>]</kbd> 速度　<kbd>-</kbd><kbd>=</kbd> 字号　<kbd>M</kbd> 节拍器　<kbd>F</kbd> 全屏　<kbd>Home</kbd> 回到开头<br>
-    点哪一句就跳到哪一句；播放中滚动鼠标会暂停。逐行显示时，后面的歌词要播到或按 ↓ 才出现。翻页踏板一般发送 PgDn / PgUp，可以直接用。
+    点哪一句就跳到哪一句；播放中滚动鼠标会暂停。默认显示当前句和后面 2 句，再往后的歌词播到或按 ↓ 才出现。翻页踏板一般发送 PgDn / PgUp，可以直接用。
   </p>
 </div>
 
@@ -368,7 +377,7 @@ kbd {
   }
 
   const prefs = Object.assign(
-    { size: 48, metro: false, reveal: true, chords: true, showNotes: false, countIn: true, mode: "smooth", theme: "auto" },
+    { size: 48, metro: false, ahead: 2, chords: true, showNotes: false, countIn: true, mode: "smooth", theme: "auto" },
     store.get("prefs2", {})
   );
   const st = { pos: 0, playing: false, countEnd: -Infinity, beat: 0, cur: -1, chord: -1, follow: false, last: performance.now() };
@@ -510,7 +519,10 @@ kbd {
     const i = curIndex(), L = song.lines[i];
     if (i !== st.cur) {
       els.forEach((e, k) => { e.classList.toggle("cur", k === i); e.classList.toggle("past", k < i); });
-      blocks.forEach(b => b.classList.toggle("later", Number(b.dataset.at) > i));
+      // 当前句往下再露出 prefs.ahead 句，更后面的先藏起来
+      const last = prefs.ahead < 0 ? Infinity : i + prefs.ahead;
+      els.forEach((e, k) => e.classList.toggle("ahead", k > i && k <= last));
+      blocks.forEach(b => b.classList.toggle("later", Number(b.dataset.at) > last));
       st.cur = i;
       st.chord = -1;
     }
@@ -598,10 +610,9 @@ kbd {
     root.style.setProperty("--size", prefs.size + "px");
     if (prefs.theme === "auto") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", prefs.theme);
-    body.classList.toggle("reveal", prefs.reveal);
     body.classList.toggle("no-chords", !prefs.chords);
     body.classList.toggle("no-notes", !prefs.showNotes);
-    $("#opt-reveal").checked = prefs.reveal;
+    $("#opt-ahead").value = String(prefs.ahead);
     $("#opt-chords").checked = prefs.chords;
     $("#opt-notes").checked = prefs.showNotes;
     $("#opt-count").checked = prefs.countIn;
@@ -670,7 +681,7 @@ kbd {
   $("#bigger").addEventListener("click", () => setPref("size", clamp(prefs.size + 4, 24, 120)));
   $("#metro").addEventListener("click", () => { audio(); setPref("metro", !prefs.metro); });
   $("#more").addEventListener("click", () => togglePanel());
-  $("#opt-reveal").addEventListener("change", e => setPref("reveal", e.target.checked));
+  $("#opt-ahead").addEventListener("change", e => { st.cur = -1; setPref("ahead", Number(e.target.value)); });
   $("#opt-chords").addEventListener("change", e => setPref("chords", e.target.checked));
   $("#opt-notes").addEventListener("change", e => setPref("showNotes", e.target.checked));
   $("#opt-count").addEventListener("change", e => setPref("countIn", e.target.checked));
