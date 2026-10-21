@@ -2,7 +2,7 @@
 # 分段并行渲染整片，拼接后混入配乐。用法：bash scripts/render_all.sh [段数]
 set -euo pipefail
 cd "$(dirname "$0")/.."
-N=${1:-3}
+N=${1:-1}
 DUR=$(node -e "import('./scene/story.js').then(m=>console.log(m.DURATION))")
 mkdir -p out/parts
 : > out/parts/list.txt

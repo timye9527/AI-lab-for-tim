@@ -8,7 +8,7 @@
     "music": "python3 scripts/music.py 156 out/music.wav",
     "serve": "node scripts/serve.mjs",
     "stills": "node scripts/render.mjs --still 5,18,33,45,60,72,90,105,118,128,136,142,150",
-    "render": "bash scripts/render_all.sh 3"
+    "render": "bash scripts/render_all.sh"
   },
   "dependencies": {
     "three": "0.169.0"

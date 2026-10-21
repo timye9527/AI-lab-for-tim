@@ -35,7 +35,7 @@ npm run data        # 下载原始数据到 data/raw（约 340MB，2 分钟）
 npm run assets      # 加工成渲染素材到 data/assets（约 2 分钟）
 npm run serve       # 浏览器打开 http://127.0.0.1:8790/?t=90 看某一秒；?play 实时播放
 npm run stills      # 抽 13 张关键帧到 out/stills/
-npm run render      # 全片 1080p30，3 路并行，约 1 小时（软件渲染），输出 out/qichun.mp4
+npm run render      # 全片 1080p30，软件渲染约 80 分钟（4 核机器上并行反而更慢），输出 out/qichun.mp4
 ```
 
 `data/` 和 `out/` 不进仓库。
