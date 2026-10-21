@@ -90,7 +90,7 @@
 
 | 层 | 做法 |
 |---|---|
-| 旁白 | v3：MeloTTS（MIT，sherpa-onnx 转换，模型来自 npm 包 `@3sln/donki-lle-voice-zh`），本机合成；`voiceover.json` 的 `lexicon` 字段按词指定声调修正变调。v2 用的是 Kokoro-82M（`scripts/tts.py`）。后期：高通、去浑、提亮度、压缩、小房间混响 |
+| 旁白 | **定稿**：标贝（Baker）语料训练的 Tacotron2 + MB-MelGAN（PyPI 包 zhtts，MIT），标准普通话女声；补了「一」「不」变调和词内三声连读；声码器底噪用 `scripts/voice_clean.py` 降噪（词间底噪比峰值低 18 → 37 dB）。每句放进原时间轴的位置，最多加速 9.5%，画面复用不重渲。此前试过：MeloTTS（有口音）（MIT，sherpa-onnx 转换，模型来自 npm 包 `@3sln/donki-lle-voice-zh`），本机合成；`voiceover.json` 的 `lexicon` 字段按词指定声调修正变调。v2 用的是 Kokoro-82M（`scripts/tts.py`）。后期：高通、去浑、提亮度、压缩、小房间混响 |
 | 配乐 | `scripts/score.py` 程序编曲，D 宫五声；GeneralUser GS 音色库（可商用）：古筝、尺八、长笛、弦乐、合唱、竖琴、太鼓、定音鼓、圆号、钢琴 |
 | 音效 | 全部程序合成：风、水、竹林沙沙、艾火噼啪、虫鸣、轮盘低鸣、翻书、盖章、镜头呼啸、高铁驶过 |
 | 混音 | 配乐加大厅混响；人声出现时音乐自动压低；两遍 loudnorm，−16 LUFS、真峰值 −1.5 dBTP |

@@ -14,7 +14,7 @@ export const title = {
 export const credits = [
   '数据与素材 Sources',
   '建筑轮廓：Shi Q. et al. (2023), CC BY 4.0, via Overture Maps 2026-09-23 · 行政边界 / 水系 / 道路：© OpenStreetMap contributors',
-  '地形：AWS Terrain Tiles · 配音：MeloTTS（MIT）本地合成 · 配乐：原创编曲，GeneralUser GS 音色库',
+  '地形：AWS Terrain Tiles · 配音：标贝语料 Tacotron2（zhtts，MIT）本地合成 · 配乐：原创编曲，GeneralUser GS 音色库',
   '画面全部由 Claude 写代码渲染 · 水墨与书页为示意 · 建筑高度缺失，统一按 6 米示意',
 ];
 

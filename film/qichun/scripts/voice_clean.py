@@ -39,3 +39,9 @@ if __name__ == "__main__":
     x, _ = sf.read(sys.argv[1]); y = final(x)
     print(f"{sys.argv[1]}  词间底噪 {floor_db(x):.1f} → {floor_db(y):.1f} dB")
     sf.write(sys.argv[2], y, SR)
+
+def final_strong(x):
+    """加强版：先压词间底噪，再轻轻去掉说话时残留的嘶声，最后补齿音"""
+    y = clean(x, prop=0.92, exp_db=12, thr_below=24)
+    y = nr.reduce_noise(y=y, sr=SR, stationary=False, prop_decrease=0.5, n_fft=1024, time_mask_smooth_ms=50, freq_mask_smooth_hz=200).astype(np.float32)
+    return highshelf(y, 4500, 4.5)
