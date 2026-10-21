@@ -1,5 +1,7 @@
 // 二维画面：水墨山水、干栏木屋、竹林、本草线描、书页、四宝、人物卡。
 // 全部程序绘制，随机数固定种子，同一时刻画出来的画面每次一样（逐帧渲染要求）。
+import { VERTICAL, W as OW, H as OH } from './format.js';
+// 下面的山水画面按横版 1920×1080 的虚拟坐标画，竖版时整体缩放、居中裁切
 const W = 1920, H = 1080;
 const INK = (a) => `rgba(24,20,16,${a})`;
 const RED = '#b5332a';
@@ -143,7 +145,10 @@ export function createInk(cv) {
     makeRange(13, { base: 860, amp: 200, freq: 0.0036, dark: 0.7, depth: 220, blur: 0.6 }),
   ];
   const bamboo = (() => { const r = rng(77); return Array.from({ length: 26 }, (_, i) => ({ x: r() * 2100 - 90, w: 10 + r() * 22, depth: r(), ph: r() * 6, lean: (r() - 0.5) * 0.08, leaves: Array.from({ length: 14 }, () => [r(), r(), r(), r()]) })).sort((a, b) => a.depth - b.depth); })();
-  const herbs = [plantStrokes(21, 'ai', 600, 900, 1.05), plantStrokes(22, 'flower', 1000, 920, 0.9), plantStrokes(23, 'herb', 1360, 910, 0.95)];
+  const herbs = VERTICAL
+    ? [plantStrokes(21, 'ai', 250, 1470, 1.05), plantStrokes(22, 'flower', 560, 1490, 0.95), plantStrokes(23, 'herb', 850, 1480, 1.0)]
+    : [plantStrokes(21, 'ai', 600, 900, 1.05), plantStrokes(22, 'flower', 1000, 920, 0.9), plantStrokes(23, 'herb', 1360, 910, 0.95)];
+  const bookPlant = plantStrokes(21, 'ai', 600, 900, 1.05);
 
   function landscape(t, opts = {}) {
     g.drawImage(paper, 0, 0);
@@ -224,43 +229,58 @@ export function createInk(cv) {
     mist(g, t, 820, 0.55, 60);
   }
 
+  // 竖版与横版各自的版式（单位：输出像素）
+  const LAY = VERTICAL ? {
+    herbLabels: [[150, 900], [460, 920], [750, 900]],
+    page: [60, 210, 960, 1290], cols: { x0: 920, top: 270, w: 92 }, plant: { dx: -340, dy: 540, s: 0.95 }, plantLabel: [130, 980], stamp: [700, 1300],
+    tre: [[300, 560], [780, 560], [300, 1110], [780, 1110]], treChar: 210, treName: 175,
+    ppl: [[540, 520], [540, 1110]], pplR: 175, pplName: 145, pplText: 232,
+    seal: [930, 220], poem: [900, 300, 84], poemBy: [790, 760], note: [70, 1490],
+  } : {
+    herbLabels: [[470, 300], [900, 300], [1250, 300]],
+    page: [140, 90, W - 280, H - 180], cols: { x0: W - 300, top: 200, w: 86 }, plant: { dx: -140, dy: 20, s: 0.95 }, plantLabel: [300, 200], stamp: [760, 660],
+    tre: [[330, 470], [750, 470], [1170, 470], [1590, 470]], treChar: 250, treName: 250,
+    ppl: [[640, 470], [1280, 470]], pplR: 210, pplName: 200, pplText: 290,
+    seal: [1720, 180], poem: [1560, 240, 92], poemBy: [1440, 640], note: [140, H - 170],
+  };
+
   function herbsPage(t, dur) {
-    g.drawImage(paperDark, 0, 0);
+    g.drawImage(paperDark, 0, 0, OW, OH);
     herbs.forEach((h, i) => drawPlant(g, h, ease((t - 0.4 - i * 1.4) / (dur * 0.55))));
-    g.font = `34px ${SERIF_TC}`; g.fillStyle = INK(0.7 * smooth(2, 3, t)); g.textAlign = 'center';
-    ['艾', '菊', '薄荷'].forEach((s, i) => vtext(g, s, [470, 900, 1250][i] , 300, 34, INK(0.7 * smooth(1.5 + i * 1.4, 2.5 + i * 1.4, t)), SERIF_TC));
+    ['艾', '菊', '薄荷'].forEach((s, i) => vtext(g, s, LAY.herbLabels[i][0], LAY.herbLabels[i][1], 34, INK(0.7 * smooth(1.5 + i * 1.4, 2.5 + i * 1.4, t)), SERIF_TC));
   }
 
   function bookPage(t, dur, stampT) {
-    g.fillStyle = '#20180f'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#20180f'; g.fillRect(0, 0, OW, OH);
     const k = 1 + 0.06 * ease(t / dur);
-    g.save(); g.translate(W / 2, H / 2); g.scale(k, k); g.rotate(-0.012); g.translate(-W / 2, -H / 2);
-    g.drawImage(paper, 140, 90, W - 280, H - 180);
-    g.strokeStyle = INK(0.85); g.lineWidth = 5; g.strokeRect(220, 150, W - 440, H - 300);
-    g.lineWidth = 1.5; g.strokeRect(232, 162, W - 464, H - 324);
+    const [px, py, pw, ph] = LAY.page;
+    g.save(); g.translate(OW / 2, OH / 2); g.scale(k, k); g.rotate(-0.012); g.translate(-OW / 2, -OH / 2);
+    g.drawImage(paper, px, py, pw, ph);
+    g.strokeStyle = INK(0.85); g.lineWidth = 5; g.strokeRect(px + 80, py + 60, pw - 160, ph - 120);
+    g.lineWidth = 1.5; g.strokeRect(px + 92, py + 72, pw - 184, ph - 144);
     // 界栏和竖排正文（右起）
     const cols = ['艾', '【集解】時珍曰', '……自成化以來', '則以蘄州者為勝', '用充方物', '天下重之', '謂之蘄艾', '……'];
-    const colW = 86, x0 = W - 300;
+    const { x0, top, w: colW } = LAY.cols;
     cols.forEach((c, i) => {
       const x = x0 - i * colW;
-      g.strokeStyle = INK(0.35); g.lineWidth = 1; g.beginPath(); g.moveTo(x - colW / 2, 162); g.lineTo(x - colW / 2, H - 162); g.stroke();
+      g.strokeStyle = INK(0.35); g.lineWidth = 1; g.beginPath(); g.moveTo(x - colW / 2, py + 72); g.lineTo(x - colW / 2, py + ph - 72); g.stroke();
       const a = smooth(0.3 + i * 0.35, 0.8 + i * 0.35, t);
-      vtext(g, c, x, 200, i === 0 ? 64 : 48, INK(0.9 * a), SERIF_TC, 1.18);
+      vtext(g, c, x, top, i === 0 ? 64 : 48, INK(0.9 * a), SERIF_TC, 1.18);
       // 重点句旁加红色圈点
       if (i >= 2 && i <= 6) {
         const n = [...c].length, b = smooth(2.2 + i * 0.5, 3.2 + i * 0.5, t);
         g.fillStyle = `rgba(181,51,42,${0.85 * b})`;
-        for (let j = 0; j < n; j++) { g.beginPath(); g.arc(x + 34, 226 + j * 48 * 1.18, 4, 0, 7); g.fill(); }
+        for (let j = 0; j < n; j++) { g.beginPath(); g.arc(x + 34, top + 26 + j * 48 * 1.18, 4, 0, 7); g.fill(); }
       }
     });
-    // 左半页：艾的线描
-    drawPlant(g, herbs[0].map((l) => ({ ...l, pts: l.pts.map(([x, y]) => [x * 0.95 - 140, y * 0.95 + 20]) })), ease((t - 0.5) / 3.5));
-    vtext(g, '蘄艾', 300, 200, 40, INK(0.75 * smooth(1, 2, t)), SERIF_TC);
+    const P = LAY.plant;
+    drawPlant(g, bookPlant.map((l) => ({ ...l, pts: l.pts.map(([x, y]) => [x * P.s + P.dx, y * P.s + P.dy]) })), ease((t - 0.5) / 3.5));
+    vtext(g, '蘄艾', LAY.plantLabel[0], LAY.plantLabel[1], 40, INK(0.75 * smooth(1, 2, t)), SERIF_TC);
     g.restore();
     // 盖章：入选世界记忆名录
     if (stampT != null && t > stampT) {
-      const u = smooth(stampT, stampT + 0.25, t), s = 1.4 - 0.4 * u;
-      g.save(); g.translate(760, 660); g.rotate(-0.08); g.scale(s, s); g.globalAlpha = u * 0.9;
+      const u = smooth(stampT, stampT + 0.25, t), sc = 1.4 - 0.4 * u;
+      g.save(); g.translate(...LAY.stamp); g.rotate(-0.08); g.scale(sc, sc); g.globalAlpha = u * 0.9;
       g.strokeStyle = RED; g.lineWidth = 7; g.strokeRect(-130, -130, 260, 260); g.lineWidth = 2; g.strokeRect(-116, -116, 232, 232);
       g.fillStyle = RED; g.font = `52px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText('世界记忆', 0, -40); g.fillText('名 录', 0, 22); g.font = `34px ${SERIF}`; g.fillText('2011', 0, 82);
@@ -269,43 +289,95 @@ export function createInk(cv) {
   }
 
   function treasures(t) {
-    g.drawImage(paper, 0, 0);
+    g.drawImage(paper, 0, 0, OW, OH);
     const items = [['艾', '蕲艾', 'Qi mugwort'], ['竹', '蕲竹', 'Qi bamboo'], ['蛇', '蕲蛇', 'Qi snake'], ['龟', '蕲龟', 'Qi turtle']];
     items.forEach(([ch, name, en], i) => {
-      const x = 330 + i * 420, a = smooth(1.2 + i * 0.75, 1.9 + i * 0.75, t);
-      const blob = g.createRadialGradient(x, 470, 10, x, 470, 210);
+      const [x, y] = LAY.tre[i], a = smooth(1.2 + i * 0.75, 1.9 + i * 0.75, t), S = LAY.treChar;
+      const blob = g.createRadialGradient(x, y, 10, x, y, S * 0.85);
       blob.addColorStop(0, INK(0.12 * a)); blob.addColorStop(1, INK(0));
-      g.fillStyle = blob; g.beginPath(); g.arc(x, 470, 220, 0, 7); g.fill();
-      g.save(); g.translate(x, 470); g.scale(0.92 + 0.08 * a, 0.92 + 0.08 * a);
-      g.fillStyle = INK(0.9 * a); g.font = `250px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, 0, -10);
+      g.fillStyle = blob; g.beginPath(); g.arc(x, y, S * 0.9, 0, 7); g.fill();
+      g.save(); g.translate(x, y); g.scale(0.92 + 0.08 * a, 0.92 + 0.08 * a);
+      g.fillStyle = INK(0.9 * a); g.font = `${S}px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(ch, 0, -10);
       g.restore();
-      g.fillStyle = INK(0.8 * a); g.font = `40px ${SERIF}`; g.textAlign = 'center'; g.fillText(name, x, 720);
-      g.fillStyle = INK(0.5 * a); g.font = `22px ${SERIF}`; g.fillText(en, x, 765);
-      if (i < 3) { g.strokeStyle = INK(0.18 * a); g.lineWidth = 1; g.beginPath(); g.moveTo(x + 210, 320); g.lineTo(x + 210, 760); g.stroke(); }
+      g.fillStyle = INK(0.8 * a); g.font = `40px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText(name, x, y + LAY.treName);
+      g.fillStyle = INK(0.5 * a); g.font = `22px ${SERIF}`; g.fillText(en, x, y + LAY.treName + 45);
     });
-    seal(g, 1700, 200, '四宝', 70);
+    seal(g, LAY.seal[0] - 20, LAY.seal[1], '四宝', 70);
   }
 
   function portraits(t, people) {
-    g.drawImage(paperDark, 0, 0);
+    g.drawImage(paperDark, 0, 0, OW, OH);
     people.forEach((p, i) => {
-      const x = 640 + i * 640, a = smooth(0.8 + i * 1.6, 1.8 + i * 1.6, t);
+      const [x, y] = LAY.ppl[i], a = smooth(0.8 + i * 1.6, 1.8 + i * 1.6, t), R = LAY.pplR;
       // 一笔圆相
-      g.strokeStyle = INK(0.55 * a); g.lineWidth = 26; g.lineCap = 'round';
-      g.beginPath(); g.arc(x, 470, 210, -2.4, -2.4 + Math.PI * 1.85 * ease((t - 0.6 - i * 1.6) / 1.4)); g.stroke();
-      g.fillStyle = INK(0.92 * a); g.font = `200px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.name, x, 460);
-      g.font = `36px ${SERIF}`; g.fillStyle = INK(0.8 * a); g.textBaseline = 'alphabetic'; g.fillText(p.years, x, 760);
-      g.font = `30px ${SERIF}`; g.fillStyle = INK(0.65 * a); g.fillText(p.role, x, 812);
-      g.font = `22px ${SERIF}`; g.fillStyle = INK(0.45 * a); g.fillText(p.en, x, 852);
+      g.strokeStyle = INK(0.55 * a); g.lineWidth = 24; g.lineCap = 'round';
+      g.beginPath(); g.arc(x, y, R, -2.4, -2.4 + Math.PI * 1.85 * ease((t - 0.6 - i * 1.6) / 1.4)); g.stroke();
+      g.fillStyle = INK(0.92 * a); g.font = `${LAY.pplName}px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(p.name, x, y - 10);
+      const ty = y + LAY.pplText;
+      g.font = `36px ${SERIF}`; g.fillStyle = INK(0.8 * a); g.textBaseline = 'alphabetic'; g.fillText(p.years, x, ty);
+      g.font = `30px ${SERIF}`; g.fillStyle = INK(0.65 * a); g.fillText(p.role, x, ty + 52);
+      g.font = `22px ${SERIF}`; g.fillStyle = INK(0.45 * a); g.fillText(p.en, x, ty + 92);
+    });
+  }
+
+  // 「流行」段：跟着鼓点跳动的字，暗底金字
+  function pop(t, seg) {
+    const beat = 60 / seg.bpm, bt = (t - seg.beat0) / beat;
+    const ph = bt - Math.floor(bt), kick = bt > 0 ? Math.exp(-ph * 6) : 0;
+    g.fillStyle = '#0d0907'; g.fillRect(0, 0, OW, OH);
+    const cx = OW / 2, cy = VERTICAL ? 720 : 450;
+    const glow = g.createRadialGradient(cx, cy, 20, cx, cy, OH * 0.6);
+    glow.addColorStop(0, `rgba(190,60,40,${0.32 + 0.25 * kick})`); glow.addColorStop(0.5, 'rgba(120,40,25,.12)'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    g.fillStyle = glow; g.fillRect(0, 0, OW, OH);
+    // 节奏光条
+    const nb = VERTICAL ? 24 : 48, bw = OW / nb, base = VERTICAL ? 1500 : 944, bh = VERTICAL ? 120 : 80;
+    for (let i = 0; i < nb; i++) {
+      const v = 0.25 + 0.75 * Math.abs(Math.sin(i * 1.7 + Math.floor(bt * 2) * 2.3)) * (0.4 + 0.6 * kick) * smooth(0, 1.5, t - seg.start);
+      g.fillStyle = `rgba(255,${190 + (i % 3) * 15},120,${0.18 + 0.3 * v})`;
+      g.fillRect(i * bw + 3, base - v * bh, bw - 6, v * bh);
+    }
+    // 书名
+    const a = smooth(seg.start + 0.3, seg.start + 1.2, t), sc = 1 + 0.035 * kick;
+    g.save(); g.translate(cx, cy); g.scale(sc, sc);
+    g.fillStyle = `rgba(255,224,170,${a})`; g.shadowColor = 'rgba(255,170,80,.6)'; g.shadowBlur = 30;
+    g.font = `${VERTICAL ? 190 : 210}px ${BRUSH}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    if (VERTICAL) { g.fillText('本草', 0, -110); g.fillText('纲目', 0, 110); } else g.fillText('本草纲目', 0, 0);
+    g.restore(); g.shadowBlur = 0;
+    // 药名在节拍上一个个弹出来（都是《本草纲目》里收录的药）
+    const herbsN = ['艾叶', '菊花', '薄荷', '人参', '当归', '枸杞', '甘草', '黄芪'];
+    herbsN.forEach((h, i) => {
+      const on = seg.beat0 + (2 + i) * beat, u = smooth(on, on + 0.18, t);
+      if (u <= 0) return;
+      const ang = (i / herbsN.length) * Math.PI * 2 - Math.PI / 2, R = VERTICAL ? [380, 430] : [620, 250];
+      const x = cx + Math.cos(ang) * R[0], y = cy + Math.sin(ang) * R[1] + (VERTICAL ? 0 : 10);
+      g.save(); g.translate(x, y); g.scale(0.6 + 0.4 * u + 0.08 * kick, 0.6 + 0.4 * u + 0.08 * kick);
+      g.fillStyle = `rgba(255,236,200,${0.85 * u})`; g.font = `44px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(h, 0, 0);
+      g.restore();
+    });
+    // 年份线：1596 金陵本 → 2006 歌曲 → 2022 健身操
+    const yrs = [['1596', '金陵本刊行'], ['2006', '同名流行歌'], ['2022', '全网健身操']];
+    yrs.forEach(([y, d], i) => {
+      const on = seg.items[0] ? seg.items[0].start + i * 1.6 : seg.start, u = smooth(on, on + 0.4, t);
+      const x = VERTICAL ? 200 + i * 340 : cx - 560 + i * 560, yy = VERTICAL ? 1300 : 790;
+      g.fillStyle = `rgba(255,216,154,${u})`; g.font = `600 40px ${SERIF}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillText(y, x, yy);
+      g.fillStyle = `rgba(244,231,207,${0.7 * u})`; g.font = `24px ${SERIF}`; g.fillText(d, x, yy + 38);
     });
   }
 
   // 主入口：按分段的 variant 画
   return function draw(seg, t, alpha) {
-    g.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    const dpr = window.devicePixelRatio;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.globalAlpha = 1;
     const lt = t - seg.start;
-    switch (seg.mode === 'ink' ? seg.variant : seg.mode) {
+    const kind = seg.mode === 'ink' ? seg.variant : seg.mode;
+    const scenic = kind === 'title' || kind === 'stilts' || kind === 'bamboo';
+    if (scenic && VERTICAL) {
+      // 竖版：先铺满宣纸，再把横版山水缩放后贴进画面区
+      g.drawImage(paper, 0, 0, OW, OH);
+      const s = 1.24; g.setTransform(dpr * s, 0, 0, dpr * s, dpr * (OW - W * s) / 2, dpr * 180);
+    }
+    switch (kind) {
       case 'title': landscape(lt, { sun: true }); birds(lt); boat(700 + lt * 14, 905); break;
       case 'stilts': {
         landscape(lt * 0.6, { lift: 30 }); water(lt, 800);
@@ -318,17 +390,19 @@ export function createInk(cv) {
       case 'book': bookPage(lt, seg.dur, seg.stampT); break;
       case 'treasures': treasures(lt); break;
       case 'portrait': portraits(lt, seg.people); break;
+      case 'pop': pop(t, seg); break;
     }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
     // 段内的章名印章和题诗
-    if (seg.seal) seal(g, 1720, 180, seg.seal, 72);
+    if (seg.seal) seal(g, LAY.seal[0] - 20, LAY.seal[1], seg.seal, 72);
     if (seg.poem) {
-      const a = smooth(2, 3, lt);
-      const pad = g.createRadialGradient(1500, 480, 20, 1500, 480, 340);
+      const a = smooth(2, 3, lt), [px, py, ps] = LAY.poem;
+      const pad = g.createRadialGradient(px - 60, py + 240, 20, px - 60, py + 240, 340);
       pad.addColorStop(0, `rgba(236,226,204,${0.92 * a})`); pad.addColorStop(1, 'rgba(236,226,204,0)');
-      g.fillStyle = pad; g.fillRect(1100, 140, 800, 700);
-      vtext(g, seg.poem, 1560, 240, 92, INK(0.9 * a));
-      g.font = `30px ${SERIF}`; g.fillStyle = INK(0.6 * a); g.textAlign = 'center'; vtext(g, `— ${seg.poemBy}`, 1440, 640, 30, INK(0.6 * a), SERIF);
+      g.fillStyle = pad; g.fillRect(px - 460, py - 100, 800, 700);
+      vtext(g, seg.poem, px, py, ps, INK(0.9 * a));
+      vtext(g, `— ${seg.poemBy}`, LAY.poemBy[0], LAY.poemBy[1], 30, INK(0.6 * a), SERIF);
     }
-    if (seg.note) { g.font = `20px ${SERIF}`; g.fillStyle = INK(0.45); g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(seg.note, 140, H - 170); }
+    if (seg.note) { g.font = `20px ${SERIF}`; g.fillStyle = INK(0.45); g.textAlign = 'left'; g.textBaseline = 'alphabetic'; g.fillText(seg.note, LAY.note[0], LAY.note[1]); }
   };
 }

@@ -1,7 +1,7 @@
 // 三个非地图的三维/着色器画面：艾条青烟、黄昏艾田、管窑拉坯。各自一块画布。
 import * as THREE from 'three';
 
-const W = 1920, H = 1080;
+import { W, H, VERTICAL } from './format.js';
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
 const smooth = (a, b, x) => { const u = clamp((x - a) / (b - a)); return u * u * (3 - 2 * u); };
 
@@ -24,11 +24,11 @@ const NOISE = /* glsl */`
 export function createSmoke(canvas) {
   const renderer = makeRenderer(canvas, '#000');
   const scene = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const U = { uT: { value: 0 }, uRes: { value: new THREE.Vector2(W * devicePixelRatio, H * devicePixelRatio) }, uV: { value: 0 }, uFade: { value: 1 } };
+  const U = { uT: { value: 0 }, uRes: { value: new THREE.Vector2(W * devicePixelRatio, H * devicePixelRatio) }, uV: { value: 0 }, uFade: { value: 1 }, uVert: { value: VERTICAL ? 1 : 0 } };
   scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
     uniforms: U, vertexShader: 'void main(){ gl_Position = vec4(position.xy, 0., 1.); }',
     fragmentShader: /* glsl */`
-      uniform float uT; uniform vec2 uRes; uniform float uV; uniform float uFade;
+      uniform float uT; uniform vec2 uRes; uniform float uV; uniform float uFade; uniform float uVert;
       ${NOISE}
       float sdSeg(vec2 p, vec2 a, vec2 b) { vec2 pa = p - a, ba = b - a; float h = clamp(dot(pa, ba) / dot(ba, ba), 0., 1.); return length(pa - ba * h); }
       void main() {
@@ -36,6 +36,7 @@ export function createSmoke(canvas) {
         // 开场：艾条竖在画面下方；艾灸：斜着从右下伸进来
         vec2 tip = mix(vec2(.02, -.2), vec2(-.06, -.12), uV);
         vec2 tail = mix(vec2(.02, -.9), vec2(.75, -.62), uV);
+        if (uVert > .5) { tip = mix(vec2(.0, -.12), vec2(-.04, -.08), uV); tail = mix(vec2(.12, -.62), vec2(.3, -.5), uV); }
         vec3 col = mix(vec3(.035, .028, .022), vec3(.07, .05, .035), smoothstep(-.6, .5, -p.y)) * (1. - .5 * length(p));
         // 烟：从艾条头上升，用流动噪声扭出卷曲的烟丝
         vec2 q = p - tip;
@@ -84,7 +85,7 @@ export function createSmoke(canvas) {
 export function createField(canvas) {
   const renderer = makeRenderer(canvas, '#000');
   const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(32, W / H, 0.02, 50);
+  const cam = new THREE.PerspectiveCamera(VERTICAL ? 44 : 32, W / H, 0.02, 50);
   const sunDir = new THREE.Vector3(0.25, 0.18, -1).normalize();
   const U = { uT: { value: 0 }, uSun: { value: sunDir }, uRes: { value: new THREE.Vector2(W * devicePixelRatio, H * devicePixelRatio) } };
 
@@ -182,8 +183,8 @@ export function createField(canvas) {
   return (seg, t) => {
     const lt = t - seg.start, u = lt / seg.dur;
     U.uT.value = lt + 4;
-    cam.position.set(-0.7 + u * 0.9, 0.95, 1.25);
-    cam.lookAt(-0.3 + u * 0.7, 0.7, -2.5);
+    if (VERTICAL) { cam.position.set(0.05 + u * 0.4, 1.0, 2.1); cam.lookAt(0.05 + u * 0.4, 0.62, -2.5); }
+    else { cam.position.set(-0.7 + u * 0.9, 0.95, 1.25); cam.lookAt(-0.3 + u * 0.7, 0.7, -2.5); }
     renderer.render(scene, cam);
   };
 }
@@ -258,7 +259,8 @@ export function createPottery(canvas) {
     pot.geometry = new THREE.LatheGeometry(profile(u), 96);
     pot.rotation.y = -lt * 9;
     const a = 0.25 + lt * 0.03;
-    cam.position.set(Math.sin(a) * 0.95, 0.34 - lt * 0.006, Math.cos(a) * 0.95);
+    const R = VERTICAL ? 1.45 : 0.95;
+    cam.position.set(Math.sin(a) * R, (VERTICAL ? 0.42 : 0.34) - lt * 0.006, Math.cos(a) * R);
     cam.lookAt(0, 0.13, 0);
     renderer.render(scene, cam);
   };

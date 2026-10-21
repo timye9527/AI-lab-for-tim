@@ -8,6 +8,8 @@ import { serve } from './serve.mjs';
 
 const arg = (k, d) => { const i = process.argv.indexOf(`--${k}`); return i > 0 ? process.argv[i + 1] : d; };
 const scale = Number(arg('scale', 1));
+const fmt = arg('fmt', 'h');
+const [VW, VH] = fmt === 'v' ? [1080, 1920] : [1920, 1080];
 const server = await serve(0); // 0 = 系统分配空闲端口
 const port = server.address().port;
 const exe = process.env.CHROME || (fs.existsSync('/opt/pw-browsers/chromium') ? undefined : undefined);
@@ -15,9 +17,9 @@ const browser = await chromium.launch({
   executablePath: exe,
   args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--disable-gpu-sandbox'],
 });
-const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: scale });
+const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: scale });
 page.on('console', (m) => { if (m.type() === 'error') console.error('[page]', m.text()); });
-await page.goto(`http://127.0.0.1:${port}/`);
+await page.goto(`http://127.0.0.1:${port}/${fmt === 'v' ? '?fmt=v' : ''}`);
 await page.waitForFunction(() => document.body.dataset.ready || document.body.dataset.error, null, { timeout: 300000 });
 const err = await page.evaluate(() => document.body.dataset.error);
 if (err) { console.error(err); process.exit(1); }
@@ -31,8 +33,9 @@ const shot = async (t) => {
 const still = arg('still');
 if (still) {
   fs.mkdirSync('out/stills', { recursive: true });
+  const pre = fmt === 'v' ? 'v' : 't';
   for (const t of still.split(',').map(Number)) {
-    fs.writeFileSync(`out/stills/t${String(t).padStart(5, '0')}.jpg`, await shot(t));
+    fs.writeFileSync(`out/stills/${pre}${String(t).padStart(5, '0')}.jpg`, await shot(t));
     console.log('still', t);
   }
 } else {

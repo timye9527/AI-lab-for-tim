@@ -8,8 +8,9 @@
     "serve": "node scripts/serve.mjs",
     "stills": "node scripts/render.mjs --still 5,18,33,45,60,72,90,105,118,128,136,142,150",
     "render": "bash scripts/render_all.sh",
-    "voice": "python3 scripts/tts.py data/models/kokoro scene/voiceover.json data/audio/vo && node scripts/timeline.mjs data/audio/vo/vo.json scene/voiceover.json data/audio/timeline.json",
-    "audio": "python3 scripts/score.py data/audio/timeline.json data/audio/GeneralUser-GS.sf2 data/audio && python3 scripts/mix.py data/audio/timeline.json data/audio data/audio/mix.wav"
+    "voice": "python3 scripts/tts_melo.py data/models/melo scene/voiceover.json data/audio/vo3 && node scripts/timeline.mjs data/audio/vo3/vo.json scene/voiceover.json data/audio/timeline.json",
+    "audio": "python3 scripts/score.py data/audio/timeline.json data/audio/GeneralUser-GS.sf2 data/audio && python3 scripts/mix.py data/audio/timeline.json data/audio data/audio/mix.wav",
+    "render:v": "FMT=v bash scripts/render_all.sh"
   },
   "dependencies": {
     "three": "0.169.0"

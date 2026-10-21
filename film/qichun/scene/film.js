@@ -4,6 +4,7 @@ import { build, weight } from './timeline.js';
 import { createMap } from './map.js';
 import { createInk } from './ink.js';
 import { createSmoke, createField, createPottery } from './aux3d.js';
+import { VERTICAL, W, H } from './format.js';
 
 const $ = (s) => document.querySelector(s);
 const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
@@ -13,7 +14,7 @@ function setText(sel, txt) { const e = $(sel); if (e.textContent !== txt) e.text
 function show(el, a) { (typeof el === 'string' ? $(el) : el).style.opacity = a.toFixed(3); }
 
 // 画布上要用到的字（字体按 unicode-range 分片，必须先加载）
-const EXTRA = '艾菊薄荷蘄艾【集解】時珍曰……自成化以來則以蘄州者為勝用充方物天下重之謂之蘄艾世界记忆名录2011四宝竹蛇龟蕲艾蕲竹蕲蛇蕲龟笛竹出蘄春白居易—西周唐本草木构建筑为示意，依据毛家咀遗址发掘报告';
+const EXTRA = '本草纲目艾叶菊花人参当归枸杞甘草黄芪1596金陵本刊行2006同名流行歌2022全网健身操艾菊薄荷蘄艾【集解】時珍曰……自成化以來則以蘄州者為勝用充方物天下重之謂之蘄艾世界记忆名录2011四宝竹蛇龟蕲艾蕲竹蕲蛇蕲龟笛竹出蘄春白居易—西周唐本草木构建筑为示意，依据毛家咀遗址发掘报告';
 
 async function preloadFonts(all) {
   const fams = ['600 20px "Noto Serif SC"', '400 20px "Noto Serif SC"', '400 20px "Noto Serif TC"', '400 20px "Ma Shan Zheng"', '400 20px "Noto Sans SC"', '500 20px "Noto Sans SC"'];
@@ -22,8 +23,9 @@ async function preloadFonts(all) {
 }
 
 async function main() {
+  if (VERTICAL) document.body.classList.add('v');
   const [vo, vlines] = await Promise.all([
-    fetch('/data/audio/vo/vo.json').then((r) => r.json()),
+    fetch('/data/audio/vo3/vo.json').then((r) => r.json()),
     fetch('/scene/voiceover.json').then((r) => r.json()),
   ]);
   const TL = build(vo, vlines.lines);
@@ -31,17 +33,17 @@ async function main() {
 
   // 画面层：每种模式一块画布
   const stage = $('#layers');
-  const mk = (id, ctx2d) => { const c = document.createElement('canvas'); c.id = id; c.width = 1920 * devicePixelRatio; c.height = 1080 * devicePixelRatio; stage.appendChild(c); return c; };
+  const mk = (id, ctx2d) => { const c = document.createElement('canvas'); c.id = id; c.width = W * devicePixelRatio; c.height = H * devicePixelRatio; stage.appendChild(c); return c; };
   const L = {
     map: { c: mk('c-map') }, smoke: { c: mk('c-smoke') }, field: { c: mk('c-field') }, pottery: { c: mk('c-pottery') },
-    ink: { c: mk('c-ink') }, book: { c: mk('c-book') }, treasures: { c: mk('c-treasures') }, portrait: { c: mk('c-portrait') },
+    ink: { c: mk('c-ink') }, book: { c: mk('c-book') }, treasures: { c: mk('c-treasures') }, portrait: { c: mk('c-portrait') }, pop: { c: mk('c-pop') },
   };
   const mapR = await createMap(L.map.c, $('#labels'), TL);
   L.map.draw = (seg, t, a) => (L.map.out = mapR.render(t, a));
   L.smoke.draw = createSmoke(L.smoke.c);
   L.field.draw = createField(L.field.c);
   L.pottery.draw = createPottery(L.pottery.c);
-  for (const k of ['ink', 'book', 'treasures', 'portrait']) L[k].draw = createInk(L[k].c);
+  for (const k of ['ink', 'book', 'treasures', 'portrait', 'pop']) L[k].draw = createInk(L[k].c);
 
   // 文字层
   $('#title h1').textContent = S.title.zh; $('#title h2').textContent = S.title.en;

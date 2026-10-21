@@ -1,6 +1,6 @@
 {
  "voice": "zm_yunjian",
- "speed": 0.86,
+ "speed": 0.92,
  "lines": [
   {
    "id": "hook1",
@@ -16,8 +16,8 @@
   },
   {
    "id": "geo1",
-   "text": "这里北依大别山，南临长江。两千三百九十八平方公里，山地、丘陵、湖泊，由北向南铺开。",
-   "sub": "北依大别山，南临长江。2398 平方公里，山地、丘陵、湖泊，由北向南铺开。",
+   "text": "这里北依大别山，南临长江。两千三百九十八平方公里，山地、丘陵、湖泊，由北向南展开。",
+   "sub": "北依大别山，南临长江。2398 平方公里，山地、丘陵、湖泊，由北向南展开。",
    "en": "Backed by the Dabie Mountains, facing the Yangtze: 2,398 km² of mountains, hills and lakes.",
    "src": "面积：生态环境部，2023-01"
   },
@@ -99,7 +99,7 @@
   },
   {
    "id": "li4",
-   "text": "书里写到家乡的艾：自成化以来，则以蕲州者唯胜，天下重之，谓之蕲艾。",
+   "text": "书里写到了家乡的艾：自成化以来，则以蕲州者唯胜，天下重之，谓之蕲艾。",
    "sub": "书里写到家乡的艾：「自成化以来，则以蕲州者为胜……天下重之，谓之蕲艾。」",
    "en": "Of mugwort he wrote: since the Chenghua era, Qizhou's has been the finest — prized as Qi'ai.",
    "src": "《本草纲目·草部·艾》"
@@ -110,6 +110,13 @@
    "sub": "2011 年，《本草纲目》入选联合国教科文组织《世界记忆名录》。",
    "en": "In 2011, it entered UNESCO's Memory of the World Register.",
    "src": "UNESCO Memory of the World, 2011"
+  },
+  {
+   "id": "pop1",
+   "text": "四百多年后，这本书的名字，成了周杰伦一首歌的歌名。二零二二年，跟着这首歌跳健身操的人，刷满了屏幕。",
+   "sub": "四百多年后，书名成了周杰伦一首歌的名字；2022 年，跟着它跳健身操的人刷满了屏幕。",
+   "en": "Four centuries on, the book's title became a Jay Chou song; in 2022, millions worked out to it online.",
+   "src": "《本草纲目》方文山作词、周杰伦作曲演唱（2006）；界面新闻 2022-04"
   },
   {
    "id": "folk1",
@@ -141,8 +148,8 @@
   },
   {
    "id": "ppl1",
-   "text": "这片土地，也走出了国学大师黄侃，和文艺理论家胡风。",
-   "sub": "这片土地，也走出了国学大师黄侃，和文艺理论家胡风。",
+   "text": "这片土地，也走出了国学大师黄侃，以及文艺理论家胡风。",
+   "sub": "这片土地，也走出了国学大师黄侃，以及文艺理论家胡风。",
    "en": "This land also raised the scholar Huang Kan, and the literary theorist Hu Feng.",
    "src": "Wikipedia「Huang Kan」；汉典「胡风」"
   },
@@ -179,5 +186,56 @@
    "sub": "这里是蕲春。欢迎你来。",
    "en": "This is Qichun. You are welcome here."
   }
- ]
+ ],
+ "engine": "melo",
+ "lexicon": {
+  "一种": [
+   4,
+   3
+  ],
+  "一条": [
+   4,
+   2
+  ],
+  "一路": [
+   2,
+   4
+  ],
+  "一千": [
+   4,
+   1
+  ],
+  "一根": [
+   4,
+   1
+  ],
+  "一缕": [
+   4,
+   3
+  ],
+  "一株": [
+   4,
+   1
+  ],
+  "好友": [
+   2,
+   3
+  ],
+  "也走": [
+   2,
+   3
+  ],
+  "铺开": [
+   1,
+   1
+  ],
+  "展开": [
+   3,
+   1
+  ],
+  "一首": [
+   4,
+   3
+  ]
+ }
 }

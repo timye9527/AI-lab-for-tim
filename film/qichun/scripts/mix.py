@@ -8,6 +8,7 @@ TL = json.load(open(sys.argv[1]))
 AD, OUT = sys.argv[2], sys.argv[3]
 SR = 48000
 rng = np.random.default_rng(5)
+VODIR = os.environ.get("VO", "vo3")   # vo3：MeloTTS 配音
 
 def biquad(kind, f0, q=0.707, gain_db=0.0):
     """RBJ 均衡器系数"""
@@ -67,14 +68,14 @@ def reverb(x, h, wet):
 N = int(SR * (TL["duration"] + 1.0))
 
 # ---------- 人声 ----------
-vo_meta = {m["id"]: m for m in json.load(open(f"{AD}/vo/vo.json"))}
+vo_meta = {m["id"]: m for m in json.load(open(f"{AD}/{VODIR}/vo.json"))}
 voice = np.zeros(N)
 for s in TL["segments"]:
     for it in s["items"]:
-        a, sr = sf.read(f"{AD}/vo/{vo_meta[it['id']]['file']}")
+        a, sr = sf.read(f"{AD}/{VODIR}/{vo_meta[it['id']]['file']}")
         a = signal.resample_poly(a, SR, sr)
         i0 = int(it["start"] * SR); voice[i0:i0 + len(a)] += a[: N - i0]
-voice = eq(voice, ("hp", 80, 0.7), ("lowshelf", 160, 0.7, 2.5), ("peak", 420, 1.0, -2.5), ("peak", 3200, 0.9, 3.0), ("highshelf", 9000, 0.7, 1.5))
+voice = eq(voice, ("hp", 95, 0.7), ("lowshelf", 220, 0.7, 1.5), ("peak", 500, 1.0, -2.0), ("peak", 3000, 0.9, 2.0), ("highshelf", 10000, 0.7, 1.0))
 voice = compress(voice, -22, 3.0, 5)
 voice = voice / (np.sqrt(np.mean(voice[voice != 0] ** 2)) + 1e-9) * 0.09
 v2 = np.stack([voice, voice], 1)

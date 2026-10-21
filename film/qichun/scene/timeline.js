@@ -19,6 +19,7 @@ export function build(vo, lines) {
     let end = (items.length ? cur - S.GAP : cur) + (seg.tail ?? 1);
     end = Math.max(end, start + (seg.min || 0));
     const o = { ...seg, start, end, dur: end - start, items };
+    if (seg.bpm) o.beat0 = start + (seg.beatOffset ?? 0);
     if (seg.stampAt) o.stampT = items.find((i) => i.id === seg.stampAt).start - start;
     segs.push(o);
     t = end;

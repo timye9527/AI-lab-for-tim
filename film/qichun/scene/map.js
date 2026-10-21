@@ -1,7 +1,7 @@
 // 地图模式：真实地形 + 建筑白模 + 水系高亮。镜头、标签、高亮线都由 story.js 的地图分段驱动。
 import * as THREE from 'three';
 
-const W = 1920, H = 1080;
+import { W, H, VERTICAL } from './format.js';
 const GHOST = 0.6;          // 历史段建筑暗影的不透明度
 const EXAG = 1.6;          // 地形竖向夸张
 const BUILDING_H = 6;      // 建筑高度缺失，统一示意（米）
@@ -271,7 +271,7 @@ function cameraKeys(segs) {
 function camAt(keys, t) {
   const v = interp(keys, t, (k) => [k.target[0], k.target[1], k.target[2], Math.log(k.dist), k.az, k.el]);
   const [tx, ty, tz, ld, az, el] = v;
-  const d = Math.exp(ld), a = az * Math.PI / 180, e = el * Math.PI / 180;
+  const d = Math.exp(ld) * (VERTICAL ? 1.3 : 1), a = az * Math.PI / 180, e = el * Math.PI / 180;
   return { target: new THREE.Vector3(tx, ty * EXAG, tz), eye: new THREE.Vector3(tx + d * Math.cos(e) * Math.sin(a), ty * EXAG + d * Math.sin(e), tz + d * Math.cos(e) * Math.cos(a)), dist: d };
 }
 
@@ -282,7 +282,7 @@ export async function createMap(canvas, labelsBox, timeline) {
   renderer.setSize(W, H, false);
   renderer.setClearColor(BG);
   const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(30, W / H, 10, 1e6);
+  const cam = new THREE.PerspectiveCamera(VERTICAL ? 48 : 30, W / H, 10, 1e6);
   const U = {
     uBg: { value: BG }, uFogNear: { value: 1e5 }, uFogFar: { value: 3e5 }, uSepia: { value: 0 },
     uExag: { value: EXAG }, uTime: { value: 0 },

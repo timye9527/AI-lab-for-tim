@@ -12,8 +12,8 @@ seg = {s["id"]: s for s in TL["segments"]}
 rng = np.random.default_rng(11)
 
 # ---------- 乐谱 ----------
-CH = dict(strings=0, koto=1, lead=2, choir=3, harp=4, taiko=5, timp=6, piano=7, horn=8, bell=10, bass=11)
-PROG = dict(strings=49, koto=107, lead=77, choir=52, harp=46, taiko=116, timp=47, piano=0, horn=60, bell=14, bass=49)
+CH = dict(strings=0, koto=1, lead=2, choir=3, harp=4, taiko=5, timp=6, piano=7, horn=8, drums=9, bell=10, bass=11, ebass=12, erhu=13)
+PROG = dict(strings=49, koto=107, lead=77, choir=52, harp=46, taiko=116, timp=47, piano=0, horn=60, drums=0, bell=14, bass=49, ebass=33, erhu=110)
 ev = []   # (时间, 序号, 类型, 参数...)
 
 def note(t, ch, key, dur, vel):
@@ -139,9 +139,37 @@ while t < b1 - 1:
 melody(b0 + 4, beat * 1.2, [(5, 2), (4, 1), (3, 1), (4, 3), (None, 1), (3, 1), (2, 1), (1, 1), (2, 1), (3, 4)], ch="lead", vel=68)
 note(seg["book"]["start"] + seg["book"]["stampT"] if "stampT" in seg["book"] else b1 - 4, "taiko", 45, 2, 70)
 
+# 7.5 流行：原创中国风节拍（鼓、贝斯、古筝和二胡的旋律），不取用任何现成歌曲的旋律
+if "pop" in seg:
+    P = seg["pop"]; b0, b1 = P.get("beat0", P["start"]), P["end"]
+    st = 60 / P.get("bpm", 96) / 4          # 十六分音符
+    bars = int((b1 - b0) / (st * 16)) + 1
+    prog_bass = [38, 35, 31, 33]            # D Bm G A 的根音
+    riff = [(0, 74), (3, 76), (4, 78), (6, 81), (8, 78), (10, 76), (11, 74), (12, 71), (14, 69)]
+    for bar in range(bars):
+        t0 = b0 + bar * st * 16
+        if t0 > b1 - 0.2: break
+        for k in (0, 6, 8, 11):
+            note(t0 + k * st, "drums", 36, 0.2, 112 if k == 0 else 92)
+        for k in (4, 12):
+            note(t0 + k * st, "drums", 38, 0.2, 100); note(t0 + k * st, "drums", 39, 0.2, 70)
+        for k in range(0, 16, 2):
+            note(t0 + k * st, "drums", 42 if k != 14 else 46, 0.1, 70 if k % 4 == 0 else 52)
+        r = prog_bass[bar % 4]
+        for k, d in ((0, 0), (3, 0), (6, 12), (8, 0), (11, 7), (14, 12)):
+            note(t0 + k * st, "ebass", r + d, st * 2, 96)
+        pad(t0, t0 + st * 16, [["D", "Bm", "G", "A"][bar % 4]], vel=60)
+        if bar >= 1:
+            for k, key in riff:
+                note(t0 + k * st, "koto", key - (0 if bar % 2 else 2 if key > 74 else 0), st * 3, 84)
+            note(t0, "erhu", 74 if bar % 2 else 69, st * 7, 80); note(t0 + st * 8, "erhu", 71 if bar % 2 else 76, st * 7, 78)
+    # 开头一记鼓加花
+    for k in range(4):
+        note(b0 - (4 - k) * st, "drums", 38, 0.1, 60 + k * 12)
+
 # 8 风物：节奏起来，太鼓轻打
 f0, f1 = seg["treasures"]["start"], seg["pottery"]["end"]
-bt = 60 / 80
+bt = 60 / 96
 pad(f0, f1, ["D", "A", "Bm", "G", "D", "A"], vel=66)
 expr("strings", f0, f0 + 2, 70, 100)
 koto_arp(f0, f1, bt / 2, [0, 2, 4, 7, 4, 2, 5, 4], vel=64)
@@ -203,7 +231,10 @@ for e in ev:
         out[pos:tgt] = buf; pos = tgt
     kind, ch = e[2], e[3]
     if kind == "prog":
-        synth.program_select(ch, sfid, 0, e[4], is_drums=False)
+        if ch == 9:
+            synth.program_select(ch, sfid, 128, 0, is_drums=True)
+        else:
+            synth.program_select(ch, sfid, 0, e[4], is_drums=False)
     elif kind == "on":
         synth.noteon(ch, e[4], e[5])
     elif kind == "off":
@@ -283,6 +314,11 @@ for s in TL["segments"]:
         i0 = int(max(0, s["start"] - 1.0) * SR); L = int(SR * 2.4)
         env = np.sin(np.linspace(0, np.pi, L)) ** 2
         add(np.pad(bandnoise(L, 40, 600) * env, (i0, max(0, n - i0 - L)))[:n], 0.09)
+# 流行段：开场前一记上扬的扫频
+if "pop" in seg:
+    s = seg["pop"]; L = int(SR * 1.6); i0 = int(max(0, s["start"] - 0.3) * SR)
+    rise = bandnoise(L, 800, 9000) * np.linspace(0, 1, L) ** 2
+    add(np.pad(rise, (i0, max(0, n - i0 - L)))[:n], 0.08)
 # 高铁驶过
 s = seg["now"]; i0 = int((s["start"] + 0.02 * s["dur"]) * SR); L = int(SR * 3.5)
 u = np.linspace(0, 1, L); env = np.exp(-((u - 0.45) / 0.18) ** 2)
