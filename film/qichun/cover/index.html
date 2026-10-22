@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>封面</title>
+<link rel="stylesheet" href="/node_modules/@fontsource/ma-shan-zheng/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/400.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-serif-sc/600.css">
+<link rel="stylesheet" href="/node_modules/@fontsource/noto-sans-sc/500.css">
+<style>
+/* 3:4 封面，1080×1440。背景用片中画面帧（out/cover/f_*.png） */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { width: 1080px; height: 1440px; overflow: hidden; }
+.c { position: relative; width: 1080px; height: 1440px; overflow: hidden; }
+.bg { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.brush { font-family: 'Ma Shan Zheng', serif; }
+.serif { font-family: 'Noto Serif SC', serif; }
+.sans { font-family: 'Noto Sans SC', sans-serif; }
+
+/* A：夜景光点 */
+.a .bg { background-image: url(/out/cover/f_172.png); background-size: 1250px auto; background-position: -60px -330px; }
+.a .shade { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(6,5,4,.96) 0%, rgba(6,5,4,.78) 24%, rgba(6,5,4,0) 44%, rgba(6,5,4,0) 74%, rgba(6,5,4,.92) 92%); }
+.a .kick { position: absolute; top: 92px; left: 0; right: 0; text-align: center; font-size: 30px; letter-spacing: .5em; text-indent: .5em; color: rgba(244,231,207,.75); }
+.a h1 { position: absolute; top: 140px; left: 0; right: 0; text-align: center; font-size: 210px; line-height: 1; color: #ffe3b0; letter-spacing: .06em; text-indent: .06em; text-shadow: 0 0 40px rgba(255,170,80,.45), 0 6px 30px rgba(0,0,0,.8); }
+.a .sub { position: absolute; top: 390px; left: 0; right: 0; text-align: center; font-size: 40px; color: #f4e7cf; letter-spacing: .22em; text-indent: .22em; }
+.a .tags { position: absolute; bottom: 150px; left: 0; right: 0; display: flex; justify-content: center; gap: 22px; }
+.a .tags span { padding: 12px 26px; border: 1.5px solid rgba(255,216,154,.7); border-radius: 40px; font-size: 32px; color: #ffd89a; background: rgba(10,8,6,.55); }
+.a .foot { position: absolute; bottom: 70px; left: 0; right: 0; text-align: center; font-size: 24px; color: rgba(244,231,207,.6); letter-spacing: .12em; }
+.a .num { position: absolute; right: 64px; bottom: 260px; text-align: right; color: #ffd89a; }
+.a .num b { display: block; font: 600 76px/1 'Noto Serif SC', serif; text-shadow: 0 4px 24px rgba(0,0,0,.8); }
+.a .num i { display: block; margin-top: 8px; font-style: normal; font-size: 24px; color: rgba(244,231,207,.75); letter-spacing: .1em; }
+
+/* B：水墨宣纸 */
+.b { background: #e7ddc7; }
+.b .bg { background-image: url(/out/cover/f_14.png); background-size: 1080px auto; background-position: 0 -690px; top: 610px; }
+.b .fade { position: absolute; left: 0; right: 0; top: 600px; height: 120px; background: linear-gradient(#e7ddc7, rgba(231,221,199,0)); }
+.b h1 { position: absolute; top: 120px; left: 0; right: 0; text-align: center; font-size: 200px; line-height: 1; color: #1b1611; letter-spacing: .08em; text-indent: .08em; }
+.b .seal { position: absolute; top: 132px; right: 86px; width: 66px; padding: 10px 0; background: #b5332a; color: #f3e6cf; text-align: center; font-size: 40px; line-height: 1.15; border-radius: 6px; }
+.b .hook { position: absolute; top: 380px; left: 0; right: 0; text-align: center; font-size: 36px; line-height: 1.75; color: #2a221a; letter-spacing: .12em; }
+.b .hook em { font-style: normal; color: #9e2c24; }
+.b .foot { position: absolute; bottom: 70px; left: 0; right: 0; text-align: center; font-size: 26px; color: #3a3026; letter-spacing: .18em; }
+.b .badge { position: absolute; bottom: 250px; left: 0; right: 0; text-align: center; }
+.b .badge span { display: inline-block; padding: 12px 30px; background: rgba(27,22,17,.85); color: #f3e6cf; font-size: 30px; letter-spacing: .14em; border-radius: 6px; }
+</style>
+</head>
+<body>
+<div class="c a" id="a" hidden>
+  <div class="bg"></div><div class="shade"></div>
+  <div class="kick sans">湖北 · 蕲春</div>
+  <h1 class="brush">蕲水长流</h1>
+  <div class="sub serif">三千年 · 一株艾 · 一本书</div>
+  <div class="num"><b>105,329</b><i>栋房屋，卫星影像里的蕲春</i></div>
+  <div class="tags sans"><span>李时珍故里</span><span>蕲艾</span><span>本草纲目</span></div>
+  <div class="foot sans">全片画面由代码渲染 · 3 分钟看完家乡</div>
+</div>
+<div class="c b" id="b" hidden>
+  <div class="bg"></div><div class="fade"></div>
+  <h1 class="brush">蕲水长流</h1>
+  <div class="seal brush">蕲<br>春</div>
+  <div class="hook serif">有一种草，叫<em>蕲艾</em><br>有一条河，叫<em>蕲水</em><br>有一个人，叫<em>李时珍</em></div>
+  <div class="badge sans"><span>从西周到今天 · 3 分钟</span></div>
+  <div class="foot serif">湖北 · 蕲春</div>
+</div>
+<script>
+  const v = new URLSearchParams(location.search).get('v') || 'a';
+  document.getElementById(v).hidden = false;
+  document.fonts.ready.then(() => { document.body.dataset.ready = '1'; });
+</script>
+</body>
+</html>
