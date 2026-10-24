@@ -173,6 +173,11 @@ def g2p_run(run):
             pys = lazy_pinyin(seg, style=Style.TONE3, neutral_tone_with_five=True)
             out += [(c, p, '词典') for c, p in zip(seg, pys)]
             i = j
+    # 模型音节表里没有的读音，换成同样规范的另一读法（谁：shéi / shuí 都规范，模型只有 shuí）
+    for k, (c, p, src) in enumerate(out):
+        base = re.sub(r'\d', '', p)
+        if base in MISSING:
+            out[k] = (c, MISSING[base] + p[len(base):], src)
     # 「一」「不」变调，词表里写死的不动
     for k, (c, p, src) in enumerate(out):
         if src in ('词表', '争议') or c not in '一不':
@@ -252,6 +257,9 @@ def mark(p):
         idx = max(s.rfind(c) for c in 'iouv')
     return (s[:idx] + MARKS[s[idx]][t - 1] + s[idx + 1:]).replace('v', 'ü')
 
+
+# 模型音节表里缺的音节 → 同样规范的替代读法
+MISSING = {'shei': 'shui'}
 
 # 模型弱音节：指令写对了，模型也发不出来（用声学对比实测，见 错误档案.md）。稿子里出现就报错，必须改写。
 # dei：模型读「dei3」和读「dé」几乎一样（频谱距离 10.6，比同音重读的自然差别 18～32 还小），「总得」「就得」都会读成 dé

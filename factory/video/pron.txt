@@ -215,3 +215,37 @@
 得出 de2 chu1
 紧接着 jin3 jie1 zhe5
 为什么 wei4 shen2 me5
+
+# ── 003 期新词 ──
+囚徒困境 qiu2 tu2 kun4 jing4
+掉队 diao4 dui4
+掺和 chan1 huo5
+入局 ru4 ju2
+入坑 ru4 keng1
+算力 suan4 li4
+封仓 feng1 cang1
+小霸王 xiao3 ba4 wang2
+步步高 bu4 bu4 gao1
+方三文 fang1 san1 wen2
+碾碎 nian3 sui4
+滚滚向前 gun3 gun3 xiang4 qian2
+同质化 tong2 zhi4 hua4
+光伏 guang1 fu2
+扩产 kuo4 chan3
+产能 chan3 neng2
+淘汰 tao2 tai4
+网易 wang3 yi4
+共进午餐 gong4 jin4 wu3 can1
+跟风 gen1 feng1
+能力圈 neng2 li4 quan1
+重仓买入 zhong4 cang1 mai3 ru4
+回调 hui2 tiao2
+长访谈 chang2 fang3 tan2
+做得 zuo4 de5
+
+# ── 人工审过、确认无误的词（003 期）──
+了解 liao3 jie3
+顺着 shun4 zhe5
+更差 geng4 cha4
+接着 jie1 zhe5
+跟着 gen1 zhe5
