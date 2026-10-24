@@ -6,7 +6,7 @@
 //   node server/admin.mjs extend <兑换码> [次数]                         客服：给一个码加次数（默认 +1）
 //   node server/admin.mjs revoke <兑换码>                               作废一个码（如退款）
 //   node server/admin.mjs backup                                       备份数据库到 backup/（建议每天定时跑）
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { openDb, makeCodes, insertCodes, EVENTS } from './db.mjs';
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -50,13 +50,20 @@ if (cmd === 'gen') {
   for (const r of rows) (byDay[r.day] ||= {})[r.ev] = r.n;
   const redeemed = db.prepare(`SELECT date(first_used_at, '+8 hours') AS day, COUNT(*) AS n FROM codes WHERE first_used_at IS NOT NULL ${where} GROUP BY day`).all(...params);
   const red = Object.fromEntries(redeemed.map((r) => [r.day, r.n]));
-  const label = { view: '打开', start: '开测', finish: '测完', poster: '存卡', invite: '邀请', unlock: '解锁' };
-  console.log(['日期      ', ...EVENTS.map((e) => label[e]), '新码使用', '测完率', '解锁率'].join('\t'));
+  // 先付费模式下输码在开测前，解锁率按「打开」算；先玩后付按「测完」算
+  const testsDir = new URL('../public/tests/', import.meta.url);
+  const ids = flags.test ? [flags.test] : existsSync(testsDir) ? readdirSync(testsDir) : [];
+  const modes = await Promise.all(ids.map((id) => import(new URL(`${id}/config.js`, testsDir)).then((m) => m.default.paywall?.mode).catch(() => null)));
+  const payFirst = modes.length > 0 && modes.every((m) => m === 'start');
+  const label = { view: '打开', invited: '邀请打开', start: '开测', finish: '测完', poster: '存卡', invite: '邀请', unlock: '解锁' };
+  console.log(['日期      ', ...EVENTS.map((e) => label[e]), '新码使用', '测完率', '存卡率', '邀请率', payFirst ? '输码率' : '解锁率'].join('\t'));
   const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '-');
   for (const day of Object.keys({ ...byDay, ...red }).sort()) {
     const d = byDay[day] || {};
-    console.log([day, ...EVENTS.map((e) => d[e] || 0), red[day] || 0, pct(d.finish || 0, d.start || 0), pct(d.unlock || 0, d.finish || 0)].join('\t'));
+    const f = (e) => d[e] || 0;
+    console.log([day, ...EVENTS.map(f), red[day] || 0, pct(f('finish'), f('start')), pct(f('poster'), f('finish')), pct(f('invite'), f('finish')), pct(f('unlock'), payFirst ? f('view') : f('finish'))].join('\t'));
   }
+  if (payFirst) console.log('（先付费模式：输码率 = 解锁 / 打开；被邀请来的人先玩后付，他们的解锁也算在里面）');
   const inv = db.prepare(`SELECT test, COUNT(*) AS total, SUM(uses > 0) AS used FROM codes WHERE 1 ${where} GROUP BY test`).all(...params);
   console.log('\n兑换码库存：');
   for (const r of inv) console.log(`  ${r.test}：共 ${r.total}，已使用 ${r.used}，未使用 ${r.total - r.used}${r.total - r.used < 50 ? '  ← 快不够了，记得补货' : ''}`);

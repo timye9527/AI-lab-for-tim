@@ -67,12 +67,8 @@ function track(ev) {
 for (const [k, v] of Object.entries(test.theme)) document.documentElement.style.setProperty(`--${k}`, v);
 document.title = test.title;
 
-const state = {
-  answers: store.get('answers', []),
-  unlocked: test.paywall.mode === 'none' || !!store.get('unlock'),
-};
-
 // 好友邀请：链接带 ?vs=<人格序号(36进制)><段位等级>&n=花名，例如 ?vs=a2，保持链接短
+let vsFromLink = false;
 const typeCodes = Object.keys(test.types);
 const vsParam = (code, level) => `${typeCodes.indexOf(code).toString(36)}${level}`;
 const vs = (() => {
@@ -85,6 +81,7 @@ const vs = (() => {
     if (raw && code) {
       const v = { code, level: Number(lv) || 0, nick: (params.get('n') || '').trim().slice(0, 12) || (params.get('vs') ? test.result.anonymous : '你的好友') };
       store.set('vs', v);
+      vsFromLink = true;
       return v;
     }
   } catch {
@@ -92,6 +89,12 @@ const vs = (() => {
   }
   return store.get('vs');
 })();
+// 先付费模式下，被好友邀请来的人可以换一种付费方式（paywall.invited，一般是先玩后付）
+const mode = (vs && test.paywall.mode === 'start' && test.paywall.invited) || test.paywall.mode;
+const state = {
+  answers: store.get('answers', []),
+  unlocked: mode === 'none' || !!store.get('unlock'),
+};
 const tierOf = (level) => test.tiers.find((t) => t.level === level);
 const vsMap = () => {
   const t = test.types[vs.code];
@@ -107,7 +110,7 @@ function go(screen) {
 
 // —— 开场 ——
 function renderIntro() {
-  const needCodeFirst = test.paywall.mode === 'start' && !state.unlocked;
+  const needCodeFirst = mode === 'start' && !state.unlocked;
   const hasResult = state.answers.length === test.questions.length;
   app.innerHTML = `
     <section class="intro">
@@ -423,12 +426,14 @@ function locked() {
 }
 
 function unlockBox() {
+  // 被邀请来的人不知道去哪买码，提示去问邀请人
+  const hint = vs && test.compare?.buyHint ? fill(test.compare.buyHint, vsMap()) : test.paywall.hint;
   return `
     <form class="unlock" data-unlock>
       <input name="code" autocomplete="off" autocapitalize="characters" placeholder="${esc(test.paywall.placeholder)}">
       <button class="btn primary" type="submit">解锁</button>
       <p class="unlock-msg" data-msg></p>
-      <p class="unlock-hint">${esc(test.paywall.hint)}</p>
+      <p class="unlock-hint">${esc(hint)}</p>
       <p class="unlock-preview" data-preview hidden>预览版：输入 DEMO 即可体验完整报告</p>
     </form>`;
 }
@@ -530,5 +535,6 @@ app.addEventListener('click', (e) => {
 });
 
 track('view');
+if (vsFromLink) track('invited');
 // 带着好友邀请来的人先看开场页的邀请横幅
 go(state.answers.length === test.questions.length && location.hash !== '#intro' && !/^#vs/.test(location.hash) ? 'result' : 'intro');

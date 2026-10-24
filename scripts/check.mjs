@@ -21,6 +21,8 @@ for (const id of ids) {
   for (const c of Object.keys(test.types)) if (!codes.includes(c)) fail(`多余类型 ${c}`);
   for (const [c, t] of Object.entries(test.types)) {
     for (const f of ['name', 'alias', 'era', 'quote', 'portrait', 'fact', 'moment']) if (!t[f]) fail(`${c} 缺 ${f}`);
+    // 史实要有出处：至少标一个《书名》
+    if (t.fact && !/《[^》]+》/.test(t.fact)) fail(`${c}（${t.name}）的 fact 没有标出处《…》`);
     if (t.tags?.length !== 3) fail(`${c} 标签应为 3 个`);
     if (t.tips?.length !== 3) fail(`${c} 反割建议应为 3 条`);
   }

@@ -14,6 +14,24 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const icon = (name, size = 200) => tierIcon(name, th.accent, th.gold).replace('width="120" height="120"', `width="${size}" height="${size}"`);
 const tiersDesc = [...test.tiers].sort((a, b) => b.level - a.level);
 const typeEntries = Object.entries(test.types);
+const QN = test.questions.length;
+const dimKeys = test.dims.map((d) => d.key);
+const buddyOf = (c) => flip(test, c, test.relations.buddy.flip);
+const rivalOf = (c) => flip(test, c, test.relations.rival.flip);
+// 某个人格在某个维度上的说法，如「敢下重注」
+const poleText = (code, key) => {
+  const i = dimKeys.indexOf(key);
+  const d = test.dims[i];
+  return [...code][i] === d.pos ? d.posText : d.negText;
+};
+const picks = (code, keys) => keys.map((k) => poleText(code, k)).join('、');
+// 每篇正文的固定结尾
+const TAIL = `${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`;
+// 使用步骤跟着付费方式走：先付费是开场输码，先玩后付是结果页输码
+const payFirst = test.paywall.mode === 'start';
+const howTo = payFirst
+  ? ['在开场页输入兑换码，开始答题', `做完 ${QN} 题，段位和完整报告一次看全`]
+  : [`做完 ${QN} 道题，免费领段位卡`, '在结果页底部输入兑换码，解锁完整人格报告'];
 
 // —— 配图模板 ——
 const CSS = `
@@ -57,6 +75,13 @@ body { width: 1080px; height: 1440px; overflow: hidden; color: ${th.text};
 .rels .lab { font-size: 32px; color: ${th.muted}; }
 .rels .who { font-size: 64px; font-weight: 900; margin: 16px 0 8px; }
 .rels .ali { font-size: 32px; color: ${th.gold}; }
+.duo .card { padding: 64px 32px; }
+.duo .who { font-size: 104px; }
+.duo .lab, .duo .ali { font-size: 36px; }
+.vs .rung { padding: 30px 32px; }
+.vs .rung b { font-size: 46px; }
+.vs .rung small { font-size: 30px; margin-top: 6px; }
+.vs .lv { font-size: 36px; width: auto; }
 .cta { font-size: 56px; font-weight: 900; color: ${th.accent}; margin-top: 36px; }
 .small { font-size: 26px; color: ${th.muted}; margin-top: 28px; line-height: 1.6; }
 `;
@@ -74,23 +99,44 @@ const S = {
   persona: (t) => `<div class="center"><div class="name">${esc(t.name)}</div><div class="era">${esc(t.era)} · ${esc(t.alias)}</div>
     <div class="tags">${t.tags.map((x) => `<span>${esc(x)}</span>`).join('')}</div><div class="quote">“${esc(t.quote)}”</div>
     <div class="card p" style="text-align:left">${esc(t.portrait)}</div></div>`,
-  text: (title, text) => `<div class="center" style="align-items:stretch;text-align:left"><div class="title" style="margin-top:0">${esc(title)}</div><div class="card p" style="font-size:48px">${esc(text)}</div></div>`,
-  rels: (t, buddy, rival) => `<div class="center" style="align-items:stretch;text-align:left"><div class="title" style="margin-top:0">${esc(t.name)}型的搭子和天敌</div><div class="rels">
+  // 字多就缩一号，保证放得下
+  text: (title, text) => `<div class="center" style="align-items:stretch;text-align:left"><div class="title" style="margin-top:0">${esc(title)}</div><div class="card p" style="font-size:${[...text].length > 100 ? 42 : 48}px">${esc(text)}</div></div>`,
+  rels: (code) => {
+    const t = test.types[code];
+    const [bc, rc] = [buddyOf(code), rivalOf(code)];
+    const [buddy, rival] = [test.types[bc], test.types[rc]];
+    const bk = test.relations.buddy.flip;
+    return `<div class="center" style="align-items:stretch;text-align:left"><div class="title" style="margin-top:0">${esc(t.name)}型的搭子和天敌</div><div class="rels">
     <div class="card"><div class="lab">${esc(test.relations.buddy.label)}</div><div class="who">${esc(buddy.name)}</div><div class="ali">${esc(buddy.alias)}</div></div>
     <div class="card"><div class="lab">${esc(test.relations.rival.label)}</div><div class="who">${esc(rival.name)}</div><div class="ali">${esc(rival.alias)}</div></div></div>
-    <div class="p" style="margin-top:44px">${esc(test.relations.buddy.why)}</div><div class="p" style="margin-top:20px">${esc(test.relations.rival.why)}</div></div>`,
+    <div class="p" style="margin-top:44px">${esc(`${buddy.name}型${picks(bc, bk)}，正好补上${t.name}型${picks(code, bk)}的另一面。`)}</div>
+    <div class="p" style="margin-top:20px">${esc(`${rival.name}型${picks(rc, dimKeys)}，四个维度全反。看对方操作，血压都会升高。`)}</div></div>`;
+  },
+  // 两个人格并排：名字、代码、心声
+  duo: (a, b, label) => `<div class="center duo" style="align-items:stretch"><div class="rels">${[a, b]
+    .map((c) => `<div class="card"><div class="lab">${esc(c)}</div><div class="who">${esc(test.types[c].name)}</div><div class="ali">${esc(test.types[c].alias)}</div>
+      <div class="p" style="font-size:42px;margin-top:40px;color:${th.accent}">“${esc(test.types[c].quote)}”</div></div>`)
+    .join('')}</div><div class="cta" style="text-align:center;color:${th.gold};font-size:72px;margin-top:64px">${esc(label)}</div></div>`,
+  // 四个维度逐条对比，不一样的维度高亮
+  versus: (a, b) => `<div class="center vs" style="align-items:stretch;text-align:left"><div class="title" style="margin-top:0">四个维度对一对</div><div class="ladder" style="gap:28px">${test.dims
+    .map((d) => {
+      const diff = poleText(a, d.key) !== poleText(b, d.key);
+      return `<div class="rung${diff ? ' on' : ''}" style="justify-content:space-between"><span class="lv">${esc(d.label)}</span>
+        <div style="text-align:right"><b>${esc(poleText(a, d.key))} ${diff ? 'vs' : '='} ${esc(poleText(b, d.key))}</b><small>${esc(test.types[a].name)}型 · ${esc(test.types[b].name)}型</small></div></div>`;
+    })
+    .join('')}</div><div class="small">高亮的是两人不一样的维度</div></div>`,
   ladder: (on) => `<div class="title">韭菜段位天梯</div><div class="ladder">${tiersDesc
     .map((t) => `<div class="rung${t.level === on ? ' on' : ''}"><span class="lv">Lv.${t.level}</span>${icon(t.icon, 72)}<div><b>${esc(t.name)}</b><small>「${esc(t.sub)}」</small></div></div>`)
     .join('')}</div>`,
   tier: (t) => `<div class="center"><div class="ring">${icon(t.icon, 200)}</div><div class="era" style="color:${th.gold};margin-top:36px">Lv.${t.level}</div>
-    <div class="name" style="font-size:96px">${esc(t.name)}</div><div class="quote" style="color:${th.gold}">「${esc(t.sub)}」</div><div class="card p" style="text-align:left">${esc(t.desc)}</div></div>`,
+    <div class="name" style="font-size:${Math.min(96, Math.floor(800 / [...t.name].length))}px">${esc(t.name)}</div><div class="quote" style="color:${th.gold}">「${esc(t.sub)}」</div><div class="card p" style="text-align:left">${esc(t.desc)}</div></div>`,
   question: (q) => `<div class="title">先来一道题</div><div class="p" style="font-weight:700;color:${th.text}">${esc(q.q)}</div>
     ${q.options.map((o, i) => `<div class="opt"><i>${'ABCD'[i]}</i>${esc(o.t)}</div>`).join('')}<div class="small">你选哪个？评论区见</div>`,
   grid: () => `<div class="title" style="margin:40px 0 24px">${esc(N.series)}</div><div class="grid">${typeEntries
     .map(([c, t]) => `<div class="cell"><b>${esc(t.name)}</b><small>${esc(t.alias)} · ${esc(c)}</small></div>`)
     .join('')}</div>`,
   cta: () => `<div class="center"><div class="big" style="font-size:84px">你是哪种韭菜？<br><em>又是哪一位？</em></div>
-    <div class="p" style="margin-top:48px">12 道盘面情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
+    <div class="p" style="margin-top:48px">${QN} 道盘面情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
     <div class="cta">${esc(N.cta)}</div><div class="small">纯属娱乐，非专业测评，不构成任何投资建议</div></div>`,
 };
 
@@ -99,25 +145,54 @@ const notes = [];
 notes.push({
   slug: '00-总览',
   title: `${N.series}，你是哪一位？`,
-  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n12 道盘面情境题，测出你的韭菜段位和人格底色。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
+  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n${QN} 道盘面情境题，测出你的韭菜段位和人格底色。\n${TAIL}`,
   slides: [S.cover(N.series, '你是哪一位？', '曹操、诸葛亮、司马懿、李白、刘禅……'), S.grid(), S.ladder(0), S.cta()],
 });
+// 人物篇：每张图都是这个人物独有的内容，真实故事负责「涨知识」
 for (const [code, t] of typeEntries) {
-  const buddy = test.types[flip(test, code, test.relations.buddy.flip)];
-  const rival = test.types[flip(test, code, test.relations.rival.flip)];
+  const [buddy, rival] = [test.types[buddyOf(code)], test.types[rivalOf(code)]];
   notes.push({
     slug: `人格-${t.name}`,
     title: `测出${t.name}型的人，都${t.hook}`,
-    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n12 道盘面情境题，测测你和哪位历史人物同一种「人格底色」。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
-    slides: [S.cover(`测出${t.name}型的人`, `都${t.hook}`, `${t.era} · ${t.alias}`), S.persona(t), S.text(`${t.name}型的盲点`, t.moment), S.rels(t, buddy, rival), S.ladder(0), S.cta()],
+    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n${QN} 道盘面情境题，测测你和哪位历史人物同一种「人格底色」。\n${TAIL}`,
+    slides: [S.cover(`测出${t.name}型的人`, `都${t.hook}`, `${t.era} · ${t.alias}`), S.persona(t), S.text(`${t.name}的真实故事`, t.fact), S.text(`${t.name}型的盲点`, t.moment), S.rels(code), S.cta()],
   });
 }
-for (const t of tiersDesc) {
+// 段位篇：样题从 sampleQuestion 起轮换，含高危词的题跳过（题目是虚构情境，但笔记要干净）
+const cleanQs = test.questions.map((q, i) => [q, i]).filter(([q]) => !lintText(q.q + q.options.map((o) => o.t).join('')).length);
+const qFrom = Math.max(0, cleanQs.findIndex(([, i]) => i >= (N.sampleQuestion || 0)));
+for (const [k, t] of tiersDesc.entries()) {
   notes.push({
     slug: `段位-Lv${t.level}-${t.name}`,
     title: `${t.name}，是怎么炼成的`,
-    body: `韭菜段位 Lv.${t.level}：${t.name}「${t.sub}」\n\n${t.desc}\n\n6 档段位，从韭菜盒子到镰刀绝缘体，你在第几档？\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
-    slides: [S.cover(t.name, '是怎么炼成的', `韭菜段位 Lv.${t.level}`), S.tier(t), S.ladder(t.level), S.question(test.questions[N.sampleQuestion]), S.cta()],
+    body: `韭菜段位 Lv.${t.level}：${t.name}「${t.sub}」\n\n${t.desc}\n\n${test.tiers.length} 档段位，从${tiersDesc.at(-1).name}到${tiersDesc[0].name}，你在第几档？\n${TAIL}`,
+    slides: [S.cover(t.name, '是怎么炼成的', `韭菜段位 Lv.${t.level}`), S.tier(t), S.ladder(t.level), S.question(cleanQs[(qFrom + k) % cleanQs.length][0]), S.cta()],
+  });
+}
+// 搭子篇 / 天敌篇：两两成对，各出一篇，鼓励评论区 @ 朋友
+const pairs = (fn) => typeEntries.map(([c]) => c).filter((c) => c < fn(c)).map((c) => [c, fn(c)]);
+const pairNote = (kind, [a, b], cover2, why) => {
+  const [A, B] = [test.types[a], test.types[b]];
+  const rel = test.relations[kind];
+  return {
+    slug: `${kind === 'buddy' ? '搭子' : '天敌'}-${A.name}×${B.name}`,
+    title: kind === 'buddy' ? `${A.name}型的${rel.label}，果然是${B.name}型` : `${A.name}型和${B.name}型，${cover2}`,
+    body: `${A.name}型：${A.hook}；\n${B.name}型：${B.hook}。\n\n${test.dims.map((d) => `${d.label}：${poleText(a, d.key)} vs ${poleText(b, d.key)}`).join('\n')}\n\n${why}\n\n你是哪一型？身边有没有这样的${rel.label}？评论区 @ 出来。\n${QN} 道盘面情境题，测测你的人格底色。\n${TAIL}`,
+    slides: [S.cover(`${A.name}型 × ${B.name}型`, cover2, `${A.alias} · ${B.alias}`), S.duo(a, b, rel.label), S.versus(a, b), S.text(kind === 'buddy' ? '为什么合得来' : '为什么互相看不惯', why), S.cta()],
+  };
+};
+const bk = test.relations.buddy.flip;
+const name = (c) => test.types[c].name;
+for (const [a, b] of pairs(buddyOf)) notes.push(pairNote('buddy', [a, b], '天生一对搭子', `${name(a)}型${picks(a, bk)}，${name(b)}型${picks(b, bk)}。${test.relations.buddy.why}`));
+for (const [a, b] of pairs(rivalOf)) notes.push(pairNote('rival', [a, b], '天生互相看不惯', `${name(a)}型${picks(a, dimKeys)}；${name(b)}型${picks(b, dimKeys)}。${test.relations.rival.why}`));
+// 借势篇：节日、年终奖这类时间点，内容写在 config.notes.seasonal
+for (const s of N.seasonal || []) {
+  notes.push({
+    slug: `借势-${s.slug}`,
+    title: s.title,
+    tags: s.tags,
+    body: `${s.body}\n\n${QN} 道盘面情境题，测出你的韭菜段位和人格底色。\n${TAIL}`,
+    slides: [S.cover(s.cover[0], s.cover[1], s.sub), ...(s.question != null ? [S.question(test.questions[s.question])] : []), S.ladder(0), S.grid(), S.cta()],
   });
 }
 
@@ -128,12 +203,7 @@ const shopSlides = [
   `<div class="center"><div class="ring">${icon('crown', 200)}</div><div class="big" style="font-size:96px;margin-top:48px">${esc(test.brand)}</div>
     <div class="quote" style="color:${th.gold};margin-top:24px">${esc(N.series)} · 完整人格报告</div><div class="sub">兑换码 · 自动发货 · 不用登录</div></div>`,
   `<div class="title">完整报告里有什么</div><div class="ladder">${perks.map((x, i) => `<div class="rung"><span class="lv">0${i}</span><div><b>${esc(x)}</b></div></div>`).join('')}</div>`,
-  `<div class="title">怎么使用</div><div class="ladder">${[
-    ['1', '下单后自动收到兑换码和使用说明'],
-    ['2', '按说明用手机浏览器打开测试页'],
-    ['3', '做完 12 道题，免费领段位卡'],
-    ['4', '输入兑换码，解锁完整人格报告'],
-  ].map(([n, x]) => `<div class="rung"><span class="lv">${n}</span><div><b style="font-size:38px">${esc(x)}</b></div></div>`).join('')}</div>
+  `<div class="title">怎么使用</div><div class="ladder">${['下单后自动收到兑换码和使用说明', '按说明用手机浏览器打开测试页', ...howTo].map((x, i) => [i + 1, x]).map(([n, x]) => `<div class="rung"><span class="lv">${n}</span><div><b style="font-size:38px">${esc(x)}</b></div></div>`).join('')}</div>
     <div class="small">一个兑换码可在 ${SH.maxDevices} 台设备上使用</div>`,
   `<div class="title">购买须知</div><div class="card p" style="font-size:38px">· 娱乐向人格测试，非专业心理测评<br>· 不构成任何投资建议<br>· 不需要登录，不收集任何个人信息<br>· 虚拟商品，兑换码发出后不支持无理由退款<br>· 遇到问题请私信店铺客服</div>`,
 ];
@@ -144,7 +214,7 @@ ${SH.title}
 ${SH.price} 元
 
 【商品详情文案】
-12 道盘面情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
+${QN} 道盘面情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
 完整报告包含：${perks.join('、')}。
 下单后自动发送兑换码和使用说明，用手机浏览器打开即可，不用登录，不收集个人信息。
 娱乐向人格测试，非专业心理测评，不构成任何投资建议。
@@ -155,8 +225,8 @@ ${SH.price} 元
 
 使用方法：
 1. 复制网址，用手机浏览器打开：${SH.url}
-2. 做完 12 道题，在结果页底部输入兑换码
-3. 解锁完整人格报告（一个兑换码可在 ${SH.maxDevices} 台设备上使用）
+2. ${howTo[0]}
+3. ${howTo[1]}（一个兑换码可在 ${SH.maxDevices} 台设备上使用）
 
 打不开或兑换失败，直接私信店铺～
 
@@ -165,13 +235,13 @@ Q 兑换码提示无效？
 A 请检查有没有多复制空格，兑换码格式是 ${test.paywall.placeholder.replace(/^.*如 /, '')}。还不行把兑换码发给我，帮你查～
 
 Q 提示次数用完？
-A 一个码可在 ${SH.maxDevices} 台设备使用。把兑换码发我，帮你加一次～（后台：mm extend 兑换码）
+A 一个码可在 ${SH.maxDevices} 台设备使用。把兑换码发我，帮你加一次～（后台：mm extend 兑换码；纯静态码表不限设备，不会出现这个提示）
 
 Q 网页打不开？
 A 请用手机自带浏览器（Safari / Chrome 等）打开发货消息里的地址；或者切换一下 Wi-Fi / 流量试试。
 
 Q 测得不准？
-A 这是娱乐向的人格测试，结果只反映你这 12 道题的作答风格～换个心情再测一次也可以。
+A 这是娱乐向的人格测试，结果只反映你这 ${QN} 道题的作答风格～换个心情再测一次也可以。
 
 Q 可以退款吗？
 A 虚拟商品兑换码发出后一般不支持无理由退款；如果码还没使用过，可以联系我处理。（后台：mm check 兑换码，看 uses 是否为 0，再用 mm revoke 作废后退款）
@@ -215,7 +285,7 @@ for (const n of notes) {
     await tab.setContent(page(n.slides[i], i + 1, n.slides.length));
     await tab.screenshot({ path: `${dir}/${String(i + 1).padStart(2, '0')}.png` });
   }
-  writeFileSync(`${dir}/文案.txt`, `【标题】\n${n.title}\n\n【正文】\n${n.body}\n\n【话题】\n${N.tags.join(' ')}\n`);
+  writeFileSync(`${dir}/文案.txt`, `【标题】\n${n.title}\n\n【正文】\n${n.body}\n\n【话题】\n${[...N.tags, ...(n.tags || [])].join(' ')}\n`);
 }
 mkdirSync(`${outRoot}/商品素材`, { recursive: true });
 for (let i = 0; i < shopSlides.length; i++) {
@@ -223,5 +293,23 @@ for (let i = 0; i < shopSlides.length; i++) {
   await tab.screenshot({ path: `${outRoot}/商品素材/${String(i + 1).padStart(2, '0')}.png` });
 }
 writeFileSync(`${outRoot}/商品素材/上架文案.txt`, shopCopy);
+// 发布顺序：总览打头，人物篇隔天一篇，中间穿插搭子 / 天敌和段位，借势篇按时间点插队
+{
+  const q = (p) => notes.filter((n) => n.slug.startsWith(p));
+  const [P, T, B, R] = [q('人格-'), q('段位-'), q('搭子-'), q('天敌-')];
+  const pairsQ = B.flatMap((n, i) => [n, R[i]]).filter(Boolean);
+  const order = [notes[0]];
+  for (let i = 0; P.length + T.length + pairsQ.length; i++) {
+    const next = [P, pairsQ, P, T][i % 4];
+    const n = next.shift() || P.shift() || pairsQ.shift() || T.shift();
+    if (n) order.push(n);
+  }
+  const lines = order.map((n, i) => `第 ${String(i + 1).padStart(2)} 天  ${n.slug}  ｜ ${n.title}`);
+  const seasonal = (N.seasonal || []).map((s) => `${s.when || '看时间点'}  借势-${s.slug}  ｜ ${s.title}`);
+  writeFileSync(
+    `${outRoot}/发布顺序.txt`,
+    `每天发 1 篇，按下面的顺序；文件夹名就是第二列。\n${lines.join('\n')}\n\n【借势篇】到了时间点插队发，当天的常规篇顺延：\n${seasonal.join('\n')}\n`,
+  );
+}
 await browser.close();
 console.log(`已生成 ${notes.length} 篇笔记素材 → ${outRoot}/${warn ? `（${warn} 条提醒，见上方）` : ''}`);
