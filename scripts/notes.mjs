@@ -14,6 +14,12 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const icon = (name, size = 200) => tierIcon(name, th.accent, th.gold).replace('width="120" height="120"', `width="${size}" height="${size}"`);
 const tiersDesc = [...test.tiers].sort((a, b) => b.level - a.level);
 const typeEntries = Object.entries(test.types);
+const QN = test.questions.length;
+// 使用步骤跟着付费方式走：先付费是开场输码，先玩后付是结果页输码
+const payFirst = test.paywall.mode === 'start';
+const howTo = payFirst
+  ? ['在开场页输入兑换码，开始答题', `做完 ${QN} 题，段位和完整报告一次看全`]
+  : [`做完 ${QN} 道题，免费领段位卡`, '在结果页底部输入兑换码，解锁完整人格报告'];
 
 // —— 配图模板 ——
 const CSS = `
@@ -90,7 +96,7 @@ const S = {
     .map(([c, t]) => `<div class="cell"><b>${esc(t.name)}</b><small>${esc(t.alias)} · ${esc(c)}</small></div>`)
     .join('')}</div>`,
   cta: () => `<div class="center"><div class="big" style="font-size:84px">你是哪种韭菜？<br><em>又是哪一位？</em></div>
-    <div class="p" style="margin-top:48px">12 道盘面情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
+    <div class="p" style="margin-top:48px">${QN} 道盘面情境题<br>测出你的韭菜段位 + 人格底色<br>不用登录，不收集任何个人信息</div>
     <div class="cta">${esc(N.cta)}</div><div class="small">纯属娱乐，非专业测评，不构成任何投资建议</div></div>`,
 };
 
@@ -99,7 +105,7 @@ const notes = [];
 notes.push({
   slug: '00-总览',
   title: `${N.series}，你是哪一位？`,
-  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n12 道盘面情境题，测出你的韭菜段位和人格底色。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
+  body: `把炒股的样子，对应到 16 位历史人物身上：\n${typeEntries.slice(0, 6).map(([, t]) => `· ${t.name}型：${t.hook}`).join('\n')}\n……\n\n${QN} 道盘面情境题，测出你的韭菜段位和人格底色。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
   slides: [S.cover(N.series, '你是哪一位？', '曹操、诸葛亮、司马懿、李白、刘禅……'), S.grid(), S.ladder(0), S.cta()],
 });
 for (const [code, t] of typeEntries) {
@@ -108,7 +114,7 @@ for (const [code, t] of typeEntries) {
   notes.push({
     slug: `人格-${t.name}`,
     title: `测出${t.name}型的人，都${t.hook}`,
-    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n12 道盘面情境题，测测你和哪位历史人物同一种「人格底色」。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
+    body: `${t.era.split(' · ')[0]}的${t.name}，放到今天的股市里，大概是这样的：\n\n${t.portrait}\n\nTA 的盲点也很真实：${t.moment}\n\n搭子是${buddy.name}型，天敌是${rival.name}型。\n${QN} 道盘面情境题，测测你和哪位历史人物同一种「人格底色」。\n${N.cta}\n（纯属娱乐，非专业测评，不构成任何投资建议）`,
     slides: [S.cover(`测出${t.name}型的人`, `都${t.hook}`, `${t.era} · ${t.alias}`), S.persona(t), S.text(`${t.name}型的盲点`, t.moment), S.rels(t, buddy, rival), S.ladder(0), S.cta()],
   });
 }
@@ -128,12 +134,7 @@ const shopSlides = [
   `<div class="center"><div class="ring">${icon('crown', 200)}</div><div class="big" style="font-size:96px;margin-top:48px">${esc(test.brand)}</div>
     <div class="quote" style="color:${th.gold};margin-top:24px">${esc(N.series)} · 完整人格报告</div><div class="sub">兑换码 · 自动发货 · 不用登录</div></div>`,
   `<div class="title">完整报告里有什么</div><div class="ladder">${perks.map((x, i) => `<div class="rung"><span class="lv">0${i}</span><div><b>${esc(x)}</b></div></div>`).join('')}</div>`,
-  `<div class="title">怎么使用</div><div class="ladder">${[
-    ['1', '下单后自动收到兑换码和使用说明'],
-    ['2', '按说明用手机浏览器打开测试页'],
-    ['3', '做完 12 道题，免费领段位卡'],
-    ['4', '输入兑换码，解锁完整人格报告'],
-  ].map(([n, x]) => `<div class="rung"><span class="lv">${n}</span><div><b style="font-size:38px">${esc(x)}</b></div></div>`).join('')}</div>
+  `<div class="title">怎么使用</div><div class="ladder">${['下单后自动收到兑换码和使用说明', '按说明用手机浏览器打开测试页', ...howTo].map((x, i) => [i + 1, x]).map(([n, x]) => `<div class="rung"><span class="lv">${n}</span><div><b style="font-size:38px">${esc(x)}</b></div></div>`).join('')}</div>
     <div class="small">一个兑换码可在 ${SH.maxDevices} 台设备上使用</div>`,
   `<div class="title">购买须知</div><div class="card p" style="font-size:38px">· 娱乐向人格测试，非专业心理测评<br>· 不构成任何投资建议<br>· 不需要登录，不收集任何个人信息<br>· 虚拟商品，兑换码发出后不支持无理由退款<br>· 遇到问题请私信店铺客服</div>`,
 ];
@@ -144,7 +145,7 @@ ${SH.title}
 ${SH.price} 元
 
 【商品详情文案】
-12 道盘面情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
+${QN} 道盘面情境题，测出你的「韭菜段位」，再从 ${N.series}里找到和你同一种人格底色的历史人物。
 完整报告包含：${perks.join('、')}。
 下单后自动发送兑换码和使用说明，用手机浏览器打开即可，不用登录，不收集个人信息。
 娱乐向人格测试，非专业心理测评，不构成任何投资建议。
@@ -155,8 +156,8 @@ ${SH.price} 元
 
 使用方法：
 1. 复制网址，用手机浏览器打开：${SH.url}
-2. 做完 12 道题，在结果页底部输入兑换码
-3. 解锁完整人格报告（一个兑换码可在 ${SH.maxDevices} 台设备上使用）
+2. ${howTo[0]}
+3. ${howTo[1]}（一个兑换码可在 ${SH.maxDevices} 台设备上使用）
 
 打不开或兑换失败，直接私信店铺～
 
@@ -165,13 +166,13 @@ Q 兑换码提示无效？
 A 请检查有没有多复制空格，兑换码格式是 ${test.paywall.placeholder.replace(/^.*如 /, '')}。还不行把兑换码发给我，帮你查～
 
 Q 提示次数用完？
-A 一个码可在 ${SH.maxDevices} 台设备使用。把兑换码发我，帮你加一次～（后台：mm extend 兑换码）
+A 一个码可在 ${SH.maxDevices} 台设备使用。把兑换码发我，帮你加一次～（后台：mm extend 兑换码；纯静态码表不限设备，不会出现这个提示）
 
 Q 网页打不开？
 A 请用手机自带浏览器（Safari / Chrome 等）打开发货消息里的地址；或者切换一下 Wi-Fi / 流量试试。
 
 Q 测得不准？
-A 这是娱乐向的人格测试，结果只反映你这 12 道题的作答风格～换个心情再测一次也可以。
+A 这是娱乐向的人格测试，结果只反映你这 ${QN} 道题的作答风格～换个心情再测一次也可以。
 
 Q 可以退款吗？
 A 虚拟商品兑换码发出后一般不支持无理由退款；如果码还没使用过，可以联系我处理。（后台：mm check 兑换码，看 uses 是否为 0，再用 mm revoke 作废后退款）

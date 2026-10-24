@@ -4,7 +4,8 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { randomInt } from 'node:crypto';
 
-export const EVENTS = ['view', 'start', 'finish', 'poster', 'invite', 'unlock'];
+// invited = 通过好友邀请链接打开
+export const EVENTS = ['view', 'invited', 'start', 'finish', 'poster', 'invite', 'unlock'];
 
 export function openDb(path = process.env.DB_PATH || 'data/app.db') {
   mkdirSync(dirname(path), { recursive: true });
