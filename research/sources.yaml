@@ -99,3 +99,36 @@ reusable_repos:
   - dgunning/edgartools              # SEC 数据
   - alchaincyf/nuwa-skill            # 人物思维蒸馏
   - c7b/CS153-Frontier-Systems-Transcripts
+
+# 卖方观点追踪（见 sell-side/），2026-10-26 加入
+sell_side:
+  - name: 华尔街见闻 / 追风交易台
+    tier: 4
+    url: https://wallstreetcn.com/
+    note: 大摩、高盛、美银研报的中文转述最快
+  - name: 格隆汇快讯
+    tier: 4
+    url: https://m.gelonghui.com/
+    note: 港股大行评级和目标价
+  - name: 同花顺研报快讯
+    tier: 4
+    url: https://stock.10jqka.com.cn/
+  - name: 财联社 海外研选
+    tier: 4
+    url: https://www.cls.cn/
+  - name: TipRanks（分析师命中率）
+    tier: 3
+    url: https://www.tipranks.com/
+  - name: MarketBeat / StockAnalysis（目标价聚合）
+    tier: 4
+    url: https://www.marketbeat.com/
+    note: 股价和共识口径常常不一致，只当线索
+  - name: TrendForce（存储合约价）
+    tier: 3
+    url: https://www.trendforce.com/
+  - name: SemiAnalysis
+    tier: 3
+    url: https://semianalysis.com/
+  - name: 港交所披露易
+    tier: 1
+    url: https://www.hkexnews.hk/
