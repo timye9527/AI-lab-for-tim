@@ -1,15 +1,10 @@
 {
   "invest-desk": {
-    "title": "投研中枢",
+    "asset": "已入库",
+    "assetNote": "AI-supply-chain 默认分支 claude/ai-supply-chain-research-6v3pzr，desk/ 有重建脚本",
     "cat": "invest",
-    "status": "运行中",
-    "date": "2026-10-18",
-    "summary": "把聪明钱观点、AI 产业链、ETF 温度、SOXL 雷达四个系统并成一个多页网站。现在每天更新，新增大行观点桌、光模块和半导体分台、每日 9:30 简报和视频选题台。",
-    "tags": [
-      "多页网站",
-      "日更"
-    ],
-    "source": "AI-supply-chain/desk",
+    "date": "2026-10-26",
+    "kind": "系统",
     "links": [
       {
         "label": "打开页面",
@@ -17,17 +12,22 @@
       },
       {
         "label": "仓库",
-        "url": "https://github.com/timye9527/AI-supply-chain/tree/main/desk"
+        "url": "https://github.com/timye9527/AI-supply-chain/tree/claude/ai-supply-chain-research-6v3pzr/desk"
       }
     ],
+    "next": "保持日更；把信息源的质量和去重打磨好，选题台只给视频供料。",
     "priority": "重点",
-    "why": "交易和内容共用的信息上游：日更给你盘感，选题台给视频供料。这一阶段重点维护和打磨信息质量。",
-    "asset": "已入库",
-    "assetNote": "AI-supply-chain 默认分支，desk/ 有重建脚本",
-    "reviewed": "2026-10-19",
+    "reviewed": "2026-10-26",
+    "source": "AI-supply-chain/desk",
+    "status": "运行中",
+    "summary": "把聪明钱观点、AI 产业链、ETF 温度、SOXL 雷达等系统并成一个多页网站，每天 9:30 日更，含大行观点桌、AI 全景和视频选题台。10-26：ETF 页和主页上的 ETF 读数改为每次构建自动刷新（之前停在 10/09，和现在的市场方向相反）。",
+    "tags": [
+      "多页网站",
+      "日更"
+    ],
+    "title": "投研中枢",
     "track": "交易",
-    "kind": "系统",
-    "next": "保持日更；把信息源的质量和去重打磨好，选题台只给视频供料。"
+    "why": "交易和内容共用的信息上游：日更给你盘感，选题台给视频供料。这一阶段重点维护和打磨信息质量。"
   },
   "ai-supply-chain": {
     "title": "AI 产业链验证系统",
@@ -90,24 +90,15 @@
     "parent": "invest-desk"
   },
   "etf-temperature": {
-    "title": "ETF 市场温度计",
+    "asset": "已入库",
+    "assetNote": "main + gh-pages，每日自动跑；10-26 网站改版已上线",
     "cat": "invest",
-    "status": "运行中",
-    "date": "2026-10-17",
-    "summary": "用 ETF 做传感器，把全球市场压成 87 个节点的市场树，每个节点 0–100 度，可拆成五个因子。收盘后自动更新。",
-    "tags": [
-      "自动更新",
-      "五因子"
-    ],
-    "source": "ETF-Market-Temperature",
+    "date": "2026-10-26",
+    "kind": "系统",
     "links": [
       {
         "label": "线上网站",
         "url": "https://timye9527.github.io/ETF-Market-Temperature/"
-      },
-      {
-        "label": "看板快照",
-        "url": "https://claude.ai/artifact/NJzk5PSu5E69fX8j7Tmb4e"
       },
       {
         "label": "指标体系设计",
@@ -116,16 +107,25 @@
       {
         "label": "仓库",
         "url": "https://github.com/timye9527/ETF-Market-Temperature"
+      },
+      {
+        "label": "站点快照（10-24）",
+        "url": "https://claude.ai/artifact/Ezcwdx75VUiiQVeDEVabKd"
       }
     ],
+    "next": "确认今晚收盘后的数据出到当天；继续把首屏和节点页当产品打磨。",
     "priority": "重点",
-    "why": "看市场状态的仪表盘，网站要持续开发、打磨，后面会往商业化走。",
-    "asset": "已入库",
-    "assetNote": "main + gh-pages，每日自动跑",
-    "reviewed": "2026-10-19",
+    "reviewed": "2026-10-26",
+    "source": "ETF-Market-Temperature",
+    "status": "运行中",
+    "summary": "用 200 多只 ETF 给全球 116 个板块量体温，每个 0–100°，可拆成五个维度，每个交易日自动更新。10-26 改版：每页有可转发的网址、节点页用一段话讲清冷热原因、全市场温度分布、可一键复制的本周温度小结、分享卡片；修好了数据一直晚一个交易日的问题。",
+    "tags": [
+      "自动更新",
+      "可转发"
+    ],
+    "title": "ETF 市场温度计",
     "track": "交易",
-    "kind": "系统",
-    "next": "把网站当产品打磨：首屏讲清今天的市场温度，节点页能看懂冷热原因，手机上好用。"
+    "why": "看市场状态的仪表盘，网站要持续开发、打磨，后面会往商业化走。"
   },
   "soxl-radar": {
     "title": "SOXL 交易雷达",
