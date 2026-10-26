@@ -179,9 +179,20 @@ if (qc.hard.length && !flag('--force')) {
   process.exit(1);
 }
 const mp4 = join(out, `${ep.id}.mp4`);
+// 背景音乐（episode.mjs 里写 bgm: true）：程序合成的铺底，停顿处比人声低约 12 dB，说话时再让开约 5 dB
+let audio = ['-i', join(out, 'voice.wav'), '-af', 'loudnorm=I=-16:TP=-1.5,apad'];
+if (ep.bgm) {
+  const bgm = join(out, 'bgm.wav');
+  const r = spawnSync('python3', [join(HERE, 'bgm.py'), bgm, String(duration + 2)], { stdio: 'inherit' });
+  if (r.status !== 0) throw new Error('背景音乐生成失败');
+  audio = ['-i', join(out, 'voice.wav'), '-i', bgm, '-filter_complex',
+    '[1:a]loudnorm=I=-16:TP=-1.5,apad,asplit=2[v1][v2];[2:a]aresample=44100,volume=0.25[m];' +
+    '[m][v1]sidechaincompress=threshold=0.05:ratio=2:attack=30:release=500[md];' +
+    '[v2][md]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[a]', '-map', '0:v', '-map', '[a]'];
+}
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-  '-i', join(out, 'voice.wav'), '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
-  '-c:a', 'aac', '-b:a', '160k', '-ar', '44100', '-af', 'loudnorm=I=-16:TP=-1.5,apad', '-shortest', '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
+  ...audio, '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
+  '-c:a', 'aac', '-b:a', '160k', '-ar', '44100', '-shortest', '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
 const frames = Math.ceil(duration * FPS);
 let lastSig = null, lastBuf = null, shots = 0;
 const t0 = Date.now();

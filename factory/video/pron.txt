@@ -279,3 +279,37 @@
 还债 huan2 zhai4
 急着 ji2 zhe5
 多数 duo1 shu4
+
+# ── 005 期 ──
+跌得 die1 de5
+答得 da2 de5
+谈得 tan2 de5
+谁还 shui2 hai2
+还的钱 huan2 de5 qian2
+提前还房贷 ti2 qian2 huan2 fang2 dai4
+反弹了 fan3 tan2 le5
+南向资金 nan2 xiang4 zi1 jin1
+一揽子 yi4 lan3 zi5
+赔率 pei2 lv4
+胜率 sheng4 lv4
+便宜 pian2 yi5
+就便宜 jiu4 pian2 yi5
+中金发现 zhong1 jin1 fa1 xian4
+
+# ── 人工审过、确认无误的词（005 期）──
+行情 hang2 qing2
+当天 dang4 tian1
+拖累 tuo1 lei3
+转负 zhuan3 fu4
+上涨空间 shang4 zhang3 kong1 jian1
+回答不了 hui2 da2 bu4 liao3
+一共长了 yi2 gong4 zhang3 le5
+只长了 zhi3 zhang3 le5
+是在长 shi4 zai4 zhang3
+力量 li4 liang4
+冲进股市 chong1 jin4 gu3 shi4
+拿着 na2 zhe5
+重估 zhong4 gu1
+差到 cha4 dao4
+当一家人 dang1 yi4 jia1 ren2
+愿意为 yuan4 yi4 wei4

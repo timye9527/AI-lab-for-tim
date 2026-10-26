@@ -32,6 +32,7 @@ npm run video:letters -- AI IPO                                  # 验证英文�
 | 配音 | `video/tts.py`：本地离线合成（sherpa-onnx + Matcha 中英双语模型，标准普通话），按读音模块生成的附加词典逐字照读；逐句缓存，改一句只重配一句 |
 | 配音质检 | 每句合成后用 SenseVoice 和 Paraformer 两个识别模型回听，按不带声调的拼音逐音节比对；多字、漏字、串音就换手法重读（原样 → 微调语速 → 拆短句，最多 8 次） |
 | 出片质检 | `video/qc.mjs`：配音结果、画面越界和孤字、字幕单行、高危词、免责声明，写成 `质检报告.md`；有必须修的项就不出片。流程见 `.claude/skills/video-qc/SKILL.md` |
+| 背景音乐 | `video/bgm.py`：程序合成的安静铺底（和弦长音 + 稀疏高音），没有版权问题；`episode.mjs` 写 `bgm: true` 才加，停顿处比人声低约 12 dB，说话时再让开约 5 dB，成片复核照常逐句听 |
 | 渲染 | `video/build.mjs`：Chromium 逐帧截图，画面没变化的帧直接复用，ffmpeg 合成 h264 + aac |
 
 ## 新做一期
