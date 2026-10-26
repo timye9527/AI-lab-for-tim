@@ -107,7 +107,7 @@ def zipvoice(a):
 SAY_CLONE = [
     (r'4F²', '4 F 平方'), (r'−(\d+(?:\.\d+)?)%', r'跌百分之\1'), (r'(\d+(?:\.\d+)?)%', r'百分之\1'),
     (r'\bCEO\b', 'C E O'), (r'\bHBM\b', 'H B M'), (r'\bFT\b', '英国金融时报'), (r'OpenAI', 'Open A I'), (r'\bAI\b', 'A I'),
-    (r'SpaceX', 'Space X'), (r'X平台', 'X 平台'), (r'CoreWeave', 'Core Weave'),
+    (r'SpaceX', 'Space X'), (r'X平台', 'X 平台'), (r'CoreWeave', 'core weave'),
     (r'DDR5', 'D D R 5'), (r'KOSPI', '韩国综合指数'), (r'[「」《》]', ''),
 ]
 
