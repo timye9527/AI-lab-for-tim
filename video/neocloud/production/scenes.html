@@ -241,6 +241,7 @@ const MODEL = (R, s, I) => {
   const good = el(scale, '租金 &gt; 利息　<span class="amber">好生意</span>', { left: '0', top: '20px', fontSize: '40px', fontWeight: 900 });
   const bad = el(scale, '利率上行 / 大租客要走　<span class="up">账全变</span>', { left: '0', top: '340px', fontSize: '38px', fontWeight: 900 });
   const ms = card(R, '<div class="tag">最大租客 · 2025 年收入占比</div><div style="margin-top:6px"><span style="font-size:44px;font-weight:900">微软 </span><span class="mono amber" style="font-size:110px;font-weight:800">~67%</span></div>', { left: '980px', top: '300px', width: '820px' });
+  const hook = el(R, '这正是马斯克那一刀<br><span class="amber">砍下来的地方</span>', { left: '0', right: '0', top: '380px', textAlign: 'center', fontSize: '84px', fontWeight: 900, lineHeight: 1.3 });
   const tK = c('账面上'), tGap = c('但问题出在'), tDebt = c('到 6 月底'), tFin = c('所以，订单不是'), tH = c('二房东'), tGood = c('租金跑赢'), tBad = c('一旦利率'), tMs = c('最大的租客'), tEnd = c('这正是马斯克');
   const rents = gap.querySelectorAll('.rent');
   return t => {
@@ -264,6 +265,7 @@ const MODEL = (R, s, I) => {
     show(scale, t, tGood, tMs - 0.3); show(good, t, tGood); show(sL, t, tGood + 0.2); show(sR, t, tBad); show(bad, t, tBad + 0.3);
     sR.style.transform = t > tBad ? `translateY(${-30 * ease((t - tBad) / 0.6)}px)` : ''; sL.style.transform = t > tBad ? `translateY(${30 * ease((t - tBad) / 0.6)}px)` : '';
     show(ms, t, tMs, tEnd);
+    show(hook, t, tEnd + 0.1);
   };
 };
 
@@ -296,7 +298,7 @@ const MUSK = (R, s, I) => {
   const cons = [['黄仁勋 · 10/15 斯德哥尔摩', '不需要英伟达兜底，它的资金成本在下降', '黄仁勋'], ['高盛 · 10 月', '上调 CoreWeave 评级', '高盛也'], ['CoreWeave 公司', '签下的合同，足够覆盖全部债务', '自己说']]
     .map(([w, x, n], i) => [card(con, `<div class="tag">${w}</div><div style="font-size:44px;font-weight:900;margin-top:8px">${x}</div>`, { left: '0', top: `${50 + i * 190}px`, width: '1680px', borderLeft: '6px solid var(--down)' }), c(n)]);
   const ju = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(11,13,16,.94)' });
-  el(ju, '我的判断', { left: '0', right: '0', top: '230px', textAlign: 'center', fontSize: '36px', color: 'var(--muted)' });
+  el(ju, '我的判断', { left: '0', right: '0', top: '200px', textAlign: 'center', fontSize: '64px', fontWeight: 900, color: 'var(--amber)' });
   const j1 = el(ju, '成批死掉的，更可能是<span class="amber">没订单、没规模</span>的小公司', { left: '0', right: '0', top: '320px', textAlign: 'center', fontSize: '60px', fontWeight: 900 });
   const j2 = el(ju, '整合，多半先从<span class="amber">收购</span>开始，而不是破产', { left: '0', right: '0', top: '450px', textAlign: 'center', fontSize: '54px', fontWeight: 700 });
   const j3 = el(ju, '但有一家绕不开：<span class="down" style="font-size:80px">英伟达</span>', { left: '0', right: '0', top: '580px', textAlign: 'center', fontSize: '54px', fontWeight: 900 });
@@ -308,7 +310,7 @@ const MUSK = (R, s, I) => {
     show(ev, t, tEv, tCon - 0.3); show(firm, t, tEv + 0.4);
     bars.forEach(([l, b2, v2, v], i) => { const t0 = c('另外两家') + i * 0.25; show(l, t, t0); grow(b2, t, t0, 'width', v * 28 - 0); show(v2, t, t0 + 0.4); });
     show(con, t, tCon, tJ - 0.3); cons.forEach(([e, t0], i) => show(e, t, i ? t0 : tCon + 0.3));
-    show(ju, t, tJ, Infinity, 0.4, 0); show(j1, t, c('成批死掉的')); show(j2, t, c('整合，多半')); show(j3, t, c('绕不开'));
+    show(ju, t, tJ, Infinity, 0.4, 0); show(j1, t, tJ + 0.3); show(j2, t, c('整合，多半')); show(j3, t, c('绕不开'));
   };
 };
 
@@ -338,6 +340,7 @@ const WHO = (R, s, I) => {
   const dq = quoteCard(R, '段永平 · 谈一家算力租赁公司（据媒体转述，非原话）', '', [dots(2), dots(2), dots(1, 'warn')], '新浪转载微博 · 10/20 前后', { left: '120px', top: '220px', width: '1680px' });
   dq.querySelector('.cred').style.display = 'none';
   const dqq = dq.querySelector('.quote');
+  const d0 = el(dqq, '<span class="muted">长期看，算力租赁这门生意会怎样？</span>', { position: 'absolute', left: '34px', top: '80px', fontSize: '52px', fontWeight: 900 }, '');
   const d1 = el(dqq, '短期有竞争力，', { position: 'relative', fontSize: '60px', fontWeight: 900 }, '');
   const d2 = el(dqq, '三到五年后，大概率面临<span class="amber">同质化</span>', { position: 'relative', fontSize: '60px', fontWeight: 900 }, '');
   const d3 = el(dqq, '很像<span class="amber">光伏</span>，只是门槛要高很多', { position: 'relative', fontSize: '60px', fontWeight: 900 }, '');
@@ -357,9 +360,11 @@ const WHO = (R, s, I) => {
   const ppl = el(R, '', { left: '120px', top: '560px', width: '1680px', height: '320px' });
   el(ppl, '这笔账，落在三类人头上', { left: '0', top: '0', fontSize: '44px', fontWeight: 900 });
   const pc = ['借钱给新云的人', '给新云担保的人', '最热的时候<br>追进去的人'].map((x, i) => card(ppl, `<div style="font-size:44px;font-weight:900;line-height:1.3" class="${i === 2 ? 'up' : ''}">${x}</div>`, { left: `${i * 570}px`, top: '70px', width: '540px', height: '200px' }));
+  const big = el(R, '这期最想讲的：<br>这笔账，落在<span class="amber">谁</span>头上？', { left: '0', right: '0', top: '380px', textAlign: 'center', fontSize: '84px', fontWeight: 900, lineHeight: 1.3 });
   const tNv = c('先看英伟达'), tLu = c('上一期'), tD = c('那长期呢'), tPv = c('为什么像光伏'), tM = c('那他说的门槛'), tP = c('所以这笔账');
   return t => {
     H(t);
+    show(big, t, s + 0.2, tNv - 0.2);
     show(loop, t, tNv, tLu - 0.3); draw(loop.querySelector('#l1'), t, c('卖显卡给它'), 0.8); draw(loop.querySelector('#l2'), t, c('挖矿的人再去'), 0.8);
     loop.querySelector('#l1').setAttribute('marker-end', t > c('卖显卡给它') + 0.7 ? 'url(#ah)' : ''); loop.querySelector('#l2').setAttribute('marker-end', t > c('挖矿的人再去') + 0.7 ? 'url(#ah)' : '');
     show(nv, t, tNv + 0.2, tLu - 0.3); show(nc, t, tNv + 0.5, tLu - 0.3);
@@ -367,7 +372,7 @@ const WHO = (R, s, I) => {
     show(ex, t, c('据美国财经'), tLu - 0.3); grow(e1, t, c('直接投资'), 'width', 9); grow(e2, t, c('直接投资') + 0.8, 'width', 400);
     show(e1t, t, c('直接投资') + 0.2); show(e2t, t, c('直接投资') + 1.0); show(eT, t, c('加起来'));
     show(lu, t, tLu, tD - 0.3); show(spin, t, c('这个圈往前'), tD - 0.3);
-    show(dq, t, tD, tPv - 0.3); show(d1, t, c('短期有竞争力')); show(d2, t, c('短期有竞争力') + 1.4); show(d3, t, c('很像光伏'));
+    show(dq, t, tD, tPv - 0.3); show(d0, t, tD + 0.2, c('短期有竞争力') - 0.1); show(d1, t, c('短期有竞争力')); show(d2, t, c('短期有竞争力') + 1.4); show(d3, t, c('很像光伏'));
     show(pvT, t, tPv, tM - 0.3); show(pv, t, c('显卡谁都能买'), tM - 0.3, 0.3, 0); draw(pv.querySelector('#rent'), t, c('一旦供给'), 1.6); draw(pv.querySelector('#int'), t, c('可借来的钱'), 0.8);
     why.forEach((w, i) => show(w, t, [c('显卡谁都能买'), c('显卡谁都能买') + 1.0, c('一旦供给'), c('而且显卡换代')][i], tM - 0.3));
     show(moat, t, tM); mc.forEach((e, i) => show(e, t, c('是电力') + i * 0.45));
@@ -386,7 +391,8 @@ const SUM = (R, s, I) => {
   const q = el(R, '租金，能不能一直<span class="amber">跑赢利息</span>？', { left: '0', right: '0', top: '690px', textAlign: 'center', fontSize: '70px', fontWeight: 900 });
   return t => {
     H(t); const tr = c('红方说'), tb = c('蓝方说');
-    show(lh, t, tr); L.forEach((e, i) => show(e, t, tr + i * 0.9)); show(rh, t, tb); Rr.forEach((e, i) => show(e, t, tb + i * 0.9));
+    const dim = (e, t0, i) => { show(e, t, s + 0.3 + i * 0.12); e.style.opacity = Math.min(+e.style.opacity, t > t0 ? 1 : 0.3); };
+    dim(lh, tr, 0); L.forEach((e, i) => dim(e, tr + i * 0.9, i)); dim(rh, tb, 3); Rr.forEach((e, i) => dim(e, tb + i * 0.9, i + 3));
     show(q, t, c('租金，能不能'));
   };
 };
