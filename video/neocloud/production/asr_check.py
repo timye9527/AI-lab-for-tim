@@ -41,7 +41,7 @@ def check(expected_tts_text, heard):
     eng_exp = set(w.lower() for w in re.findall(r'[A-Za-z]{2,}', joined + ' ' + expected_tts_text.replace(' ', '')))
     eng_got = [w for w in re.findall(r'[A-Za-z]{3,}', heard) if w.lower() not in eng_exp]
     issues = []
-    if eng_got:
+    if eng_got and not eng_exp:  # 本来就有英文的句子交给 english_check，中文识别听英文只会乱拼
         issues.append('冒出英文：' + ' '.join(eng_got))
     if rate > 0.15:
         issues.append(f'拼音错误率 {rate:.0%}')

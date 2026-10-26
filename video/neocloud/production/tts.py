@@ -217,8 +217,16 @@ def main():
     with open(os.path.join(out, 'subtitles.srt'), 'w', encoding='utf8') as f:
         k = 0
         for ln in lines:
-            if ln['text']:
-                k += 1; f.write(f'{k}\n{srt_time(ln["start"])} --> {srt_time(ln["end"])}\n{ln["text"]}\n\n')
+            if not ln['text']:
+                continue
+            # 超过 24 字的句子在逗号处拆成两条，时间按字数分
+            parts, cut = [ln['text']], [m.end() for m in re.finditer(r'[，：；]', ln['text'][:-1])]
+            if len(ln['text']) > 24 and cut:
+                c = min(cut, key=lambda x: abs(x - len(ln['text']) / 2)); parts = [ln['text'][:c], ln['text'][c:]]
+            t0, dur = ln['start'], ln['end'] - ln['start']
+            for ptxt in parts:
+                t1 = t0 + dur * len(ptxt) / len(ln['text'])
+                k += 1; f.write(f'{k}\n{srt_time(t0)} --> {srt_time(t1)}\n{ptxt}\n\n'); t0 = t1
     bad = [l for l in lines if l.get('issue')]
     with open(os.path.join(out, 'asr-report.md'), 'w', encoding='utf8') as f:
         f.write(f'# 配音回检报告\n\n共 {sum(1 for l in lines if l["text"])} 句，有问题 {len(bad)} 句。\n\n| 稿子 | 听写 | 问题 |\n|---|---|---|\n')
