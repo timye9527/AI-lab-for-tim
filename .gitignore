@@ -12,3 +12,6 @@ data/
 out/
 backup/
 *.zip
+# 视频模型、字体缓存（约 1.6 GB，不提交）
+.cache/
+__pycache__/

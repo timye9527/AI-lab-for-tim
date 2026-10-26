@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>新云 · 封面</title>
+<link rel="stylesheet" href="../out/node_modules/@fontsource/noto-sans-sc/900.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/jetbrains-mono/800.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0B0D10; color: #EDEEF0; font-family: 'Noto Sans SC', sans-serif; overflow: hidden; }
+  .c { position: relative; overflow: hidden;
+    background: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 60px 60px,
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px) 0 0 / 60px 60px,
+                radial-gradient(ellipse at 75% 35%, rgba(48,164,108,.22), transparent 60%), #0B0D10; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-weight: 800; }
+  .down { color: #30A46C; } .amber { color: #FFB224; }
+  .chip { display: inline-block; background: #FFB224; color: #0B0D10; font-weight: 900; border-radius: 14px; }
+</style>
+</head>
+<body>
+<div id="c" class="c"></div>
+<script>
+// v=wide 16:9（B 站 / 西瓜 / YouTube）、card 3:4（小红书 / 视频号）、tall 9:16（抖音）
+// c=a 主推「−37% · 第一张骨牌倒在债上」；c=b 备选「卖铲人，还是背债人？」
+const q = new URLSearchParams(location.search);
+const V = { wide: [1920, 1080], card: [1080, 1440], tall: [1080, 1920] };
+const v = q.get('v') || 'wide', cv = q.get('c') || 'a';
+const [W, H] = V[v]; const c = document.getElementById('c');
+c.style.width = W + 'px'; c.style.height = H + 'px'; document.body.style.width = W + 'px';
+const add = (html, css) => { const d = document.createElement('div'); d.style.position = 'absolute'; d.innerHTML = html; Object.assign(d.style, css); c.appendChild(d); return d; };
+// 骨牌：一排倒下的长条
+const dominos = (x0, y0, n, h, gap) => Array.from({ length: n }, (_, i) => add('', { left: x0 + i * gap + 'px', top: y0 + 'px', width: h * 0.22 + 'px', height: h + 'px', background: i ? '#3A3F47' : '#FFB224', borderRadius: '8px', transformOrigin: '100% 100%', transform: `rotate(${i ? Math.max(0, 60 - i * 15) : 72}deg)` }));
+const A = {
+  wide: () => {
+    add('CoreWeave 一个月', { left: '100px', top: '90px', fontSize: '96px', fontWeight: 900 });
+    add('<span class="mono down">−37%</span>', { left: '84px', top: '190px', fontSize: '330px', lineHeight: 1 });
+    add('AI 第一张骨牌<br>倒在了<span class="amber">债</span>上', { left: '100px', top: '540px', fontSize: '128px', fontWeight: 900, lineHeight: 1.12 });
+    add('<span class="chip" style="font-size:52px;padding:10px 26px">订单 1040 亿，为什么还缺钱？</span>', { left: '100px', top: '880px' });
+    dominos(1360, 300, 4, 300, 120);
+  },
+  tall: () => {
+    const s = v === 'card' ? 0.82 : 1, T = v === 'card' ? 110 : 260;
+    add('CoreWeave<br>一个月', { left: '70px', top: T + 'px', fontSize: 110 * s + 'px', fontWeight: 900, lineHeight: 1.1 });
+    add('<span class="mono down">−37%</span>', { left: '52px', top: T + 250 * s + 'px', fontSize: 300 * s + 'px', lineHeight: 1 });
+    add('AI 第一张骨牌<br>倒在了<span class="amber">债</span>上', { left: '70px', top: T + 590 * s + 'px', fontSize: 128 * s + 'px', fontWeight: 900, lineHeight: 1.15 });
+    add('<span class="chip" style="font-size:' + 46 * s + 'px;padding:10px 24px">订单 1040 亿，为什么还缺钱？</span>', { left: '70px', top: T + 920 * s + 'px' });
+  },
+};
+const B = {
+  wide: () => {
+    add('<span class="chip" style="font-size:44px;padding:8px 22px">马斯克：200+ 新云将成批死掉</span>', { left: '100px', top: '120px' });
+    add('AI 新云<br>是<span class="amber">卖铲人</span><br>还是<span style="color:#E5484D">背债人</span>？', { left: '100px', top: '260px', fontSize: '150px', fontWeight: 900, lineHeight: 1.12 });
+    add('<span class="mono down">−37%</span>', { right: '110px', top: '700px', fontSize: '170px' });
+    dominos(1300, 250, 4, 260, 110);
+  },
+  tall: () => {
+    const s = v === 'card' ? 0.82 : 1, T = v === 'card' ? 110 : 260;
+    add('<span class="chip" style="font-size:' + 42 * s + 'px;padding:8px 20px">马斯克：200+ 新云将成批死掉</span>', { left: '70px', top: T + 'px' });
+    add('AI 新云<br>是<span class="amber">卖铲人</span><br>还是<span style="color:#E5484D">背债人</span>？', { left: '70px', top: T + 140 * s + 'px', fontSize: 150 * s + 'px', fontWeight: 900, lineHeight: 1.15 });
+    add('<span class="mono down">−37%</span>', { left: '70px', top: T + 800 * s + 'px', fontSize: 200 * s + 'px' });
+  },
+};
+const set = cv === 'b' ? B : A;
+(v === 'wide' ? set.wide : set.tall)();
+add('看懂AI主线 · AI 产业链', { left: '84px', top: (H - (v === 'wide' ? 90 : 140)) + 'px', fontSize: '36px', fontWeight: 700, color: '#6E757C', display: v === 'wide' ? 'none' : 'block' });
+</script>
+</body>
+</html>

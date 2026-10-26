@@ -1,0 +1,70 @@
+# 行业读音表：过稿时人工确认过的读音，合成时优先使用（会写进合成词典）
+# 格式：词<TAB>拼音（数字标调，5 = 轻声）<TAB>说明 / 出处
+# 规则：只收「工具会读错、但行业里有固定读法」的词；新词先在 08-读音核对表.md 里确认，再加到这里
+长约	chang2 yue1	长期协议的简称；工具默认把「长」读成 zhǎng
+长单	chang2 dan1	长期订单
+长协	chang2 xie2	长期协议
+长鑫	chang2 xin1	长鑫存储（CXMT），官方英文 ChangXin
+长江存储	chang2 jiang1 cun2 chu3	YMTC
+长期	chang2 qi1	
+增长	zeng1 zhang3	
+成长	cheng2 zhang3	
+上调	shang4 tiao2	调整之意读 tiáo；工具默认 diào
+下调	xia4 tiao2	同上
+调高	tiao2 gao1	
+调低	tiao2 di1	
+调整	tiao2 zheng3	
+剪刀差	jian3 dao1 cha1	差距之意读 chā；工具默认 chà
+差距	cha1 ju4	
+价差	jia4 cha1	
+行情	hang2 qing2	
+行业	hang2 ye4	
+投行	tou2 hang2	投资银行
+银行	yin2 hang2	
+发行	fa1 xing2	
+空头	kong1 tou2	
+做空	zuo4 kong1	
+多头	duo1 tou2	
+供给	gong1 ji3	
+良率	liang2 lv4	
+利润率	li4 run4 lv4	
+概率	gai4 lv4	
+率先	shuai4 xian1	
+重估	chong2 gu1	
+重新	chong2 xin1	
+重仓	zhong4 cang1	
+还在	hai2 zai4	
+还是	hai2 shi4	
+还款	huan2 kuan3	
+将近	jiang1 jin4	
+差不多	cha4 bu5 duo1	
+曹堪宇	cao2 kan1 yu3	长鑫存储总裁
+陈福阳	chen2 fu2 yang2	博通 CEO Hock Tan
+熔断	rong2 duan4	
+量产	liang4 chan3	
+产量	chan3 liang4	
+应验	ying4 yan4	
+处于	chu3 yu2	
+着力	zhuo2 li4	
+打趴	da3 pa1	
+砸懵	za2 meng1	
+一地坏账	yi1 di4 huai4 zhang4	
+周一	zhou1 yi1	避免「周一只让」被切成「周 / 一只」
+周二	zhou1 er4	
+周三	zhou1 san1	
+周四	zhou1 si4	
+周五	zhou1 wu3	
+只让	zhi3 rang4	「周一只让海力士跌了 3%」，只 = 仅仅
+# 新云一期（2026-10-26）人工按语境审过
+跌得	die1 de5	补语读轻声
+好得	hao3 de5	补语读轻声
+收得	shou1 de5	补语读轻声
+成批地	cheng2 pi1 de5	副词后缀读轻声
+空档	kong4 dang4	空隙之意读 kòng
+往前转	wang3 qian2 zhuan4	旋转之意读 zhuàn
+倒着转	dao4 zhe5 zhuan4	旋转之意读 zhuàn
+担保	dan1 bao3	
+背债	bei1 zhai4	背负之意读 bēi
+当天	dang4 tian1	同一天
+签得	qian1 de5	补语读轻声
+公平地	gong1 ping2 de5	副词后缀读轻声
