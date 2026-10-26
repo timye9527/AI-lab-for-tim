@@ -32,7 +32,7 @@ function inspectScene() {
         r.setStart(n, i);
         r.setEnd(n, i + 1);
         const b = r.getBoundingClientRect();
-        if (b.height) tops.push({ ch: t[i], top: b.top, bottom: b.bottom });
+        if (b.height) tops.push({ ch: t[i], top: b.top, bottom: b.bottom, left: b.left });
       }
     }
     return tops;
@@ -45,11 +45,11 @@ function inspectScene() {
     const tops = charTops(el);
     if (!tops.length) continue;
     const text = tops.map((x) => x.ch).join('');
-    // 上下有重叠就算同一行（字号不同的字顶边高度不一样）
+    // 换行 = 字回到左边并且往下走。不按上下是否重叠判断：字号不同时顶边不齐，行高很紧时上下两行的字框会重叠
     const lineOf = [];
     let line = 0;
     tops.forEach((x, i) => {
-      if (i && x.top >= tops[i - 1].bottom - 2) line++;
+      if (i && x.left < tops[i - 1].left - 1 && x.top > tops[i - 1].top + 1) line++;
       lineOf.push(line);
     });
     const lines = line + 1;

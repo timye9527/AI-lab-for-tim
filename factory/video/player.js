@@ -40,6 +40,15 @@
         <polyline points="345,96 410,84 470,78 530,86 590,118 650,150 720,178 790,196 860,214"/></g>
       <g class="drop" style="opacity:0"><text x="650" y="128" font-size="56" font-weight="900" fill="#b0281f" font-family="Serif">约 −40%</text></g>
     </svg>`,
+    debt: `<svg width="920" height="340" viewBox="0 0 920 340">
+      <g class="axis" fill="none" stroke="#cfc6b9" stroke-width="4"><path d="M90 30 V300 H900"/></g>
+      <g class="loan" style="opacity:0"><path data-keep d="M95 180 H895" stroke="#6f6a63" stroke-width="4" stroke-dasharray="14 10" fill="none"/>
+        <text x="110" y="214" font-size="30" fill="#6f6a63" font-family="Sans">借来的钱</text></g>
+      <g class="buy"><text x="100" y="40" font-size="34" font-weight="700" fill="#1c1916" font-family="Sans">买入 100</text></g>
+      <g class="price" fill="none" stroke="#b0281f" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="110,62 240,52 370,72 490,118 600,166 720,212 860,242"/></g>
+      <g class="low" style="opacity:0"><text x="640" y="290" font-size="52" font-weight="900" fill="#b0281f" font-family="Serif">跌到 25</text></g>
+    </svg>`,
     casino: `<svg width="260" height="260" viewBox="0 0 260 260"><g fill="none" stroke="#b0281f" stroke-width="7" stroke-linejoin="round">
       <rect x="20" y="80" width="220" height="176"/><rect x="40" y="30" width="180" height="50"/>
       <rect x="62" y="130" width="56" height="56" rx="8"/><rect x="142" y="130" width="56" height="56" rx="8"/>
@@ -201,6 +210,18 @@
         unit(g('.price'), T(el.lineAt), 'draw', 1.6);
         unit(g('.ref'), T(el.lineAt) + 1.2, 'in', 0.5);
         unit(g('.drop'), T(el.lineAt) + 1.5, 'pop', 0.5);
+        return w;
+      }
+      case 'debt': {
+        // 借钱买的资产：价格线跌穿借款线
+        const w = $('div', 'house debt', drawable(svg.debt));
+        const g = (sel) => w.querySelector(sel);
+        unit(w, t0);
+        unit(g('.axis'), t0, 'draw', 0.8);
+        unit(g('.buy'), t0 + 0.3, 'in', 0.5);
+        unit(g('.loan'), T(el.loanAt), 'in', 0.5);
+        unit(g('.price'), T(el.lineAt), 'draw', 1.8);
+        unit(g('.low'), T(el.lineAt) + 1.7, 'pop', 0.5);
         return w;
       }
       case 'vs': {

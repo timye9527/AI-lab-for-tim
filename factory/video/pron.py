@@ -10,6 +10,7 @@ from pypinyin import pinyin, lazy_pinyin, Style
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIGITS = '零一二三四五六七八九'
 NUMCHARS = set('零一二三四五六七八九十百千万亿两点')
+DIGIT_CHARS = set('零一二三四五六七八九点')
 
 
 def _load(name):
@@ -187,7 +188,8 @@ def g2p_run(run):
         if c == '一' and 0 < k < len(out) - 1 and out[k - 1][0] == out[k + 1][0]:
             np = 'yi5'  # 看一看、想一想
         elif c == '一':
-            num_ctx = prev in NUMCHARS or prev == '第' or (k + 1 < len(out) and out[k + 1][0] in NUMCHARS)
+            # 逐位读的数字、序数、数字中间读 yī；「一百」「一万」开头的数照常变调（yì bǎi、yí wàn）
+            num_ctx = prev in NUMCHARS or prev == '第' or (k + 1 < len(out) and out[k + 1][0] in DIGIT_CHARS)
             if nxt is None or num_ctx:
                 np = 'yi1'
             else:

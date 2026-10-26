@@ -104,6 +104,7 @@ const desc = (el) => {
     case 'agenda': return `章节预告：${el.items.map((x) => x.n + ' ' + x.title).join('，')}（随口播逐个点亮，顶部章节栏同步高亮）`;
     case 'profile': return `人物卡「${el.name}｜${el.role}」：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
     case 'house': return '房子线条画出，随后房价线一路下行，标出「约 −40%」';
+    case 'debt': return '坐标轴画出，「买入 100」，虚线「借来的钱」，价格线一路下行跌穿虚线，弹出「跌到 25」（示意）';
     case 'timeline': return `时间线：${el.items.map((x) => x.y + ' ' + x.text).join('；')}`;
     case 'stats': return `数据卡：${el.items.map((x) => x.value + ' ' + x.label).join('；')}`;
     case 'grid': return `卡片网格（当前一条红框）：${el.items.map((x) => x.n + '. ' + x.title + (x.from ? `（${x.from}）` : '')).join('；')}`;

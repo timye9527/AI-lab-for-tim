@@ -37,11 +37,11 @@ npm run video:letters -- AI IPO                                  # 验证英文�
 ## 新做一期
 
 1. 复制 `episodes/001-lilu-columbia/`，改 `episode.mjs` 里的标题、章节、页面和口播。
-2. 元素类型见 `player.js` 的 `build()`：`lead` 引导语、`quote` 大字引文、`note` 解读卡、`profile` 人物卡、`timeline` 时间线、`house` 房子房价图、`stats` 数据卡、`grid` 卡片网格、`compare` 左右对比、`fork` 分叉图、`ladder` 阶梯图、`flow` 流向图、`bars` 柱状示意、`chips` 地区卡、`zero` 等式、`church` 教堂赌场图、`wall` 金句墙、`sources` 来源。
+2. 元素类型见 `player.js` 的 `build()`：`lead` 引导语、`quote` 大字引文、`note` 解读卡、`profile` 人物卡、`timeline` 时间线、`house` 房子房价图、`debt` 借钱买的资产跌穿借款线、`stats` 数据卡、`grid` 卡片网格、`compare` 左右对比、`fork` 分叉图、`ladder` 阶梯图、`flow` 流向图、`bars` 柱状示意、`chips` 地区卡、`zero` 等式、`church` 教堂赌场图、`wall` 金句墙、`sources` 来源。
 3. 口播稿照常写汉字、数字、英文缩写，读音交给读音模块。
 4. 先跑 `--stills` 看版式，再跑 `--no-video` 修到质检全部通过、审完 `读音表.md`，最后出片。详细流程见 `.claude/skills/video-qc/SKILL.md`。
 5. 脚本结构按 [`../docs/content-factory/爆款结构.md`](../docs/content-factory/爆款结构.md)，写稿流程见 `.claude/skills/viral-script/SKILL.md`。
-6. 动画类型：`in` 浮现、`grow` 长高、`sweep` 红字下划线扫过、`count` 数字滚动、`draw` 线条描画、`pop` 弹出；`house` 元素是房子加房价下行曲线。
+6. 动画类型：`in` 浮现、`grow` 长高、`sweep` 红字下划线扫过、`count` 数字滚动、`draw` 线条描画、`pop` 弹出；`house` 元素是房子加房价下行曲线，`debt` 是价格线跌穿借款虚线（示意）。
 
 ## 第一次在新机器上跑
 
