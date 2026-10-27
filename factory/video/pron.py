@@ -118,10 +118,40 @@ def num_cn(m):
     return int_cn(int(s))
 
 
+# 数字后面跟这些字，就是在计数或计量，按数值读
+UNITS = '万亿千百点倍元块角分美港个人年月日号天周岁届条只家项次股位名台辆张份度米斤岁'
+
+
+def _read(a, b, text):
+    # 纯数字的读法替换（924 => 九二四）只替换完整的数，而且后面不能跟单位：「924亿」仍按数值读
+    if re.fullmatch(r'\d+', a):
+        return re.sub(rf'(?<![\d.]){a}(?![\d.%]|\s*[{UNITS}])', b, text)
+    return text.replace(a, b)
+
+
+def numbers(text):
+    """列出稿子里的每个数和实际读法。没有单位的三位以上整数可能是代号或日期简称（924、618），标为待确认。"""
+    for a, b in READS:
+        text = _read(a, b, text)
+    out = []
+    for m in re.finditer(r'(?<![\d.])\d+(?:\.\d+)?%?', text):
+        raw = m.group(0)
+        nxt = text[m.end():m.end() + 1]
+        prev = text[max(0, m.start() - 2):m.start()]
+        tail = nxt if re.match(rf'[{ZH}]', nxt) else ''
+        head = prev if re.fullmatch(rf'[{ZH}]+', prev) else ''
+        said = normalize(head + raw + tail)
+        said = said[len(head):len(said) - len(tail)]
+        ambiguous = (re.fullmatch(r'\d{3,}', raw) is not None and not (tail and tail in UNITS)
+                     and prev != '制造')
+        out.append((raw, said, ambiguous))
+    return out
+
+
 def normalize(text):
     """只影响配音的读法：缩写、符号、数字。"""
     for a, b in READS:
-        text = text.replace(a, b)
+        text = _read(a, b, text)
     # 全大写缩写和单个大写字母，按字母读
     text = re.sub(r'(?<![A-Za-z])[A-Z]+(?![a-z])', _acronym, text)
     # 年份逐位读：带「年」的四位数，以及「中国制造2025」这类编号。其他四位数按数值读

@@ -11,7 +11,8 @@
     "build:preview": "node scripts/build-preview.mjs",
     "codes:static": "node --no-warnings scripts/codes-static.mjs",
     "video": "node factory/video/build.mjs",
-    "video:letters": "cd factory/video && python3 letters_check.py"
+    "video:letters": "cd factory/video && python3 letters_check.py",
+    "video:rhythm": "cd factory/video && python3 rhythm.py"
   },
   "engines": {
     "node": ">=22.13"

@@ -282,10 +282,22 @@ def write_sheet(path, beats, plans):
         lines += ['## 需要拍板：争议读音（词典读法和日常听感可能不一致）', '']
         lines += [f'- {w}：现在读 {pron.mark(" ".join(pron.DISPUTED[w]))}，出现在第 {"、".join(map(str, ns))} 句' for w, ns in disputed.items()]
         lines += ['', '> 拍板后：确认按词典读，就把 `pron.txt` 里这行末尾的「?」删掉；要改读法，就改拼音再删「?」；也可以改写稿子避开这个词。', '']
+    # 数字：每个数怎么读都列出来；没有单位的三位以上整数可能是代号或日期简称，单独标出待确认
+    nums, unsure = [], []
+    for i, b in enumerate(beats):
+        for raw, said, amb in pron.numbers(b['text']):
+            (unsure if amb else nums).append(f'句 {i + 1}：{raw} → {said}')
+    if unsure:
+        lines += ['## 数字读法待确认（没有单位，可能是代号或日期简称）', '',
+                  '> 按含义判断：数值按数值读（3794 点）；代号、日期简称逐位读（924 是 9 月 24 日，读「九二四」）。'
+                  '确认后写进 `read.txt`（逐位读写「924 => 九二四」，按数值读也写一行固定下来），这里就不再列出。', '']
+        lines += [f'- ⚠ {x}' for x in unsure] + ['']
+    if nums:
+        lines += ['## 数字读法', '', '> 自动按数值读的数，扫一眼含义对不对。', ''] + [f'- {x}' for x in nums] + ['']
     if risky:
         lines += ['## 重点审：高风险字（由词典自动取音，没经过覆盖表）', '',
                   '> 逐个按语境判断：读出整句，想这个字在句子里是什么意思，再对照 `读音规范.md` 的「多音字语境规则」。', ''] + risky + ['']
-    if disputed or risky:
+    if disputed or risky or nums or unsure:
         lines += ['## 逐句', '']
     for i, (b, p) in enumerate(zip(beats, plans)):
         marked, k = '', 0

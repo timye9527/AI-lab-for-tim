@@ -7,6 +7,7 @@ npm run video -- factory/episodes/001-lilu-columbia            # 完整出片
 npm run video -- factory/episodes/001-lilu-columbia --stills   # 只出每页关键帧和总览图，改版式时用
 npm run video -- factory/episodes/001-lilu-columbia --no-video   # 只出配音、字幕和质检报告，不渲染
 npm run video:letters -- AI IPO                                  # 验证英文缩写读得准不准
+npm run video:rhythm -- "恒生科技最高" "恒科指数最高"           # 对比几种说法的节奏，找被读断的词
 ```
 
 产物在 `out/video/<期>/`（不提交）：

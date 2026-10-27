@@ -117,6 +117,13 @@ export async function runQC({ page, ep, scenes, subs, beats, out, epDir }) {
     sec.push(`  - △ ${d.slice(2)}`);
   }
   if (risky.length) soft.push(`读音表有 ${risky.length} 句多音字待按语境审`);
+  // 没有单位的数：可能是代号或日期简称（924 读「九二四」），确认前不算干净
+  const numUnsure = sheetText.match(/^- ⚠ 句 \d+：.*$/gm) || [];
+  sec.push(`- 「数字读法待确认」${numUnsure.length} 处：没有单位的三位以上整数，按含义定逐位读还是按数值读，确认后写进 \`read.txt\`。`);
+  for (const d of numUnsure) {
+    soft.push(`数字读法待确认：${d.slice(4)}`);
+    sec.push(`  - △ ${d.slice(4)}`);
+  }
   sec.push('');
 
   // 3. 画面
