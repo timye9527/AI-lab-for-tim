@@ -180,7 +180,7 @@ def main():
             json.dump({'tries': tries, 'heard': heard, 'err': rate, 'issue': issue}, open(meta, 'w', encoding='utf8'), ensure_ascii=False)
         gap = 0 if prev is None else (0.12 if sid == prev else 0.35)
         chunks.append(np.zeros(int(SR * gap), dtype=np.float32)); t += gap
-        rows.append({'shot': sid, 'text': text, 'say': tts_text, 'start': round(t, 3), 'end': round(t + len(x) / SR, 3),
+        rows.append({'shot': sid, 'text': text, 'say': tts_text, 'wav': os.path.relpath(wav, ROOT), 'start': round(t, 3), 'end': round(t + len(x) / SR, 3),
                      'heard': heard, 'err': round(rate, 3), 'issue': issue, 'tries': tries})
         chunks.append(x); t += len(x) / SR; prev = sid
         print(f'{i + 1}/{len(lines)} {t:.1f}s {"⚠ " + issue if issue else "✓"} {text[:18]}', flush=True)

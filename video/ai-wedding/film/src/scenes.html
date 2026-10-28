@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="fonts.css">
+<style>html,body{margin:0}canvas{display:block}</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import * as S from './scenes.js';
+import { figure, orb, CHEN, LI } from './chars.js';
+import { makeCanvas } from './util.js';
+await document.fonts.load('40px "ZCOOL KuaiLe"'); await document.fonts.load('900 40px "Noto Sans SC"');
+await S.loadBackgrounds();
+const out = document.getElementById('c').getContext('2d');
+const cells = [
+  (c) => { S.street(c, { light: 'dawn' }); figure(c, CHEN, { x: 420, y: 960, s: 1.15 }); figure(c, LI, { x: 1560, y: 960, s: 1.05, flip: -1, expr: 'confident' }); },
+  (c) => { S.street(c, { light: 'night', liLit: 1 }); orb(c, 1560, 600, 1.2, 0); },
+  (c) => { S.shop(c, { season: 0 }); figure(c, CHEN, { x: 960, y: 1000, s: 1.2, expr: 'star', armL: [2.6, 0.3], armR: [2.6, 0.3] }); },
+  (c) => { S.banquet(c, { mode: 'party' }); },
+  (c) => { S.studio(c, {}); figure(c, LI, { x: 700, y: 1000, s: 1.2, armR: [2.8, 0.4] }); },
+  (c) => { S.diorama(c, {}); },
+];
+cells.forEach((f, i) => { const cv = makeCanvas(); f(cv.getContext('2d')); out.drawImage(cv, (i % 3) * 640, Math.floor(i / 3) * 360, 640, 360); });
+const cv = makeCanvas(); S.paper(cv.getContext('2d')); out.drawImage(cv, 0, 720, 640, 360);
+const cv2 = makeCanvas(); S.shop(cv2.getContext('2d'), { light: 'night' }); out.drawImage(cv2, 640, 720, 640, 360);
+const cv3 = makeCanvas(); S.banquet(cv3.getContext('2d'), { mode: 'candle' }); out.drawImage(cv3, 1280, 720, 640, 360);
+window.ready = true;
+</script>

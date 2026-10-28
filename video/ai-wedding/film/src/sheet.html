@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="fonts.css">
+<style>html,body{margin:0}canvas{display:block}</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+import { figure, orb, CHEN, LI, STAFF, BRIDE, GROOM } from './chars.js';
+const ctx = document.getElementById('c').getContext('2d');
+const g = ctx.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, '#FBE3C8'); g.addColorStop(1, '#F3C9A2'); ctx.fillStyle = g; ctx.fillRect(0, 0, 1920, 1080);
+const ex = ['smile', 'grin', 'star', 'worry', 'shock', 'stiff', 'brow', 'pout'];
+figure(ctx, CHEN, { x: 260, y: 900, s: 1.35, expr: 'smile', armL: [0.2, 0.3], armR: [0.25, -0.4] });
+figure(ctx, LI, { x: 620, y: 900, s: 1.35, expr: 'confident', armR: [2.4, 0.5], handR: 'open' });
+STAFF.forEach((C, i) => figure(ctx, C, { x: 900 + i * 150, y: 900, s: 0.8, expr: 'smile' }));
+figure(ctx, BRIDE, { x: 1700, y: 900, s: 0.85 }); figure(ctx, GROOM, { x: 1820, y: 900, s: 0.85, flip: -1 });
+ex.forEach((e, i) => { ctx.save(); ctx.translate(980 + i * 115, 300); ctx.scale(0.55, 0.55); ctx.translate(0, 400); figure(ctx, CHEN, { expr: e }); ctx.restore(); });
+ex.forEach((e, i) => { ctx.save(); ctx.translate(980 + i * 115, 560); ctx.scale(0.55, 0.55); ctx.translate(0, 400); figure(ctx, LI, { expr: e, glint: i === 6 ? 1 : 0 }); ctx.restore(); });
+orb(ctx, 820, 330, 1.4, 1.2, { trail: [1, 0.3] });
+await document.fonts.ready; window.ready = true;
+</script>

@@ -1,0 +1,9 @@
+/* 字体走 npm 包（SIL OFL 1.1），按需加载分片 */
+@import url('../node_modules/@fontsource/noto-sans-sc/chinese-simplified-500.css');
+@import url('../node_modules/@fontsource/noto-sans-sc/latin-500.css');
+@import url('../node_modules/@fontsource/noto-sans-sc/chinese-simplified-700.css');
+@import url('../node_modules/@fontsource/noto-sans-sc/latin-700.css');
+@import url('../node_modules/@fontsource/noto-sans-sc/chinese-simplified-900.css');
+@import url('../node_modules/@fontsource/noto-sans-sc/latin-900.css');
+@import url('../node_modules/@fontsource/zcool-kuaile/chinese-simplified-400.css');
+@import url('../node_modules/@fontsource/zcool-kuaile/latin-400.css');
