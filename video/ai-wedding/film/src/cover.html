@@ -1,0 +1,22 @@
+<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="fonts.css">
+<style>html,body{margin:0}canvas{display:block}</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script type="module">
+// 封面：小陈、小李隔街对望，金币飘向街对面；文案戳痛点，两行大字
+import * as S from './scenes.js';
+import { figure, CHEN, LI } from './chars.js';
+import * as I from './info.js';
+import { label } from './text.js';
+import { FONT } from './util.js';
+for (const f of ['900 40px "Noto Sans SC"', '40px "ZCOOL KuaiLe"']) await document.fonts.load(f, '省下的钱被谁赚走了？AI');
+await S.loadBackgrounds();
+const c = document.getElementById('c').getContext('2d');
+S.street(c, { light: 'dusk', cam: { x: 960, y: 600, z: 1.08 } });
+c.fillStyle = 'rgba(40,15,15,0.25)'; c.fillRect(0, 0, 1920, 1080);
+figure(c, CHEN, { x: 380, y: 1080, s: 1.25, expr: 'shock', armL: [0.9, 1.2], armR: [1.6, 0.4], handR: 'open', sweat: 1 });
+figure(c, LI, { x: 1560, y: 1080, s: 1.18, flip: -1, expr: 'confident' });
+for (let i = 0; i < 9; i++) { const k = i / 8; I.coin(c, 560 + k * 820, 720 - Math.sin(k * Math.PI) * 220, 34, i * 0.7); }
+label(c, 'AI 省下的钱', 960, 210, { size: 150, font: FONT.body, weight: 900, color: '#FFF3D6', stroke: '#7A1E22', strokeW: 22 });
+label(c, '被谁赚走了？', 960, 400, { size: 170, font: FONT.body, weight: 900, color: '#F7C948', stroke: '#7A1E22', strokeW: 24 });
+window.ready = true;
+</script>

@@ -145,7 +145,8 @@ if (srt) {
 // ── 抽帧拼图：一张 3×3 图看全片版面，比看 9 张单图省得多 ──
 if (sheet && v) {
   const step = dur / 9;
-  spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', file, '-vf', `fps=1/${step.toFixed(3)},scale=${v.height > v.width ? 240 : 400}:-2,tile=3x3:padding=4:color=white`, '-frames:v', '1', '-update', '1', sheet]);
+  // 用 select 从 0 秒起取帧：fps=1/N 取的是每段中点，第一格不是首帧（婚庆片发现）
+  spawnSync('ffmpeg', ['-v', 'error', '-y', '-i', file, '-vf', `select='isnan(prev_selected_t)+gte(t-prev_selected_t\\,${step.toFixed(3)})',scale=${v.height > v.width ? 240 : 400}:-2,tile=3x3:padding=4:color=white`, '-fps_mode', 'vfr', '-frames:v', '1', '-update', '1', sheet]);
   add('✓', `抽帧拼图 ${sheet}（从 0 秒起每 ${step.toFixed(1)} 秒一帧，第一格就是首帧）`);
 }
 
