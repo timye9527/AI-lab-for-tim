@@ -56,11 +56,12 @@ def build_lexicon(engine, lines, path):
         cur.setdefault(w, py)
     if engine == 'zipvoice':
         base = os.path.join(MODELS, 'sherpa-onnx-zipvoice-distill-int8-zh-en-emilia', 'lexicon.txt')
-        rows = [f'{w} {tokens(py)}' for w, py in cur.items()]
+        # ZipVoice 词典也没有英文字母，「A I」被当 OOV 整个丢掉（婚庆片实测，时长和不带 AI 的句子一样）
+        rows = [f'{w} {tokens(py)}' for w, py in cur.items()] + [f'{c} {tokens(py)}' for c, py in [('A', 'ei1'), ('a', 'ei1'), ('I', 'ai4'), ('i', 'ai4')]]
     else:
         base = os.path.join(MODELS, 'matcha-icefall-zh-en', 'lexicon.txt')
         # Matcha 词典里没有单个字母，不加就整个跳过（婚庆片实测）；按中文音节读
-        rows = [f'{w} {py}' for w, py in cur.items()] + ['A ei2', 'a ei2', 'I ai1', 'i ai1']
+        rows = [f'{w} {py}' for w, py in cur.items()] + ['A ei1', 'a ei1', 'I ai4', 'i ai4']
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf8') as f:
         f.write('\n'.join(rows) + '\n'); f.write(open(base, encoding='utf8').read())
@@ -136,6 +137,11 @@ def main():
     out = a.out; os.makedirs(out, exist_ok=True)
     lex = os.path.join(out, 'lexicon.txt')
     build_lexicon(a.engine, [v for _, v in lines], lex)
+    # 英文词必须在词典里：两个模型遇到词典外的英文都直接丢掉，只在 stderr 打一行 OOV
+    words = {ln.split(maxsplit=1)[0] for ln in open(lex, encoding='utf8') if ln.strip()}
+    miss = sorted({w for _, v in lines for w in re.findall(r'[A-Za-z]+', say(v)) if w not in words})
+    if miss:
+        raise SystemExit(f'词典里没有这些英文，合成时会被丢掉：{miss}')
     gen = zipvoice(a, lex) if a.engine == 'zipvoice' else matcha(a, lex)
     from asr_check import transcribe, check
     asr = os.path.join(MODELS, 'sherpa-onnx-paraformer-zh-small-2024-03-09')
