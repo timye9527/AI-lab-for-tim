@@ -1,0 +1,346 @@
+<title>AI 投行观点日报</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* 版式：研究所晨会纸——顶部刊头 + 今日主线 + 分歧表 + 研报卡片流 + 原文渠道 */
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #141a24;
+  --muted: #5b6575;
+  --line: #dde1e8;
+  --accent: #1f4e8c;
+  --accent-soft: #e6eef8;
+  --bull: #c23a2b;      /* A 股习惯：红为偏多 */
+  --bull-soft: #fbeae7;
+  --bear: #1e7a4c;      /* 绿为偏谨慎 */
+  --bear-soft: #e5f3ec;
+  --flat: #6b7280;
+  --flat-soft: #eef0f3;
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141c; --paper: #161d28; --ink: #e7ebf2; --muted: #9aa5b5; --line: #2a3443;
+    --accent: #7fb0f0; --accent-soft: #1c2b42;
+    --bull: #f08070; --bull-soft: #3a201d; --bear: #5fc495; --bear-soft: #17322a;
+    --flat: #a0a8b5; --flat-soft: #232b37;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141c; --paper: #161d28; --ink: #e7ebf2; --muted: #9aa5b5; --line: #2a3443;
+  --accent: #7fb0f0; --accent-soft: #1c2b42;
+  --bull: #f08070; --bull-soft: #3a201d; --bear: #5fc495; --bear-soft: #17322a;
+  --flat: #a0a8b5; --flat-soft: #232b37;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.65;
+}
+.wrap {
+  max-width: 920px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+  display: grid; gap: 28px;
+}
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+.label { font-size: 12px; letter-spacing: .08em; color: var(--muted); }
+.mono { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+
+/* 刊头 */
+.mast { display: grid; gap: 10px; border-bottom: 3px double var(--ink); padding-bottom: 14px; }
+.mast-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; align-items: baseline; }
+.mast h1 { font-size: clamp(26px, 6vw, 38px); font-weight: 900; letter-spacing: .02em; }
+.mast .sub { color: var(--muted); font-size: 14px; max-width: 62ch; }
+.edition-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
+.edition-bar select { font: inherit; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; }
+
+/* 今日主线 */
+.lead { display: grid; gap: 12px; }
+.lead h2 { font-size: 21px; }
+.headline { font-family: var(--font-display); font-size: 18px; font-weight: 600; line-height: 1.5; margin: 0; }
+.takeaways { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; max-width: 70ch; }
+.note { font-size: 13px; color: var(--muted); background: var(--flat-soft); border-radius: 6px; padding: 10px 12px; margin: 0; }
+
+/* 分歧表 */
+.split { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.split table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+.split th, .split td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.split tr:last-child td { border-bottom: 0; }
+.split th { font-weight: 500; color: var(--muted); font-size: 12px; letter-spacing: .06em; }
+.split td.bull { border-left: 3px solid var(--bull); }
+.split td.bear { border-left: 3px solid var(--bear); }
+
+/* 筛选 */
+.filters { display: grid; gap: 10px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 999px; padding: 3px 11px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.search { font: inherit; width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; background: var(--paper); color: var(--ink); }
+.count { font-size: 13px; color: var(--muted); }
+
+/* 研报卡片 */
+.list { display: grid; gap: 14px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; }
+.bank { font-weight: 700; font-size: 15px; }
+.side { font-size: 12px; padding: 1px 7px; border-radius: 4px; background: var(--accent-soft); color: var(--accent); }
+.stance { font-size: 12px; padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+.stance.bull { background: var(--bull-soft); color: var(--bull); }
+.stance.bear { background: var(--bear-soft); color: var(--bear); }
+.stance.flat { background: var(--flat-soft); color: var(--flat); }
+.new { font-size: 11px; font-weight: 700; color: var(--paper); background: var(--bull); padding: 1px 6px; border-radius: 4px; }
+.date { margin-left: auto; color: var(--muted); }
+.card h3 { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 17px; line-height: 1.45; text-wrap: balance; }
+.team { font-size: 13px; color: var(--muted); margin: -6px 0 0; }
+.core { margin: 0; font-weight: 500; }
+.points { margin: 0; padding-left: 1.2em; display: grid; gap: 4px; font-size: 14px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; color: var(--muted); border: 1px dashed var(--line); border-radius: 4px; padding: 0 6px; }
+details { font-size: 14px; border-top: 1px solid var(--line); padding-top: 8px; }
+summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+blockquote { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--line); color: var(--ink); background: var(--bg); border-radius: 0 6px 6px 0; white-space: pre-wrap; }
+.src-note { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; }
+.links a { text-decoration: none; border-bottom: 1px solid currentColor; overflow-wrap: anywhere; }
+.ltype { font-size: 11px; color: var(--muted); margin-right: 4px; }
+.channel { font-size: 13px; color: var(--muted); margin: 0; }
+.verified { font-size: 12px; color: var(--muted); margin: 0; }
+
+/* 渠道表 */
+.channels { display: grid; gap: 10px; }
+.channels h2 { font-size: 19px; }
+.ch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.ch { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px; font-size: 14px; display: grid; gap: 4px; min-width: 0; }
+.ch b { font-size: 14px; }
+.ch span { color: var(--muted); font-size: 13px; }
+
+.empty { color: var(--muted); padding: 24px 0; text-align: center; }
+footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 4px; }
+@media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } .card:hover { border-color: var(--accent); } }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="mast-top">
+      <h1>AI 投行观点日报</h1>
+      <span class="label mono" id="issue">读取中…</span>
+    </div>
+    <p class="sub">中美头部投行与券商研究所对 AI 产业链（算力、云与资本开支、半导体、应用、融资、港股与 A 股 AI 资产）的最新观点。每天北京时间 10 点前更新。</p>
+    <div class="edition-bar">
+      <label for="edition">看哪一期</label>
+      <select id="edition"><option>最新一期</option></select>
+      <span id="updated"></span>
+    </div>
+  </header>
+
+  <section class="lead" aria-labelledby="lead-h">
+    <h2 id="lead-h">今日主线</h2>
+    <p class="headline" id="headline">正在读取本期内容…</p>
+    <ol class="takeaways" id="takeaways"></ol>
+    <p class="note" id="ed-note" hidden></p>
+  </section>
+
+  <section class="lead" aria-labelledby="split-h" id="split-sec" hidden>
+    <h2 id="split-h">多空分歧</h2>
+    <div class="split"><table>
+      <thead><tr><th style="width:22%">议题</th><th>偏多的一方</th><th>偏谨慎的一方</th></tr></thead>
+      <tbody id="split"></tbody>
+    </table></div>
+  </section>
+
+  <section aria-label="研报列表" style="display:grid;gap:12px">
+    <div class="filters">
+      <div class="chips" id="f-side" aria-label="机构"></div>
+      <div class="chips" id="f-chain" aria-label="产业链环节"></div>
+      <input class="search" id="q" type="search" placeholder="搜机构、标题、关键词，例如：资本开支、港股、英伟达">
+      <span class="count" id="count"></span>
+    </div>
+    <div class="list" id="list"><p class="empty">正在读取研报…</p></div>
+  </section>
+
+  <section class="channels" aria-labelledby="ch-h">
+    <h2 id="ch-h">去哪里找原文</h2>
+    <p class="channel" style="margin:0">投行完整研报大多只发给机构客户。下面是能看到原文或官方摘要的入口，按机构排。</p>
+    <div class="ch-grid" id="channels"></div>
+  </section>
+
+  <footer>
+    <span>本页只摘编公开渠道可见的研究观点，便于个人跟踪，不构成任何投资建议。观点归原机构所有，以原报告为准。</span>
+    <span>「原文摘录」若标注为媒体转述，说明当期没能打开原报告，引文来自转载报道。</span>
+  </footer>
+</div>
+
+<script>
+// 原文渠道：静态内容，不放数据库
+const CHANNELS = [
+  ["中金公司", "微信搜「中金点睛」公众号 / 小程序，研报全文在小程序里；官网研究入口", "https://research.cicc.com/"],
+  ["中信证券", "微信公众号「中信证券研究」，每天发晨会和行业深度摘要", ""],
+  ["华泰证券", "「华泰睿思」App / 公众号「华泰证券研究所」", ""],
+  ["国泰海通 / 中信建投 / 广发", "各自研究所公众号；全文常在东方财富研报中心能搜到", "https://data.eastmoney.com/report/"],
+  ["高盛 Goldman Sachs", "公开摘要：Goldman Sachs Insights；全文在 Marquee（机构客户）", "https://www.goldmansachs.com/insights"],
+  ["摩根士丹利 Morgan Stanley", "公开摘要：Morgan Stanley Ideas；全文在 Matrix（机构客户）", "https://www.morganstanley.com/ideas"],
+  ["摩根大通 J.P. Morgan", "公开摘要：J.P. Morgan Global Research；全文在 J.P. Morgan Markets（机构客户）", "https://www.jpmorgan.com/insights/global-research"],
+  ["瑞银 UBS", "UBS CIO House View 每周要点公开可读", "https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/house-view.html"],
+  ["研报聚合（中资为主）", "东方财富研报中心、慧博投研、萝卜投研、发现报告：按机构 + 标题搜 PDF", "https://data.eastmoney.com/report/"],
+  ["外资研报中文转述", "华尔街见闻 App（含见闻 VIP）、财联社、智通财经，常最早转述外资观点", "https://wallstreetcn.com/"],
+];
+
+const STANCE = { "偏多": "bull", "谨慎": "bear", "中性": "flat" };
+const state = { side: "全部", chain: "全部", q: "", edition: null, reports: [], editions: [] };
+const $ = (id) => document.getElementById(id);
+
+function el(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function safeUrl(u) {
+  try { const x = new URL(u); return x.protocol === "https:" || x.protocol === "http:" ? x.href : null; } catch { return null; }
+}
+
+function renderChannels() {
+  const box = $("channels");
+  for (const [name, how, url] of CHANNELS) {
+    const c = el("div", "ch");
+    c.append(el("b", null, name), el("span", null, how));
+    if (url) { const a = el("a", null, url.replace(/^https:\/\//, "").replace(/\/$/, "")); a.href = url; a.target = "_blank"; a.rel = "noopener"; c.append(a); }
+    box.append(c);
+  }
+}
+
+function currentEdition() {
+  return state.editions.find((e) => e.date === state.edition) || state.editions[0] || null;
+}
+
+function renderEdition() {
+  const ed = currentEdition();
+  const sel = $("edition");
+  sel.replaceChildren(...state.editions.map((e) => {
+    const o = el("option", null, `第 ${e.no} 期 · ${e.date}`); o.value = e.date; return o;
+  }));
+  if (!ed) {
+    $("issue").textContent = "尚无内容";
+    $("headline").textContent = "还没有任何一期。每天早上的更新任务会把第一期写进来。";
+    $("takeaways").replaceChildren();
+    $("split-sec").hidden = true;
+    return;
+  }
+  sel.value = ed.date;
+  $("issue").textContent = `第 ${ed.no} 期 · ${ed.date}`;
+  $("updated").textContent = ed.updatedAt ? `更新于 ${ed.updatedAt}` : "";
+  $("headline").textContent = ed.headline || "";
+  $("takeaways").replaceChildren(...(ed.takeaways || []).map((t) => el("li", null, t)));
+  const note = $("ed-note");
+  note.hidden = !ed.note; note.textContent = ed.note || "";
+  const rows = ed.divergence || [];
+  $("split-sec").hidden = rows.length === 0;
+  $("split").replaceChildren(...rows.map((r) => {
+    const tr = el("tr");
+    tr.append(el("td", null, r.topic), el("td", "bull", r.bull), el("td", "bear", r.bear));
+    return tr;
+  }));
+}
+
+function chipRow(box, values, key) {
+  box.replaceChildren(...values.map((v) => {
+    const b = el("button", "chip", v);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(state[key] === v));
+    b.onclick = () => { state[key] = v; renderList(); };
+    return b;
+  }));
+}
+
+function card(r, isNew) {
+  const c = el("article", "card");
+  const head = el("div", "card-head");
+  head.append(el("span", "bank", r.bank), el("span", "side", r.side));
+  if (r.stance) head.append(el("span", "stance " + (STANCE[r.stance] || "flat"), r.stance));
+  if (isNew) head.append(el("span", "new", "本期新增"));
+  head.append(el("span", "date mono", r.date));
+  c.append(head, el("h3", null, r.title));
+  if (r.team) c.append(el("p", "team", r.team));
+  c.append(el("p", "core", r.core));
+  if (r.points?.length) { const ul = el("ul", "points"); ul.append(...r.points.map((p) => el("li", null, p))); c.append(ul); }
+  if (r.chain?.length) { const t = el("div", "tags"); t.append(...r.chain.map((x) => el("span", "tag", x))); c.append(t); }
+  if (r.excerpt) {
+    const d = el("details");
+    d.append(el("summary", null, "原文摘录"), el("blockquote", null, r.excerpt));
+    if (r.excerptNote) d.append(el("p", "src-note", r.excerptNote));
+    c.append(d);
+  }
+  const links = (r.links || []).map((l) => ({ ...l, href: safeUrl(l.url) })).filter((l) => l.href);
+  if (links.length) {
+    const box = el("div", "links");
+    for (const l of links) {
+      const s = el("span"); s.append(el("span", "ltype", l.type || "链接"));
+      const a = el("a", null, l.label || l.href); a.href = l.href; a.target = "_blank"; a.rel = "noopener";
+      s.append(a); box.append(s);
+    }
+    c.append(box);
+  }
+  if (r.channel) c.append(el("p", "channel", "找原文：" + r.channel));
+  if (r.verified) c.append(el("p", "verified", "核实情况：" + r.verified));
+  return c;
+}
+
+function renderList() {
+  const ed = currentEdition();
+  const newIds = new Set(ed?.newIds || []);
+  // 只看所选这一期及以前的研报
+  const pool = state.reports.filter((r) => !ed || !r.added || r.added <= ed.date);
+  const chains = ["全部", ...new Set(pool.flatMap((r) => r.chain || []))];
+  chipRow($("f-side"), ["全部", "本期新增", "中资", "外资"], "side");
+  chipRow($("f-chain"), chains, "chain");
+  const q = state.q.trim().toLowerCase();
+  const shown = pool.filter((r) => {
+    if (state.side === "本期新增" && !newIds.has(r.id)) return false;
+    if ((state.side === "中资" || state.side === "外资") && r.side !== state.side) return false;
+    if (state.chain !== "全部" && !(r.chain || []).includes(state.chain)) return false;
+    if (q) {
+      const hay = [r.bank, r.team, r.title, r.core, ...(r.points || []), r.excerpt, ...(r.chain || [])].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => (newIds.has(b.id) - newIds.has(a.id)) || String(b.date).localeCompare(String(a.date)));
+  $("count").textContent = `共 ${shown.length} 篇` + (newIds.size ? `，本期新增 ${newIds.size} 篇` : "");
+  $("list").replaceChildren(...(shown.length ? shown.map((r) => card(r, newIds.has(r.id))) : [el("p", "empty", pool.length ? "没有符合筛选的研报。" : "还没有研报。每天早上的更新任务会写进来。")]));
+}
+
+async function boot() {
+  renderChannels();
+  $("q").addEventListener("input", (e) => { state.q = e.target.value; renderList(); });
+  $("edition").addEventListener("change", (e) => { state.edition = e.target.value; renderEdition(); renderList(); });
+  const db = await claude.use("db");
+  if (!db) {
+    $("headline").textContent = "这个视图读不到数据。请登录 claude.ai 后打开本页。";
+    $("list").replaceChildren(el("p", "empty", "数据未加载。"));
+    $("issue").textContent = "未加载";
+    return;
+  }
+  const fail = () => { $("list").replaceChildren(el("p", "empty", "数据读取中断，刷新页面重试。")); };
+  db.collection("editions").orderBy("date", "desc").limit(400).onSnapshot((snap) => {
+    state.editions = snap.docs.map((d) => ({ date: d.id, ...d.data() }));
+    if (!state.editions.some((e) => e.date === state.edition)) state.edition = state.editions[0]?.date || null;
+    renderEdition(); renderList();
+  }, fail);
+  db.collection("reports").orderBy("date", "desc").limit(1000).onSnapshot((snap) => {
+    state.reports = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderList();
+  }, fail);
+}
+boot();
+</script>
