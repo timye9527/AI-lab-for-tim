@@ -39,7 +39,9 @@ def check(expected_tts_text, heard):
     rate = edit(exp, got) / max(1, len(exp))
     joined = re.sub(r'(?<=\b[A-Za-z]) (?=[A-Za-z]\b)', '', expected_tts_text)  # 「C E O」合回「CEO」
     eng_exp = set(w.lower() for w in re.findall(r'[A-Za-z]{2,}', joined + ' ' + expected_tts_text.replace(' ', '')))
-    eng_got = [w for w in re.findall(r'[A-Za-z]{3,}', heard) if w.lower() not in eng_exp]
+    eng_exp |= {c.lower() for w in re.findall(r'[A-Za-z]+', expected_tts_text) for c in w}  # 「a i」分开听写也算对
+    # 单个多余字母也报：婚庆片 Matcha 读成「论 ai u」时只看 3 个字母以上的词会放过
+    eng_got = [w for w in re.findall(r'[A-Za-z]+', heard) if w.lower() not in eng_exp]
     issues = []
     if eng_got:
         issues.append('冒出英文：' + ' '.join(eng_got))
@@ -48,6 +50,13 @@ def check(expected_tts_text, heard):
     for w in re.findall(r'[A-Za-z]+', joined.replace(' ', '') if re.fullmatch(r'[A-Za-z ]+', joined) else joined):
         if w.lower() not in heard_letters:
             issues.append(f'英文没听到：{w}' + ('（听成了汉字，可能读成「爱」，人耳确认）' if re.search('[爱艾哀诶欸]', heard) else ''))
+    # 婚庆片：「他不再亲自接」听成「他再亲自接」只差 7.7%，15% 的门槛放过了意思反掉的句子
+    dist = edit(exp, got)
+    for neg in ('bu', 'mei'):
+        if exp.count(neg) > got.count(neg):
+            issues.append(f'少了否定词（{neg}）')
+    if dist >= 2 and rate <= 0.15:
+        issues.append(f'错了 {dist} 个音节')
     if rate > 0.15:
         issues.append(f'拼音错误率 {rate:.0%}')
     return rate, '；'.join(issues)

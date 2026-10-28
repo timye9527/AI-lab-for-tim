@@ -6,7 +6,7 @@
   （不带 --shots 就是全片）
 沿用存储视频 video/memory-wallst/production/tts.py 的做法：
   数字一律转中文；AI 拆成「A I」；ZipVoice 按 0.95 倍生成再保持音调加速，防句尾被截断；句尾淡出。
-  每句用 Paraformer 听写回来按拼音比对，不过就重读，最多 3 次，仍不过写进报告。
+  每句用 Paraformer 听写回来按拼音比对，不过就重读（ZipVoice 3 次、Matcha 8 次），仍不过写进报告。
 依赖：pip install sherpa-onnx soundfile numpy pypinyin；模型在 out/models/（下载脚本 out/models/dl.sh 的同款地址见 README）
 """
 import argparse, hashlib, json, os, re, subprocess, sys, tempfile
@@ -49,6 +49,9 @@ def sandhi_words(lines):
             out[han[i:i + 2]] = f'{syl} {nxt}'
     return out
 
+# 英文字母按中文音节读（两个模型的词典都没有字母）；LETTERS=A:ei1,I:ai4 可临时覆盖做对比
+LETTERS = [(c, py) for k in os.environ.get('LETTERS', 'A:ei1,I:ai4').split(',') for c0, py in [k.split(':')] for c in (c0, c0.lower())]
+
 def build_lexicon(engine, lines, path):
     cur = {w: py for w, (py, _) in load_curated().items()}
     auto = sandhi_words(lines)
@@ -57,11 +60,12 @@ def build_lexicon(engine, lines, path):
     if engine == 'zipvoice':
         base = os.path.join(MODELS, 'sherpa-onnx-zipvoice-distill-int8-zh-en-emilia', 'lexicon.txt')
         # ZipVoice 词典也没有英文字母，「A I」被当 OOV 整个丢掉（婚庆片实测，时长和不带 AI 的句子一样）
-        rows = [f'{w} {tokens(py)}' for w, py in cur.items()] + [f'{c} {tokens(py)}' for c, py in [('A', 'ei1'), ('a', 'ei1'), ('I', 'ai4'), ('i', 'ai4')]]
+        rows = [f'{w} {tokens(py)}' for w, py in cur.items()] + [f'{c} {tokens(py)}' for c, py in LETTERS]
     else:
         base = os.path.join(MODELS, 'matcha-icefall-zh-en', 'lexicon.txt')
         # Matcha 词典里没有单个字母，不加就整个跳过（婚庆片实测）；按中文音节读
-        rows = [f'{w} {py}' for w, py in cur.items()] + ['A ei1', 'a ei1', 'I ai4', 'i ai4']
+        # Matcha 把 AI 当一个整词读 éi āi，比拆成两个字母稳（全片 13 句一次过 8 句 vs 7 句）
+        rows = [f'{w} {py}' for w, py in cur.items()] + ['AI ei2 ai1']
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf8') as f:
         f.write('\n'.join(rows) + '\n'); f.write(open(base, encoding='utf8').read())
@@ -139,7 +143,8 @@ def main():
     build_lexicon(a.engine, [v for _, v in lines], lex)
     # 英文词必须在词典里：两个模型遇到词典外的英文都直接丢掉，只在 stderr 打一行 OOV
     words = {ln.split(maxsplit=1)[0] for ln in open(lex, encoding='utf8') if ln.strip()}
-    miss = sorted({w for _, v in lines for w in re.findall(r'[A-Za-z]+', say(v)) if w not in words})
+    said = [say(v) if a.engine == 'zipvoice' else say(v).replace('A I', 'AI') for _, v in lines]
+    miss = sorted({w for v in said for w in re.findall(r'[A-Za-z]+', v) if w not in words})
     if miss:
         raise SystemExit(f'词典里没有这些英文，合成时会被丢掉：{miss}')
     gen = zipvoice(a, lex) if a.engine == 'zipvoice' else matcha(a, lex)
@@ -150,15 +155,17 @@ def main():
     chunks, t, prev, rows = [np.zeros(int(SR * 0.3), dtype=np.float32)], 0.3, None, []
     cache = os.path.join(out, 'lines'); os.makedirs(cache, exist_ok=True)
     for i, (sid, text) in enumerate(lines):
-        tts_text = say(text)
+        tts_text = say(text) if a.engine == 'zipvoice' else say(text).replace('A I', 'AI')
         key = hashlib.md5(json.dumps([a.engine, a.ref, a.speed, tts_text]).encode()).hexdigest()[:10]
         wav = os.path.join(cache, f'{i:03d}-{key}.wav')
         tries, heard, rate, issue = 0, '', 0, ''
-        if os.path.exists(wav):
+        meta = wav[:-4] + '.json'  # 回听结果跟着缓存走，报告才完整
+        if os.path.exists(wav) and os.path.exists(meta):
             x, _ = sf.read(wav, dtype='float32')
+            m = json.load(open(meta, encoding='utf8')); tries, heard, rate, issue = m['tries'], m['heard'], m['err'], m['issue']
         else:
             best = None
-            for tries in range(1, 4):
+            for tries in range(1, (4 if a.engine == 'zipvoice' else 9)):  # Matcha 快，按规则重读到 8 次
                 x, sr, tempo = gen(tts_text)
                 x = finish(x, sr, tempo)
                 heard = transcribe(asr, x.tolist(), sr)
@@ -170,6 +177,7 @@ def main():
             x, rate, issue, heard, sr = best
             x = np.interp(np.linspace(0, len(x) - 1, int(len(x) * SR / sr)), np.arange(len(x)), x).astype(np.float32)
             sf.write(wav, x, SR)
+            json.dump({'tries': tries, 'heard': heard, 'err': rate, 'issue': issue}, open(meta, 'w', encoding='utf8'), ensure_ascii=False)
         gap = 0 if prev is None else (0.12 if sid == prev else 0.35)
         chunks.append(np.zeros(int(SR * gap), dtype=np.float32)); t += gap
         rows.append({'shot': sid, 'text': text, 'say': tts_text, 'start': round(t, 3), 'end': round(t + len(x) / SR, 3),

@@ -2,7 +2,7 @@
 
 4–5 分钟横版二维动画经济科普（16:9，1920×1080，30fps）。主角是两个虚构人物：县城婚庆公司老板小陈、街对面工作室的小李。
 
-**当前进度：G1 已过；画风定 A；G3 声音样片三选一中；等主理人出背景图（K4–K8）后做关键帧。** 还没有生成任何视频。
+**当前进度：G4 全量配音完成（87 句回听全过，人声 4 分 51 秒）；画面制作中，等主理人出背景图（K4–K8）。**
 
 ## 文件
 
@@ -33,7 +33,7 @@ npm run video:lint -- video/ai-wedding/口播稿.md  # 稿件预检
 |---|---|
 | 标题 | AI省下的钱，被谁赚走了？ |
 | 时长 | 约 5 分钟，不删句 |
-| 声音 | AI 女声（具体音色、语速待 G3 样片确认） |
+| 声音 | **1 号 Matcha 标准女声**（sherpa-onnx `matcha-icefall-zh-en` + `vocos-16khz-univ`），语速 1.1 倍，导出 48 kHz；AI 按整词读 éi āi |
 | 画面路线 | **A 国漫电影感**（参考图 `ref/style-A.webp`）：背景由主理人用 AI 出空景（K4–K8），角色、道具、信息图、文字由代码绘制 |
 
 ## 配音（production/）
@@ -48,4 +48,5 @@ python3 production/voices.py screen                # Kokoro 55 个中文女声�
 python3 production/voices.py ref 23                # 生成参考音色 out/voice-ref/f23/
 python3 production/tts.py --engine zipvoice --ref out/voice-ref/f23 --shots C49-C54 --out out/sample/f23
 python3 production/tts.py --engine matcha --shots C49-C54 --out out/sample/matcha
+python3 production/tts.py --engine matcha --speed 1.1 --out out/vo   # 全片（定稿参数）；逐句缓存，只重配改过的句子
 ```
