@@ -35,3 +35,17 @@ npm run video:lint -- video/ai-wedding/口播稿.md  # 稿件预检
 | 时长 | 约 5 分钟，不删句 |
 | 声音 | AI 女声（具体音色、语速待 G3 样片确认） |
 | 画面路线 | 待定：A 国漫电影感 / B 温暖绘本感 / C 扁平科普动画（纯代码） |
+
+## 配音（production/）
+
+沿用存储视频 `video/memory-wallst/production/` 的管线：`numcn.py`（数字转中文）、`pronounce.py`（读音核对表）、`asr_check.py`（回听）原样搬来，只改了路径；`asr_check.py` 补了「英文缩写必须听得到」。
+
+```bash
+pip install sherpa-onnx soundfile numpy pypinyin
+mkdir -p out/models && (cd out/models && bash ../../production/dl-models.sh)  # 模型都从 sherpa-onnx 的 GitHub 发布页下载，约 1 GB，放在 out/models/（不入库）
+python3 production/pronounce.py                    # 读音核对表.md；「待确认」必须为 0
+python3 production/voices.py screen                # Kokoro 55 个中文女声初筛（只当 ZipVoice 的音色参考）
+python3 production/voices.py ref 23                # 生成参考音色 out/voice-ref/f23/
+python3 production/tts.py --engine zipvoice --ref out/voice-ref/f23 --shots C49-C54 --out out/sample/f23
+python3 production/tts.py --engine matcha --shots C49-C54 --out out/sample/matcha
+```

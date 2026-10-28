@@ -1,0 +1,25 @@
+# 读音表：人工确认过的读音，合成时优先使用（会写进合成词典）
+# 格式：词<TAB>拼音（数字标调，5 = 轻声）<TAB>说明 / 出处
+# 新词先在 读音核对表.md 里确认，再加到这里
+一场	yi4 chang3	已知坑词：001 期读成 cháng
+行业	hang2 ye4	
+会计	kuai4 ji4	会计事务所
+重复	chong2 fu4	
+重新	chong2 xin1	
+背后	bei4 hou4	
+差不多	cha4 bu5 duo1	
+便宜	pian2 yi5	
+承担	cheng2 dan1	
+为别人	wei4 bie2 ren2	
+经营着	jing1 ying2 zhe5	
+忙着	mang2 zhe5	
+跟着	gen1 zhe5	
+急着	ji2 zhe5	
+值得	zhi2 de5	
+变得	bian4 de5	
+好几套	hao3 ji3 tao4	
+几百段	ji3 bai3 duan4	
+几十家	ji3 shi2 jia1	
+算了算	suan4 le5 suan4	
+慢慢地	man4 man4 de5	读音核对表发现：词典给 dì
+都会	dou1 hui4	「公司都会经历」：词典按「都会」（大都市 dū huì）切
