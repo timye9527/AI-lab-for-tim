@@ -96,7 +96,7 @@ dt { color: var(--muted) } dd { margin: 0 }
   <header>
     <div class="eyebrow">二维动画经济科普 · 横版 16:9 · 1920×1080 · 分镜审阅稿</div>
     <h1>AI省下的钱，<br>被谁赚走了？</h1>
-    <p class="lede">一家县城婚庆公司的故事。旁白一字不加，只为配音安全改了 4 处。下面是逐镜头分镜：时间码按估算语速算，配音做完后按实际时长重排。还没有生成任何视频。</p>
+    <p class="lede">一家县城婚庆公司的故事。旁白一字不加，只为配音安全改了几处说法，意思不变。下面是逐镜头分镜：时间码按估算语速算，配音做完后按实际时长重排。还没有生成任何视频。</p>
     <div class="facts" id="facts"></div>
   </header>
 
@@ -105,8 +105,8 @@ dt { color: var(--muted) } dd { margin: 0 }
     <ol>
       <li><b>标题</b>：《AI省下的钱，被谁赚走了？》<small>已确认</small></li>
       <li><b>时长</b>：正常 5 分钟，不删句 <small>已确认</small></li>
-      <li><b>声音</b>：AI 女声 <small>已确认；样片出两个音色给你挑</small></li>
-      <li><b>画面</b>：待定。先用提示词页比 A 国漫电影感 / B 温暖绘本感 / C 扁平科普动画（纯代码）三种画风</li>
+      <li><b>声音</b>：AI 女声 <small>已确认；三个音色样片待你挑</small></li>
+      <li><b>画面</b>：A 国漫电影感 <small>已确认；背景用 AI 出空景，角色、信息图、文字由代码画</small></li>
     </ol>
   </section>
 
