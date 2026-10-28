@@ -101,14 +101,13 @@ dt { color: var(--muted) } dd { margin: 0 }
   </header>
 
   <section class="ask" aria-labelledby="ask-h">
-    <h2 id="ask-h">需要你拍板的四件事</h2>
+    <h2 id="ask-h">已定和待定</h2>
     <ol>
-      <li><b>标题</b>：用《AI省下的钱，被谁赚走了？》吗？<small>原题 19 字封面放不下，30 → 12 小时也不止「翻倍」。</small></li>
-      <li><b>时长</b>：照原稿约 5 分钟（推荐），还是删约 70 字压到 4 分 30 秒？</li>
-      <li><b>声音</b>：AI 男声，样片阶段出「沉稳」「明亮讲故事」两版给你挑（推荐）；或你自己录 / AI 女声。</li>
-      <li><b>画面</b>：纯代码绘制，0 元、我全部跑完、角色绝不走样（推荐）；或你用提示词出 5 张背景，画面更有画感。</li>
+      <li><b>标题</b>：《AI省下的钱，被谁赚走了？》<small>已确认</small></li>
+      <li><b>时长</b>：正常 5 分钟，不删句 <small>已确认</small></li>
+      <li><b>声音</b>：AI 女声 <small>已确认；样片出两个音色给你挑</small></li>
+      <li><b>画面</b>：待定。先用提示词页比 A 国漫电影感 / B 温暖绘本感 / C 扁平科普动画（纯代码）三种画风</li>
     </ol>
-    <p class="note" style="margin-top:10px">确认后下一步只做 35 秒声音样片 + 2 张关键帧给你看，不直接做全片。</p>
   </section>
 
   <section class="tl" aria-labelledby="tl-h">
