@@ -19,6 +19,7 @@
 | [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
 | [`hub/README.md`](hub/README.md) | 主理人 / AI 助手 | 成果中台：所有项目成果的登记规则和分类 |
 | [`docs/VIDEO-GUIDE.md`](docs/VIDEO-GUIDE.md) | 主理人 | 做视频：流程、下单模板、什么费 token / 时间 / 显卡 / 钱；质检技能在 `.claude/skills/video-qa/` |
+| [`docs/content-factory/`](docs/content-factory/README.md) | 主理人 | 新方向：把投资大佬的深度内容做成 10 分钟中视频（人物池、格式拆解、首批选题） |
 
 ## 目录
 
