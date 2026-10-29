@@ -14,7 +14,9 @@
     "video:final": "node scripts/video-final.mjs",
     "video": "node factory/video/build.mjs",
     "video:letters": "cd factory/video && python3 letters_check.py",
-    "video:rhythm": "cd factory/video && python3 rhythm.py"
+    "video:rhythm": "cd factory/video && python3 rhythm.py",
+    "video:check": "node video/memory-wallst/check.mjs",
+    "video:pronounce": "python3 video/memory-wallst/production/pronounce.py"
   },
   "engines": {
     "node": ">=22.13"

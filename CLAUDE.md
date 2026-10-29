@@ -9,9 +9,10 @@
 5. **史实要真。** 人物的 `fact` 必须是有出处的史实，并标注出处；`quote` 是编写的「人物心声」，不能冒充原话。
 6. **兑换码和数据不提交。** `codes/`、`data/`、`backup/`、`out/` 都已被忽略。
 7. **网站和服务端保持零依赖。** 网站是原生 HTML / CSS / ES Module，服务端只用 Node 内置模块。`playwright-core` 只用于 `npm run notes` 和 `npm run video` 生成素材；视频配音用的 Python 依赖只在 `factory/` 里。
+8. 文案用中文，代码注释简短、用中文。
 9. **大陆合规优先。** 笔记、商品页、段位卡上不放链接、二维码、微信；网址只能出现在付款后的自动发货内容里。改了文案要跑 `npm run notes`，看高危词提醒。
 10. **数据结构变更**要同时改 `db/schema.sql`、`server/db.mjs` 和 `server/admin.mjs`。
+11. **成果登记。** 任何项目交付了成果（页面、报告、产品、素材、视频、PPT），收尾时登记到成果中台，并按主线定档（见 hub/README.md 的定位和主线）、检查是否已存进 GitHub，做法见 `hub/README.md`。只做检索、没有交付物的不登记。改 `hub/` 不受第 1、2 条限制。
 12. **做视频一律先走 `.claude/skills/video-qa`**（哪怕只改一句台词、用户没提质检）：先读 `错误档案.md` 的「每次必查」，按关卡推进，声音样片确认后才做全片；配音前跑 `npm run video:lint`，出片后跑 `npm run video:final`。犯了新错，先让检查能抓到，再记进错误档案。
 13. **视频出片前必须过质检。** 用 `factory/` 做视频时按 `.claude/skills/video-qc` 走：`质检报告.md` 全部通过、读音表审完才出片，不用 `--force` 绕过。写脚本按 `.claude/skills/viral-script`。
-8. 文案用中文，代码注释简短、用中文。
-11. **成果登记。** 任何项目交付了成果（页面、报告、产品、素材、视频、PPT），收尾时登记到成果中台，并按主线定档（见 hub/README.md 的定位和主线）、检查是否已存进 GitHub，做法见 `hub/README.md`。只做检索、没有交付物的不登记。改 `hub/` 不受第 1、2 条限制。
+14. **视频配音前必须过读音核对。** 合成前跑 `npm run video:pronounce`，看 `08-读音核对表.md` 的「待确认」；行业词的读音（长约 cháng、长鑫 cháng、上调 tiáo、剪刀差 chā……）写进 `production/pronounce.tsv`，和用户过稿时一起确认。拼音库和合成模型都会在行业词上读错，不能只靠自动判读。配音时数字一律转中文读法（`numcn.py`，剩一个阿拉伯数字就拒绝合成），合成后看 `asr-report.md` 的听写回检，有问题的句子修完再出片。

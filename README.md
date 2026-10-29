@@ -128,6 +128,15 @@ npm run codes:static -- jiucai 500 --prefix JC   # 生成兑换码 + 静态码�
 - 报告内容在前端，懂开发者工具的人可以绕过付费墙。0.99 元的产品不值得为此加服务端渲染。真要防的话，可以把 `types` 挪到服务端，由接口返回。
 - 解锁状态存在本机浏览器里。服务器模式下每个码默认可在 3 台设备上用；静态码表模式不限次数。
 
+## 同仓库的其他项目
+
+| 目录 | 内容 |
+|---|---|
+| [`research/`](research/README.md) | 投研中台：信息源清单、主张台账、观察日历、案例 |
+| [`finance-video/`](finance-video/README.md) | 财经视频生产线：选题打分、脚本结构、AI 主播、华尔街风格图表 |
+| [`video/memory-wallst/`](video/memory-wallst/README.md) | 存储多空四回合 10 分钟视频：定稿脚本、事实台账、自检（`npm run video:check`） |
+| [`video/dram-hbm/`](video/dram-hbm/README.md) | 上一版 2 分钟 DRAM / HBM 科普和两张图解 |
+
 ## 和 Claude 协作的方式
 
 把这个仓库交给 Claude（Claude Code），下面这些事可以直接让它做：
