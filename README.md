@@ -18,6 +18,7 @@
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | 主理人 | 笔记打法、定价、冷启动两周、看什么数据 |
 | [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
 | [`hub/README.md`](hub/README.md) | 主理人 / AI 助手 | 成果中台：所有项目成果的登记规则和分类 |
+| [`docs/VIDEO-GUIDE.md`](docs/VIDEO-GUIDE.md) | 主理人 | 做视频：流程、下单模板、什么费 token / 时间 / 显卡 / 钱；质检技能在 `.claude/skills/video-qa/` |
 
 ## 目录
 
@@ -38,6 +39,8 @@ scripts/
   build-preview.mjs         ← 打包静态预览版
   codes-static.mjs          ← 生成兑换码 + 静态码表
   lint-words.mjs            ← 高危词表（导流 / 金融 / 迷信 / 夸大）
+  video-lint.mjs            ← 视频配音前稿件预检（以前读错过的写法、数字、英文）
+  video-final.mjs           ← 视频成片体检（规格、响度、黑屏、静音、字幕、抽帧拼图）
 ```
 
 ## 常用命令
