@@ -137,7 +137,7 @@ footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line)
       <h1>AI 投行观点日报</h1>
       <span class="label mono" id="issue">读取中…</span>
     </div>
-    <p class="sub">中美头部投行与券商研究所对 AI 产业链（算力、云与资本开支、半导体、应用、融资、港股与 A 股 AI 资产）的最新观点。每天北京时间 10 点前更新。</p>
+    <p class="sub">中美头部投行与券商研究所对 AI 产业链（算力、存储、云与资本开支、应用、融资、与 AI 主线相关的美股宏观、港股与 A 股 AI 资产）的最新观点，并附关键市场事件对照。每天北京时间 10 点前更新。</p>
     <div class="edition-bar">
       <label for="edition">看哪一期</label>
       <select id="edition"><option>最新一期</option></select>
@@ -303,12 +303,12 @@ function renderList() {
   // 只看所选这一期及以前的研报
   const pool = state.reports.filter((r) => !ed || !r.added || r.added <= ed.date);
   const chains = ["全部", ...new Set(pool.flatMap((r) => r.chain || []))];
-  chipRow($("f-side"), ["全部", "本期新增", "中资", "外资"], "side");
+  chipRow($("f-side"), ["全部", "本期新增", "中资", "外资", "市场事件"], "side");
   chipRow($("f-chain"), chains, "chain");
   const q = state.q.trim().toLowerCase();
   const shown = pool.filter((r) => {
     if (state.side === "本期新增" && !newIds.has(r.id)) return false;
-    if ((state.side === "中资" || state.side === "外资") && r.side !== state.side) return false;
+    if (["中资", "外资", "市场事件"].includes(state.side) && r.side !== state.side) return false;
     if (state.chain !== "全部" && !(r.chain || []).includes(state.chain)) return false;
     if (q) {
       const hay = [r.bank, r.team, r.title, r.core, ...(r.points || []), r.excerpt, ...(r.chain || [])].join(" ").toLowerCase();
