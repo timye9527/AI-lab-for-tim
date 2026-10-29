@@ -1,0 +1,315 @@
+# 读音覆盖表：词 + 每个字的拼音（数字标调，5 为轻声，ü 写 v）。
+# 这里的词优先于 pypinyin；「一」「不」写在这里就不再自动变调。
+# 新人名、新术语、读错过的词都加在这里。
+
+# ── 财经术语里的多音字 ──
+看空 kan4 kong1
+看多 kan4 duo1
+做空 zuo4 kong1
+卖空 mai4 kong1
+空仓 kong1 cang1
+空头 kong1 tou2
+多头 duo1 tou2
+重仓 zhong4 cang1
+加仓 jia1 cang1
+调仓 tiao2 cang1
+调研 diao4 yan2
+调整 tiao2 zheng3
+调控 tiao2 kong4
+行情 hang2 qing2
+行业 hang2 ye4
+银行 yin2 hang2
+行长 hang2 zhang3
+发行 fa1 xing2
+供给 gong1 ji3
+给予 ji3 yu3
+收益率 shou1 yi4 lv4
+汇率 hui4 lv4
+利率 li4 lv4
+回报率 hui2 bao4 lv4
+率先 shuai4 xian1
+涨幅 zhang3 fu2
+涨停 zhang3 ting2
+增长 zeng1 zhang3
+成长 cheng2 zhang3
+长期 chang2 qi1
+长线 chang2 xian4
+长远 chang2 yuan3
+差价 cha1 jia4
+差距 cha1 ju4
+差额 cha1 e2
+差不多 cha4 bu5 duo1
+处于 chu3 yu2
+处理 chu3 li3
+着眼 zhuo2 yan3
+着手 zhuo2 shou3
+着急 zhao2 ji2
+连着 lian2 zhe5
+角色 jue2 se4
+证券 zheng4 quan4
+债券 zhai4 quan4
+参与 can1 yu4
+估值 gu1 zhi2
+市值 shi4 zhi2
+解套 jie3 tao4
+降息 jiang4 xi1
+降低 jiang4 di1
+份额 fen4 e2
+分化 fen1 hua4
+能力圈 neng2 li4 quan1
+购买力 gou4 mai3 li4
+零和 ling2 he2
+复利 fu4 li4
+投机 tou2 ji1
+安全边际 an1 quan2 bian1 ji4
+数据 shu4 ju4
+大量 da4 liang4
+量化 liang4 hua4
+冲击 chong1 ji1
+落地 luo4 di4
+落后 luo4 hou4
+模型 mo2 xing2
+模式 mo2 shi4
+重要 zhong4 yao4
+重新 chong2 xin1
+重组 chong2 zu3
+只有 zhi3 you3
+应该 ying1 gai1
+供应 gong1 ying4
+称为 cheng1 wei2
+结果 jie2 guo3
+尽管 jin3 guan3
+
+# ── 口语常用 ──
+还是 hai2 shi4
+为了 wei4 le5
+因为 yin1 wei4
+作为 zuo4 wei2
+认为 ren4 wei2
+似乎 si4 hu1
+一点点 yi4 dian3 dian3
+一场 yi4 chang3
+一段一段 yi2 duan4 yi2 duan4
+一层一层 yi4 ceng2 yi4 ceng2
+一轮一轮 yi4 lun2 yi4 lun2
+
+# ── 争议读音：行尾「?」= 规范读法确实存在两种说法时才用，每期读音表列出来请主理人拍板。目前没有 ──
+
+总得 zong3 dei3
+
+# ── 人名、机构、地名 ──
+李录 li3 lu4
+段永平 duan4 yong3 ping2
+张磊 zhang1 lei3
+邓晓峰 deng4 xiao3 feng1
+冯柳 feng2 liu3
+邱国鹭 qiu1 guo2 lu4
+杨东 yang2 dong1
+宁泉 ning2 quan2
+张坤 zhang1 kun1
+付鹏 fu4 peng2
+洪灏 hong2 hao4
+李迅雷 li3 xun4 lei2
+朱啸虎 zhu1 xiao4 hu3
+陆奇 lu4 qi2
+沈南鹏 shen3 nan2 peng2
+李开复 li3 kai1 fu4
+芒格 mang2 ge2
+巴菲特 ba1 fei1 te4
+格雷厄姆 ge2 lei2 e4 mu3
+多德 duo1 de2
+塔诺 ta3 nuo4
+桑托斯 sang1 tuo1 si1
+阿贝尔 a1 bei4 er3
+伯克希尔 bo2 ke4 xi1 er3
+霍华德 huo4 hua2 de2
+马克斯 ma3 ke4 si1
+黄仁勋 huang2 ren2 xun1
+马斯克 ma3 si1 ke4
+喜马拉雅 xi3 ma3 la1 ya3
+哥伦比亚 ge1 lun2 bi3 ya4
+哥大 ge1 da4
+唐山 tang2 shan1
+华尔街 hua2 er3 jie1
+奥马哈 ao4 ma3 ha1
+橡树资本 xiang4 shu4 zi1 ben3
+高瓴 gao1 ling2
+高毅 gao1 yi4
+芒格书院 mang2 ge2 shu1 yuan4
+硅谷 gui1 gu3
+
+# ── 高风险字：得（děi 必须 / de 补语 / dé 得到）、了、量、冲、转 ──
+就得 jiu4 dei3
+还得 hai2 dei3
+你得 ni3 dei3
+你得到 ni3 de2 dao4
+得到 de2 dao4
+传得 chuan2 de5
+涨得 zhang3 de5
+离得开 li2 de5 kai1
+到得了 dao4 de5 liao3
+付了 fu4 le5
+去量 qu4 liang2
+他量的 ta1 liang2 de5
+量完 liang2 wan2
+量美股 liang2 mei3 gu3
+量中国 liang2 zhong1 guo2
+量世界 liang2 shi4 jie4
+冲着 chong4 zhe5
+运转 yun4 zhuan3
+地方 di4 fang5
+稳固地 wen3 gu4 de5
+视频为 shi4 pin2 wei2
+
+# ── 人工审过、确认无误的词（001 期）──
+流传 liu2 chuan2
+为你 wei4 ni3
+在为 zai4 wei4
+看得懂 kan4 de5 dong3
+到不了 dao4 bu4 liao3
+转向 zhuan3 xiang4
+数字 shu4 zi4
+少数 shao3 shu4
+不差 bu2 cha4
+强调 qiang2 diao4
+不得不 bu4 de2 bu4
+赢得 ying2 de2
+行动 xing2 dong4
+值得 zhi2 de5
+
+# ── 002 期新词 ──
+彭博 peng2 bo2
+纳斯达克 na4 si1 da2 ke4
+标普 biao1 pu3
+浑然不觉 hun2 ran2 bu4 jue2
+孤注一掷 gu1 zhu4 yi2 zhi4
+置身事外 zhi4 shen1 shi4 wai4
+均值回归 jun1 zhi2 hui2 gui1
+拐点 guai3 dian3
+备忘录 bei4 wang4 lu4
+摧毁 cui1 hui3
+杠杆 gang4 gan3
+市盈率 shi4 ying2 lv4
+回本 hui2 ben3
+喊顶 han3 ding3
+高歌猛进 gao1 ge1 meng3 jin4
+迭代 die2 dai4
+过时 guo4 shi2
+站位 zhan4 wei4
+那一批 na4 yi4 pi1
+怕泡沫 pa4 pao4 mo4
+吹泡沫 chui1 pao4 mo4
+撑得住 cheng1 de5 zhu4
+
+# ── 人工审过、确认无误的词（002 期）──
+到处 dao4 chu4
+看着 kan4 zhe5
+当了 dang1 le5
+觉得 jue2 de5
+看重 kan4 zhong4
+当年 dang1 nian2
+为将来 wei4 jiang1 lai2
+成为 cheng2 wei2
+打转 da3 zhuan4
+执行 zhi2 xing2
+得出 de2 chu1
+紧接着 jin3 jie1 zhe5
+为什么 wei4 shen2 me5
+
+# ── 003 期新词 ──
+囚徒困境 qiu2 tu2 kun4 jing4
+掉队 diao4 dui4
+掺和 chan1 huo5
+入局 ru4 ju2
+入坑 ru4 keng1
+算力 suan4 li4
+封仓 feng1 cang1
+小霸王 xiao3 ba4 wang2
+步步高 bu4 bu4 gao1
+方三文 fang1 san1 wen2
+碾碎 nian3 sui4
+滚滚向前 gun3 gun3 xiang4 qian2
+同质化 tong2 zhi4 hua4
+光伏 guang1 fu2
+扩产 kuo4 chan3
+产能 chan3 neng2
+淘汰 tao2 tai4
+网易 wang3 yi4
+共进午餐 gong4 jin4 wu3 can1
+跟风 gen1 feng1
+能力圈 neng2 li4 quan1
+重仓买入 zhong4 cang1 mai3 ru4
+回调 hui2 tiao2
+长访谈 chang2 fang3 tan2
+做得 zuo4 de5
+
+# ── 人工审过、确认无误的词（003 期）──
+了解 liao3 jie3
+顺着 shun4 zhe5
+更差 geng4 cha4
+接着 jie1 zhe5
+跟着 gen1 zhe5
+
+# ── 004 期 ──
+达利欧 da2 li4 ou1
+桥水 qiao2 shui3
+米尔肯 mi3 er3 ken3
+正处在 zheng4 chu3 zai4
+讲得 jiang3 de5
+说得 shuo1 de5
+错得 cuo4 de5
+他还给了 ta1 hai2 gei3 le5
+一样要还 yi2 yang4 yao4 huan2
+还不起 huan2 bu4 qi3
+人为明天 ren2 wei4 ming2 tian1
+
+# ── 人工审过、确认无误的词（004 期）──
+对冲 dui4 chong1
+冲进来 chong1 jin4 lai2
+不行 bu4 xing2
+重大 zhong4 da4
+指数 zhi3 shu4
+读数 du2 shu4
+当时 dang1 shi2
+高处 gao1 chu4
+传统 chuan2 tong3
+量级 liang4 ji2
+逼着 bi1 zhe5
+变差 bian4 cha4
+还债 huan2 zhai4
+急着 ji2 zhe5
+多数 duo1 shu4
+
+# ── 005 期 ──
+跌得 die1 de5
+答得 da2 de5
+谈得 tan2 de5
+谁还 shui2 hai2
+还的钱 huan2 de5 qian2
+提前还房贷 ti2 qian2 huan2 fang2 dai4
+反弹了 fan3 tan2 le5
+南向资金 nan2 xiang4 zi1 jin1
+一揽子 yi4 lan3 zi5
+赔率 pei2 lv4
+胜率 sheng4 lv4
+便宜 pian2 yi5
+就便宜 jiu4 pian2 yi5
+中金发现 zhong1 jin1 fa1 xian4
+
+# ── 人工审过、确认无误的词（005 期）──
+行情 hang2 qing2
+当天 dang4 tian1
+拖累 tuo1 lei3
+转负 zhuan3 fu4
+上涨空间 shang4 zhang3 kong1 jian1
+回答不了 hui2 da2 bu4 liao3
+一共长了 yi2 gong4 zhang3 le5
+只长了 zhi3 zhang3 le5
+是在长 shi4 zai4 zhang3
+力量 li4 liang4
+冲进股市 chong1 jin4 gu3 shi4
+拿着 na2 zhe5
+重估 zhong4 gu1
+差到 cha4 dao4
+当一家人 dang1 yi4 jia1 ren2
+愿意为 yuan4 yi4 wei4

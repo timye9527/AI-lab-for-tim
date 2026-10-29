@@ -1,0 +1,37 @@
+# 英文字母读法。每个都用识别模型验证过：在句子里合成 3 次，都能被准确听成这个字母。
+# 写拼音的用中文音节读（播音里读缩写的方式），写「=单词」的交给英文发音引擎读，写 ✗ 的这个模型读不准。
+# 稿子里出现 ✗ 的字母会直接报错，请改写（例如 LLM 写成「大语言模型」）。
+# 新加字母读法后要重新验证：npm run video:letters
+
+A ei2
+B bi4
+C xi1
+D di1
+E yi4
+F ai2 fu5
+G ji4
+H =aitch
+I ai1
+J =jay
+K kai4
+L ✗
+M ai2 mu5
+N en1
+O ou1
+P pi4
+Q =queue
+R a1 er5
+S ai2 si5
+T ti1
+U =you
+V wei1
+W da2 bu5 liu3
+X ai2 ke4 si5
+Y wai1
+Z ✗
+
+# 整词读法，优先于逐个字母。字母之间用 / 隔开。
+AI ei2 / ai1
+
+# 验证不过的缩写（npm run video:letters 实测），稿子里改写成中文：
+# MBA 0/3（听成 m b b）→ 写「工商管理硕士」

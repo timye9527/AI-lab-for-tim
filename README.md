@@ -17,7 +17,9 @@
 | [`docs/FRIEND-SOP.md`](docs/FRIEND-SOP.md) | 大陆伙伴 | 部署服务器、开店上架、每天运营、客服命令，一步步照做 |
 | [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) | 主理人 | 笔记打法、定价、冷启动两周、看什么数据 |
 | [`docs/LAUNCH-CN.md`](docs/LAUNCH-CN.md) | 主理人 | 大陆落地调研：开店主体、类目、部署、财经内容红线 |
+| [`hub/README.md`](hub/README.md) | 主理人 / AI 助手 | 成果中台：所有项目成果的登记规则和分类 |
 | [`docs/VIDEO-GUIDE.md`](docs/VIDEO-GUIDE.md) | 主理人 | 做视频：流程、下单模板、什么费 token / 时间 / 显卡 / 钱；质检技能在 `.claude/skills/video-qa/` |
+| [`docs/content-factory/`](docs/content-factory/README.md) | 主理人 | 新方向：把投资大佬的深度内容做成 10 分钟中视频（人物池、格式拆解、首批选题） |
 
 ## 目录
 
@@ -125,6 +127,15 @@ npm run codes:static -- jiucai 500 --prefix JC   # 生成兑换码 + 静态码�
 
 - 报告内容在前端，懂开发者工具的人可以绕过付费墙。0.99 元的产品不值得为此加服务端渲染。真要防的话，可以把 `types` 挪到服务端，由接口返回。
 - 解锁状态存在本机浏览器里。服务器模式下每个码默认可在 3 台设备上用；静态码表模式不限次数。
+
+## 同仓库的其他项目
+
+| 目录 | 内容 |
+|---|---|
+| [`research/`](research/README.md) | 投研中台：信息源清单、主张台账、观察日历、案例 |
+| [`finance-video/`](finance-video/README.md) | 财经视频生产线：选题打分、脚本结构、AI 主播、华尔街风格图表 |
+| [`video/memory-wallst/`](video/memory-wallst/README.md) | 存储多空四回合 10 分钟视频：定稿脚本、事实台账、自检（`npm run video:check`） |
+| [`video/dram-hbm/`](video/dram-hbm/README.md) | 上一版 2 分钟 DRAM / HBM 科普和两张图解 |
 
 ## 和 Claude 协作的方式
 
