@@ -127,6 +127,8 @@ blockquote { margin: 8px 0 0; padding: 8px 12px; border-left: 3px solid var(--li
 .ch span { color: var(--muted); font-size: 13px; }
 
 .empty { color: var(--muted); padding: 24px 0; text-align: center; }
+.quant-sum { margin: 0; max-width: 70ch; font-weight: 500; }
+.q-src { font-size: 13px; color: var(--muted); }
 footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 4px; }
 @media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s; } .card:hover { border-color: var(--accent); } }
 </style>
@@ -137,7 +139,7 @@ footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line)
       <h1>AI 投行观点日报</h1>
       <span class="label mono" id="issue">读取中…</span>
     </div>
-    <p class="sub">中美头部投行与券商研究所对 AI 产业链（算力、存储、云与资本开支、应用、融资、与 AI 主线相关的美股宏观、港股与 A 股 AI 资产）的最新观点，并附关键市场事件对照。每天北京时间 10 点前更新。</p>
+    <p class="sub">中美头部投行与券商研究所对 AI 产业链（算力、存储、云与资本开支、应用、融资、与 AI 主线相关的美股宏观、港股与 A 股 AI 资产）的最新观点，量化团队与资金流信号，并附关键市场事件对照。每天北京时间 10 点前更新。</p>
     <div class="edition-bar">
       <label for="edition">看哪一期</label>
       <select id="edition"><option>最新一期</option></select>
@@ -150,6 +152,15 @@ footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line)
     <p class="headline" id="headline">正在读取本期内容…</p>
     <ol class="takeaways" id="takeaways"></ol>
     <p class="note" id="ed-note" hidden></p>
+  </section>
+
+  <section class="lead" aria-labelledby="quant-h" id="quant-sec" hidden>
+    <h2 id="quant-h">量化与资金面</h2>
+    <p class="quant-sum" id="quant-sum"></p>
+    <div class="split"><table>
+      <thead><tr><th style="width:18%">信号</th><th>读数</th><th style="width:9%">方向</th><th style="width:18%">来源</th></tr></thead>
+      <tbody id="quant"></tbody>
+    </table></div>
   </section>
 
   <section class="lead" aria-labelledby="split-h" id="split-sec" hidden>
@@ -195,6 +206,7 @@ const CHANNELS = [
   ["瑞银 UBS", "UBS CIO House View 每周要点公开可读", "https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/house-view.html"],
   ["研报聚合（中资为主）", "东方财富研报中心、慧博投研、萝卜投研、发现报告：按机构 + 标题搜 PDF", "https://data.eastmoney.com/report/"],
   ["外资研报中文转述", "华尔街见闻 App（含见闻 VIP）、财联社、智通财经，常最早转述外资观点", "https://wallstreetcn.com/"],
+  ["量化与资金流", "高盛 CTA Corner / 主经纪商周报、美银 Flow Show（每周五）、德银仓位周报、摩根大通 Flows & Liquidity、野村 McElligott 交易台点评；中文转述常见于华尔街见闻「追风交易台」", ""],
 ];
 
 const STANCE = { "偏多": "bull", "谨慎": "bear", "中性": "flat" };
@@ -236,6 +248,7 @@ function renderEdition() {
     $("headline").textContent = "还没有任何一期。每天早上的更新任务会把第一期写进来。";
     $("takeaways").replaceChildren();
     $("split-sec").hidden = true;
+    $("quant-sec").hidden = true;
     return;
   }
   sel.value = ed.date;
@@ -250,6 +263,17 @@ function renderEdition() {
   $("split").replaceChildren(...rows.map((r) => {
     const tr = el("tr");
     tr.append(el("td", null, r.topic), el("td", "bull", r.bull), el("td", "bear", r.bear));
+    return tr;
+  }));
+  // 量化与资金面：信号表
+  const qs = ed.quant || [];
+  $("quant-sec").hidden = qs.length === 0 && !ed.quantSummary;
+  $("quant-sum").textContent = ed.quantSummary || "";
+  $("quant").replaceChildren(...qs.map((q) => {
+    const tr = el("tr");
+    const dir = el("td");
+    dir.append(el("span", "stance " + (STANCE[q.read] || "flat"), q.read || "中性"));
+    tr.append(el("td", null, q.signal), el("td", null, q.reading), dir, el("td", "q-src", q.source));
     return tr;
   }));
 }
@@ -303,12 +327,12 @@ function renderList() {
   // 只看所选这一期及以前的研报
   const pool = state.reports.filter((r) => !ed || !r.added || r.added <= ed.date);
   const chains = ["全部", ...new Set(pool.flatMap((r) => r.chain || []))];
-  chipRow($("f-side"), ["全部", "本期新增", "中资", "外资", "市场事件"], "side");
+  chipRow($("f-side"), ["全部", "本期新增", "中资", "外资", "量化资金", "市场事件"], "side");
   chipRow($("f-chain"), chains, "chain");
   const q = state.q.trim().toLowerCase();
   const shown = pool.filter((r) => {
     if (state.side === "本期新增" && !newIds.has(r.id)) return false;
-    if (["中资", "外资", "市场事件"].includes(state.side) && r.side !== state.side) return false;
+    if (["中资", "外资", "量化资金", "市场事件"].includes(state.side) && r.side !== state.side) return false;
     if (state.chain !== "全部" && !(r.chain || []).includes(state.chain)) return false;
     if (q) {
       const hay = [r.bank, r.team, r.title, r.core, ...(r.points || []), r.excerpt, ...(r.chain || [])].join(" ").toLowerCase();
