@@ -1,0 +1,20 @@
+id,fact,number,as_of,tier,verify,source,url,stale_after,refresh_on
+F01,SK 海力士三季度收入 104.6 万亿韩元、营业利润 83.3 万亿韩元（利润率约 80%），超共识约 9%；长协覆盖 2027–28 年一半以上产能；管理层称供不应求的结构持续到 2030 年,83.3 万亿韩元；80%,2026-10-28,T1,交叉印证,CNBC 10/28；投研中枢存储桌 10/28（L1）,https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html,2027-01-31,2027-01-28
+F02,10/28 财报日 SK 海力士 +10.89%、三星 +9.01%、KOSPI +6.63%,+10.89%,2026-10-28,T2,交叉印证,投研中枢 10/29 日报；CNBC,https://www.cnbc.com/2026/10/28/sk-hynix-third-quarter-profit.html,2026-12-31,
+F03,10/30 SK 海力士 −7.08%、三星 −3.02%；美光约 −5%,−7.08%,2026-10-30,T2,交叉印证,GuruFocus；Invezz；投研中枢 10/31,https://invezz.com/news/2026/10/30/why-are-micron-sk-hynix-and-sandisk-stocks-falling-on-friday,2026-12-31,
+F04,三星三季度营业利润 107.4 万亿韩元，存储所在 DS 部门 106.5 万亿；HBM4 销量环比 3 倍以上，2027 年 HBM 已售罄；净利 75.1 万亿不及共识 87.4 万亿，股价 −4.13%,107.4 万亿韩元,2026-10-29,T2,交叉印证,投研中枢存储桌 10/30,https://www.trendforce.com/news/2026/10/08/news-samsung-sees-3q26-operating-profit-soaring-783-to-record-krw-107-4-trillion-on-hbm4-memory-price-gains,2027-01-31,
+F05,英特尔 10/30 −28.58%（1974 年以来最差单日）；四季度指引大幅低于预期，PC 放缓至少到明年上半年,−28.58%,2026-10-30,T1,交叉印证,TheStreet；Benzinga；投研中枢 10/31,https://www.thestreet.com/stock-market-today/stock-market-today-dow-jones-sp-500-nasdaq-updates-oct-30-2026,2026-12-31,
+F06,英特尔 CEO 陈立武：内存价格涨了数倍，已占低端手机和笔电成本的 70–80%,70–80%,2026-09,T2,待核一手,Herald Corp（投研中枢 10/31 引）,https://biz.heraldcorp.com/article/10875375,2026-12-31,
+F07,10/30 纳指 −2.86%，6 月以来最差单日；10 月为 2025 年 3 月以来最差月份；较 10/6 高点约 −7.8%,−2.86%,2026-10-30,T2,交叉印证,TheStreet；GV Wire；投研中枢 10/31,https://gvwire.com/2026/10/30/nasdaq-hits-near-three-month-low-as-amazon-intel-deepen-ai-capex-concerns/,2026-12-31,
+F08,常规 DRAM 合约价环比：一季度 +90–95% → 二季度 +58–63% → 三季度 +13–18% → 四季度预测 +10–15%（TrendForce）,+10–15%,2026-10,T2,交叉印证,投研中枢存储桌（TrendForce）,https://www.trendforce.com/,2026-11-30,2026-11-30
+F09,晨星把美光公允价值下调约两成（由中性转为看空估值），模型里 2028 年后价格下行；伯恩斯坦开始建模 2028 年三家 DRAM 厂收入同比下滑,—,2026-10,T2,交叉印证,投研中枢存储桌 10 月期,—,2026-12-31,
+F10,瑞银（10/18）、野村（10/20）维持对韩国两家存储厂看好，认为供给和竞争担忧被高估、短缺持续到 2028 年,—,2026-10-20,T2,交叉印证,投研中枢存储桌 10 月期,—,2026-12-31,
+F11,长鑫三季度营收预告同比 +589% 至 +619%，前三季度扭亏为盈；二季度 DRAM 份额约 9.5%（一季度 7.6%）,约 +600%；9.5%,2026-10-16,T2,交叉印证,彭博 / 第一财经（预告）；投研中枢存储桌,https://invezz.com/news/2026/10/30/cxmt-posts-613-jump-in-revenue-as-micron-sandisk-shares-tumble,2026-12-31,
+F12,美光技术高管 Scott DeBoer（10/21）：4F² 的密度优势是「神话」，美光研究多年后决定不商业化,—,2026-10-21,T2,交叉印证,投研中枢存储桌 10/21,—,2026-12-31,
+F13,摩根士丹利（8/27）：长鑫 2028 年产能约占全球 15%，2028 年前对全球 DRAM 定价不会产生实质影响,15%,2026-08-27,T2,交叉印证,投研中枢存储桌 9 月期,—,2026-12-31,
+F14,美银 10 月基金经理调查：45% 认为「做多全球半导体」是最拥挤交易（7 月 82%、9 月 53%）；净 37% 增配科技，2020 年 8 月以来最高；最大尾部风险是债券收益率失序上升（31%）,45%；37%,2026-10-08,T3,待核一手,Cryptobriefing；Seoul Economic Daily（转引 Barchart）,https://en.sedaily.com/finance/2026/10/25/wall-street-warns-of-ai-bubble-but-keeps-buying-tech-stocks,2026-11-20,2026-11-17
+F15,高盛主经纪商数据：截至 10/15 那一周，对冲基金减持科技股的速度为至少十年最快，半导体卖得最多，以多头平仓为主；净杠杆降到一年低点 48.6%,48.6%,2026-10-15,T2,交叉印证,24/7 Wall St.；雅虎财经；TheStreet,https://247wallst.com/investing/2026/10/20/hedge-funds-dumped-tech-stocks-at-the-fastest-pace-in-a-decade-goldman-says/,2026-12-31,
+F16,10 年期美债收益率 10 月在 5% 以上，一度约 5.35%（2002 年以来最高）；布伦特原油 9–10 月在 100 美元上方（中东战事）,约 5%+；100 美元+,2026-10,T2,交叉印证,投研中枢存储桌；Democracy Now 9/15；Nasdaq.com,https://www.democracynow.org/2026/9/15/headlines/yield_on_10_year_us_treasury_bonds_passes_5_as_mideast_war_drives_up_oil_prices,2026-11-15,2026-11-02
+F17,10/28 FOMC 维持 3.75–4.00%，两票主张加息；12 月加息概率约 83%（CME）,约 83%,2026-10-29,T2,交叉印证,投研中枢 10/29–10/30 日报,—,2026-12-10,2026-12-10
+F18,谷歌宣布 2027 年 capex「显著增加」，季度自由现金流转负，10/29 −12.64%（史上最差单日）；亚马逊 AWS +39%、2026 capex 约 2200 亿美元不降，TTM 自由现金流约 −424 亿美元,−12.64%；2200 亿,2026-10-29,T2,交叉印证,投研中枢 10/29–10/30 日报,—,2026-12-31,
+F19,韩国关税厅：10 月前 20 天半导体出口 275 亿美元（+222.5%）,+222.5%,2026-10-21,T1,已核,韩国关税厅（投研中枢存储桌 L1）,—,2026-11-02,2026-11-01
