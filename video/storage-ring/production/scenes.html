@@ -418,7 +418,13 @@ window.render = t => {
   score.style.opacity = cur >= 2 && cur <= 7 ? 1 : 0;
   score.querySelectorAll('span').forEach(e => { const on = SCORE[cur] === e.dataset.k || (cur > 4 && cur < 8); e.className = on ? 'on' : ''; e.style.background = on ? C[e.dataset.k] : 'var(--panel)'; });
   const line = TL.lines.find(l => l.text && t >= l.start - 0.05 && t < l.end + 0.25);
-  sub.textContent = line ? line.text : '';
+  const txt = line ? line.text : '';
+  if (sub.textContent !== txt) {
+    sub.textContent = txt;
+    // 长句缩字号，保证一行放得下
+    sub.style.fontSize = '44px';
+    if (sub.scrollWidth > 1640) sub.style.fontSize = Math.floor(44 * 1580 / sub.scrollWidth) + 'px';
+  }
 };
 </script>
 </body>
