@@ -365,7 +365,7 @@ BUILD.push((R, s) => {
 BUILD.push((R, s) => {
   const c = n => cue(7, n);
   const H = el(R, '跟踪清单 · <span class="amber">每一条都对应一位聪明人的框架</span>', { left: '110px', top: '120px', fontSize: '48px', fontWeight: 900 });
-  const L = [['瓶', '台积电扩产计划', '扩得越猛，越要小心', '贝克的温度计', '第一'], ['泡', '云巨头现金流转正时间表', '能不能给出年份', '达利欧和马克斯的尺子', '第二'], ['周', '每月 1 号韩国芯片出口 · 月底 DRAM 合约价', '涨价减速到零附近就是信号', '周期派的信号', '第三'], ['', '11 月中旬', '量化派和威尔逊，谁说对了', '钱的投票', '第四']]
+  const L = [['瓶', '台积电扩产计划', '扩得越猛，越要小心', '贝克的温度计', '第一'], ['泡', '云巨头现金流何时转正', '能不能给出年份', '达利欧和马克斯的尺子', '第二'], ['周', '韩国出口 · DRAM 合约价', '涨价减速到零附近就是信号', '周期派的信号', '第三'], ['', '11 月中旬', '量化派和威尔逊，谁说对了', '钱的投票', '第四']]
     .map(([k, a, b, w, n], i) => [card(R, `<div style="display:flex;gap:22px;align-items:center">${k ? badge(k, 84) : `<div style="width:84px;height:84px;border-radius:18px;border:6px solid #1F2430;display:grid;place-items:center;font-size:44px;font-weight:900">$</div>`}<div style="flex:1"><div style="font-size:36px;font-weight:900">${a}</div><div class="muted" style="font-size:26px;font-weight:700;margin-top:4px">${b}</div></div><span class="pill" style="font-size:22px">${w}</span></div>`, { left: `${110 + (i % 2) * 870}px`, top: `${220 + Math.floor(i / 2) * 230}px`, width: '830px', padding: '22px 26px' }), c(n)]);
   const mid = card(R, '<div class="tag">11 月 3 日 · 美国中期选举</div><div style="font-size:38px;font-weight:900;margin-top:8px">历史上选后一年，美股平均 <span class="mono up">+12%</span>　<span class="muted" style="font-size:26px">（1900 年来 31 次）</span></div><div style="font-size:32px;font-weight:700;margin-top:6px">但高利率、高油价这样的冲击，<span class="red">也盖过过这个规律</span></div>', { left: '110px', top: '700px', width: '1700px' });
   return t => {
@@ -380,14 +380,14 @@ BUILD.push((R, s) => {
   const c = n => cue(8, n);
   const rg = ring(R, { left: '260px', top: '300px' });
   const mc = el(R, xiaocun('point', 0.9), { left: '780px', top: '470px' });
-  const labs = ['泡', '瓶', '周'].map((k, i) => el(R, `<div style="display:flex;align-items:center;gap:12px">${badge(k, 70)}<span style="font-size:40px;font-weight:900;color:${C[k]}">${CN[k]}</span></div>`, { left: ['300px', '1340px', '110px'][i], top: ['180px', '180px', '900px'][i] }));
+  const labs = ['泡', '瓶', '周'].map((k, i) => el(R, `<div style="display:flex;align-items:center;gap:12px">${badge(k, 70)}<span style="font-size:40px;font-weight:900;color:${C[k]}">${CN[k]}</span></div>`, { left: ['300px', '1340px', '330px'][i], top: ['180px', '180px', '850px'][i] }));
   const ask = el(R, '你站哪一派？', { left: '0', right: '0', top: '120px', textAlign: 'center', fontSize: '64px', fontWeight: 900 });
-  const chips = el(R, '评论区打一个字：<span class="pill" style="border-color:var(--red);color:var(--red);font-size:44px">泡</span> <span class="pill" style="border-color:var(--blue);color:var(--blue);font-size:44px">瓶</span> <span class="pill" style="border-color:var(--amber);color:var(--amber);font-size:44px">周</span>', { left: '1240px', top: '880px', fontSize: '36px', fontWeight: 900 });
-  const d = el(R, '本期只做观点和信息整理，人物观点均为媒体转述；不提任何买卖建议，不构成任何投资建议', { left: '0', right: '0', top: '990px', textAlign: 'center', fontSize: '24px', color: 'var(--muted)' });
+  const chips = el(R, '评论区打一个字：<span class="pill" style="border-color:var(--red);color:var(--red);font-size:44px">泡</span> <span class="pill" style="border-color:var(--blue);color:var(--blue);font-size:44px">瓶</span> <span class="pill" style="border-color:var(--amber);color:var(--amber);font-size:44px">周</span>', { left: '700px', top: '858px', fontSize: '36px', fontWeight: 900 });
+  const d = el(R, '本期只做观点和信息整理，人物观点均为媒体转述；不提任何买卖建议，不构成任何投资建议', { left: '0', right: '0', top: '215px', textAlign: 'center', fontSize: '24px', color: 'var(--muted)' });
   return t => {
     show(rg, t, s, Infinity, 0.4, 0); bounce(mc, t, s + 0.3); show(ask, t, c('最后'));
     labs.forEach((e, i) => bounce(e, t, c('你站') + i * 0.35));
-    show(chips, t, c('评论区')); show(d, t, c('本期只做'));
+    show(chips, t, c('评论区')); show(d, t, Infinity);
   };
 });
 
