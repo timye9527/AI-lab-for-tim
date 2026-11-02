@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>存储擂台 · 第三期 · 画面引擎</title>
+<link rel="stylesheet" href="../out/node_modules/@fontsource/noto-sans-sc/400.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/noto-sans-sc/700.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/noto-sans-sc/900.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/jetbrains-mono/500.css">
+<link rel="stylesheet" href="../out/node_modules/@fontsource/jetbrains-mono/800.css">
+<style>
+  /* 画风：扁平卡通擂台。浅色纸面，三个角落三种颜色，小存（绿色内存条）当解说；红涨绿跌 */
+  :root {
+    --paper: #F4EFE4; --mat: #EADFC8; --panel: #FFFFFF; --ink: #1F2430; --muted: #6B6F78; --line: #E2D8C4;
+    --red: #E0464B; --blue: #3A63D6; --amber: #E39A12; --green: #23A563;
+    --up: #E0464B; --down: #23A563;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--paper); }
+  body { font-family: 'Noto Sans SC', sans-serif; color: var(--ink); }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 120%, #E7DCC4 0%, transparent 60%), var(--paper); }
+  .abs { position: absolute; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .scene { position: absolute; inset: 0; opacity: 0; }
+  .card { position: absolute; background: var(--panel); border: 3px solid var(--ink); border-radius: 18px; padding: 26px 32px; box-shadow: 8px 8px 0 rgba(31,36,48,.9); }
+  .tag { font-size: 24px; color: var(--muted); font-weight: 700; letter-spacing: .02em; }
+  .src { position: absolute; right: 18px; bottom: 10px; font-size: 16px; color: #8B8F98; font-family: 'JetBrains Mono', monospace; }
+  .big { font-weight: 900; line-height: 1.05; }
+  .up { color: var(--up); } .down { color: var(--down); } .red { color: var(--red); } .blue { color: var(--blue); } .amber { color: var(--amber); } .muted { color: var(--muted); } .green { color: var(--green); }
+  .pill { display: inline-block; border: 3px solid var(--ink); border-radius: 999px; padding: 6px 20px; font-size: 26px; font-weight: 700; background: var(--panel); }
+  .stamp { position: absolute; border: 6px solid var(--red); color: var(--red); border-radius: 12px; padding: 4px 18px; font-size: 40px; font-weight: 900; transform: rotate(-8deg); background: rgba(255,255,255,.85); }
+  #top { position: absolute; left: 110px; right: 110px; top: 34px; height: 52px; display: flex; justify-content: space-between; align-items: center; font-size: 24px; }
+  #top .brand { display: flex; align-items: center; gap: 14px; font-weight: 700; }
+  #top .brand b { background: var(--ink); color: var(--paper); padding: 4px 14px; border-radius: 8px; font-weight: 900; }
+  #chip { border: 3px solid var(--ink); border-radius: 999px; padding: 3px 18px; font-weight: 700; background: var(--panel); }
+  #score { position: absolute; right: 110px; top: 100px; display: flex; gap: 10px; opacity: 0; }
+  #score span { border: 3px solid var(--ink); border-radius: 10px; padding: 2px 14px; font-size: 22px; font-weight: 900; background: var(--panel); color: var(--muted); }
+  #score span.on { color: #fff; }
+  #disclaimer { position: absolute; left: 30px; top: 150px; writing-mode: vertical-rl; font-size: 17px; color: rgba(107,111,120,.75); letter-spacing: .12em; }
+  #sub { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); max-width: 1640px; padding: 8px 28px; border-radius: 12px;
+    background: rgba(31,36,48,.9); color: #fff; font-size: 44px; font-weight: 700; text-align: center; white-space: nowrap; }
+  #sub:empty { display: none; }
+  .bar { position: absolute; border-radius: 8px; border: 3px solid var(--ink); }
+  .plate { position: absolute; width: 230px; text-align: center; }
+  .plate .nm { font-size: 34px; font-weight: 900; margin-top: 8px; }
+  .plate .rl { font-size: 20px; color: var(--muted); font-weight: 700; }
+  .say { position: absolute; background: var(--panel); border: 3px solid var(--ink); border-radius: 22px; padding: 18px 26px; font-size: 40px; font-weight: 900; line-height: 1.35; }
+  .say::after { content: ''; position: absolute; left: 40px; bottom: -22px; border: 12px solid transparent; border-top: 14px solid var(--ink); }
+  .hl { background: linear-gradient(transparent 58%, rgba(227,154,18,.45) 58%); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="top"><div class="brand"><b>存储擂台</b>AI 是见顶了，还是中场休息？</div><div id="chip"></div></div>
+  <div id="score"><span data-k="泡">泡沫派</span><span data-k="瓶">瓶颈派</span><span data-k="周">周期派</span></div>
+  <div id="disclaimer">本视频仅为观点与信息整理，人物观点均为媒体转述，不构成投资建议</div>
+  <div id="scenes"></div>
+  <div id="sub"></div>
+</div>
+<script>
+// ---------- 基础工具（同新云一期引擎） ----------
+const $s = document.getElementById('scenes');
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+const pop = x => { const p = clamp(x); return p < 1 ? 1 - Math.pow(1 - p, 3) * Math.cos(p * 9) : 1; };
+let TL = null, SC = [];
+function el(parent, html, css = {}, cls = 'abs') { const d = document.createElement('div'); d.className = cls; d.innerHTML = html; Object.assign(d.style, css); parent.appendChild(d); return d; }
+function cue(sec, needle, k = 0) {
+  const ls = TL.lines.filter(l => l.sec === sec && l.text.includes(needle));
+  if (!ls.length) throw new Error(`找不到口播：第 ${sec} 段「${needle}」`);
+  return ls[Math.min(k, ls.length - 1)].start;
+}
+function secStart(sec) { return TL.lines.find(l => l.sec === sec).start; }
+function secEnd(sec) { const n = TL.lines.find(l => l.sec === sec + 1); return n ? n.start : TL.duration; }
+function show(e, t, t0, t1 = Infinity, d = 0.4, dy = 26) {
+  const p = ease((t - t0) / d), q = t1 === Infinity ? 1 : 1 - ease((t - t1) / 0.3);
+  e.style.opacity = Math.min(p, q); e.style.transform = (e.dataset.base || '') + ` translateY(${(1 - p) * dy}px)`;
+}
+function bounce(e, t, t0, t1 = Infinity) { const p = pop((t - t0) / 0.5), q = t1 === Infinity ? 1 : 1 - ease((t - t1) / 0.3); e.style.opacity = Math.min(clamp((t - t0) / 0.15), q); e.style.transform = (e.dataset.base || '') + ` scale(${0.6 + 0.4 * p})`; }
+function count(e, t, t0, to, fmt, d = 0.9) { e.textContent = fmt(to * ease((t - t0) / d)); }
+function grow(e, t, t0, prop, to, d = 0.8) { e.style[prop] = (to * ease((t - t0) / d)) + 'px'; }
+function svg(parent, w, h, inner, css) { return el(parent, `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${inner}</svg>`, css); }
+function draw(path, t, t0, d = 0.6) { const L = path.getTotalLength(); path.style.strokeDasharray = L; path.style.strokeDashoffset = L * (1 - ease((t - t0) / d)); }
+function card(parent, html, css) { return el(parent, html, css, 'card'); }
+const dim = (e, on) => { e.style.filter = on ? 'none' : 'grayscale(1)'; e.style.opacity = Math.min(+e.style.opacity || 0, on ? 1 : 0.35); };
+
+// ---------- 角色与道具 ----------
+const C = { 泡: 'var(--red)', 瓶: 'var(--blue)', 周: 'var(--amber)' };
+const CN = { 泡: '泡沫派', 瓶: '瓶颈派', 周: '周期派' };
+// 小存：绿色内存条。mood: ok / ko（被打倒）/ point（指着）/ think
+function xiaocun(mood = 'ok', s = 1) {
+  const eyes = mood === 'ko'
+    ? '<path d="M70 70 l22 22 M92 70 l-22 22 M150 70 l22 22 M172 70 l-22 22" stroke="#1F2430" stroke-width="8" stroke-linecap="round"/>'
+    : '<circle cx="82" cy="80" r="13" fill="#1F2430"/><circle cx="160" cy="80" r="13" fill="#1F2430"/><circle cx="86" cy="75" r="4" fill="#fff"/><circle cx="164" cy="75" r="4" fill="#fff"/>';
+  const mouth = mood === 'ko' ? '<path d="M100 122 q21 -16 42 0" fill="none" stroke="#1F2430" stroke-width="7" stroke-linecap="round"/>'
+    : mood === 'think' ? '<path d="M104 120 h34" stroke="#1F2430" stroke-width="7" stroke-linecap="round"/>'
+    : '<path d="M98 112 q23 22 46 0" fill="none" stroke="#1F2430" stroke-width="7" stroke-linecap="round"/>';
+  const arm = mood === 'point' ? '<path d="M236 120 L300 70" stroke="#1F2430" stroke-width="12" stroke-linecap="round"/><circle cx="304" cy="66" r="12" fill="#23A563" stroke="#1F2430" stroke-width="5"/>' : '';
+  const chips = [0, 1, 2, 3].map(i => `<rect x="${22 + i * 52}" y="140" width="38" height="34" rx="4" fill="#1F2430"/>`).join('');
+  const pins = Array.from({ length: 11 }, (_, i) => `<rect x="${18 + i * 19}" y="196" width="12" height="22" rx="2" fill="#E3B341" stroke="#1F2430" stroke-width="3"/>`).join('');
+  return `<svg width="${320 * s}" height="${230 * s}" viewBox="0 0 320 230"><rect x="6" y="20" width="230" height="182" rx="18" fill="#23A563" stroke="#1F2430" stroke-width="7"/>${chips}${pins}${eyes}${mouth}${arm}<rect x="108" y="196" width="22" height="24" fill="#F4EFE4"/></svg>`;
+}
+// 名牌剪影：不画真人脸
+function plate(parent, name, role, color, css) {
+  return el(parent, `<svg width="150" height="150" viewBox="0 0 150 150"><circle cx="75" cy="75" r="70" fill="${color}" stroke="#1F2430" stroke-width="6"/><circle cx="75" cy="58" r="26" fill="#1F2430"/><path d="M28 128 q47 -58 94 0" fill="#1F2430"/></svg><div class="nm">${name}</div><div class="rl">${role}</div>`, css, 'plate');
+}
+// 角落徽章
+function badge(k, size = 120) {
+  const icon = k === '泡' ? '<circle cx="48" cy="58" r="22" fill="none" stroke="#fff" stroke-width="7"/><circle cx="78" cy="38" r="12" fill="none" stroke="#fff" stroke-width="6"/><circle cx="80" cy="76" r="8" fill="none" stroke="#fff" stroke-width="5"/>'
+    : k === '瓶' ? '<path d="M32 22 h56 M32 98 h56 M38 22 q0 30 22 38 q-22 8 -22 38 M82 22 q0 30 -22 38 q22 8 22 38" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>'
+    : '<path d="M14 62 q16 -40 32 0 t32 0 t32 0" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/>';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 120 120"><rect x="4" y="4" width="112" height="112" rx="22" fill="${C[k]}" stroke="#1F2430" stroke-width="7"/>${icon}</svg>`;
+}
+// 擂台（透视）
+function ring(parent, css, lit = {}) {
+  const post = (x, y, k) => `<rect x="${x - 14}" y="${y - 150}" width="28" height="160" rx="6" fill="${k ? C[k] : '#B9AE97'}" stroke="#1F2430" stroke-width="5" class="post" data-k="${k || ''}"/>`;
+  return svg(parent, 1400, 560, `
+    <polygon points="200,180 1200,180 1360,520 40,520" fill="#EADFC8" stroke="#1F2430" stroke-width="6"/>
+    <polygon points="40,520 1360,520 1360,552 40,552" fill="#CFC2A6" stroke="#1F2430" stroke-width="6"/>
+    ${[0, 1, 2].map(i => `<path d="M${200 - i * 6} ${110 + i * 28} L${1200 + i * 6} ${110 + i * 28}" stroke="#E0464B" stroke-width="7"/><path d="M${40 + i * 8} ${360 + i * 40} L${200 - i * 6} ${110 + i * 28}" stroke="#1F2430" stroke-width="6"/><path d="M${1360 - i * 8} ${360 + i * 40} L${1200 + i * 6} ${110 + i * 28}" stroke="#1F2430" stroke-width="6"/>`).join('')}
+    ${post(200, 180, '泡')}${post(1200, 180, '瓶')}${post(40, 520, '周')}${post(1360, 520, '')}`, css);
+}
+const head = (R, s, k, txt) => {
+  const h = el(R, `<span style="display:inline-block;vertical-align:middle;margin-right:18px">${badge(k, 76)}</span><span style="vertical-align:middle">${txt}</span>`, { left: '110px', top: '120px', fontSize: '48px', fontWeight: 900 });
+  return t => show(h, t, s);
+};
+const quote = (parent, who, txt, src, color, css) => card(parent, `<div class="tag" style="color:${color}">${who}</div><div style="font-size:46px;font-weight:900;line-height:1.4;margin-top:10px">${txt}</div>${src ? `<div class="src">${src}</div>` : ''}`, Object.assign({ borderLeft: `14px solid ${color}` }, css));
+
+// ================= 第三期：每段一个场景 =================
+const BUILD = [];
+
+// 0 冷开场：首帧 = 封面
+BUILD.push((R, s) => {
+  const c = n => cue(0, n);
+  const ko = el(R, xiaocun('ko', 1.25), { left: '1180px', top: '560px', dataBase: '' });
+  ko.dataset.base = 'rotate(-14deg)';
+  const stars = svg(R, 300, 120, [0, 1, 2].map(i => `<path transform="translate(${40 + i * 90} ${30 + (i % 2) * 30})" d="M0 -20 L6 -6 L21 -6 L9 3 L13 18 L0 9 L-13 18 L-9 3 L-21 -6 L-6 -6Z" fill="#E39A12" stroke="#1F2430" stroke-width="4"/>`).join(''), { left: '1260px', top: '470px' });
+  const cover = el(R, '<div class="tag" style="font-size:30px">10 月 30 日 · 黑色星期五</div><div style="font-size:84px;font-weight:900;margin-top:8px">芯片股一天</div><div class="big mono down" style="font-size:200px">−1 万亿</div><div style="font-size:84px;font-weight:900">美元</div>', { left: '110px', top: '200px' });
+  const intel = card(R, '<div class="tag">英特尔 · 10/30 单日</div><div class="big mono down" style="font-size:130px">−28%</div><div class="muted" style="font-size:24px;font-weight:700">1974 年以来最差</div>', { left: '1150px', top: '170px', width: '520px' });
+  const goog = card(R, '<div class="tag">两天前 · 谷歌</div><div style="font-size:52px;font-weight:900;margin-top:6px">史上最大<br>单日跌幅</div>', { left: '1150px', top: '170px', width: '520px' });
+  const v1 = el(R, '泡沫破了，<span class="red">快跑！</span>', { left: '200px', top: '300px', fontSize: '60px' }, 'say');
+  const v2 = el(R, '产能卖到 2030，<span class="blue">别慌！</span>', { left: '980px', top: '300px', fontSize: '60px' }, 'say');
+  const x1 = el(R, '这期两种都不讲', { left: '640px', top: '520px' }, 'stamp');
+  const names = ['李录', '马克斯', '达利欧', '段永平', '德鲁肯米勒'].map((n, i) => plate(R, n, '据报道 / 整理稿', ['#F1B9B6', '#F1B9B6', '#F1B9B6', '#F5D7A0', '#B9C8F2'][i], { left: `${150 + i * 330}px`, top: '230px' }));
+  const boss = el(R, '+ 一群产业里的老板', { left: '0', right: '0', top: '560px', textAlign: 'center', fontSize: '48px', fontWeight: 900 });
+  const three = ['泡', '瓶', '周'].map((k, i) => card(R, `<div style="display:flex;align-items:center;gap:22px">${badge(k, 110)}<div><div style="font-size:60px;font-weight:900;color:${C[k]}">${CN[k]}</div><div class="muted" style="font-size:26px;font-weight:700">${['技术是真的，泡沫也是真的', '最聪明的钱没有撤，在挑', '暴利会自己消灭自己'][i]}</div></div></div>`, { left: `${110 + i * 580}px`, top: '300px', width: '540px', padding: '24px 26px' }));
+  const hint = el(R, '最反常识的一句，在 6 分钟左右', { left: '110px', top: '600px', fontSize: '30px', fontWeight: 700, color: 'var(--muted)' });
+  const note = el(R, '<span class="pill" style="font-size:24px">下面的人物观点，都来自媒体报道和整理稿</span>', { left: '110px', top: '700px' });
+  const tI = c('英特尔一天'), tG = c('两天前'), tV = c('两种声音'), tX = c('这期两种'), tN = c('我把最近'), t3 = c('他们其实'), tNote = c('先说明');
+  return t => {
+    show(cover, t, s - 1, tV - 0.2, 0.01, 0); show(ko, t, s - 1, tV - 0.2, 0.01, 0); show(stars, t, s - 1, tV - 0.2, 0.01, 0);
+    stars.style.transform += ` rotate(${(t - s) * 40}deg)`; stars.style.transformOrigin = '50% 50%';
+    show(intel, t, tI, tG - 0.15); show(goog, t, tG, tV - 0.2);
+    bounce(v1, t, tV + 0.6, tN - 0.2); bounce(v2, t, tV + 1.6, tN - 0.2); bounce(x1, t, tX, tN - 0.2);
+    names.forEach((p, i) => show(p, t, tN + i * 0.25, t3 - 0.2)); show(boss, t, c('一群产业'), t3 - 0.2);
+    three.forEach((e, i) => show(e, t, t3 + 0.6 + i * 0.35)); show(hint, t, t3 + 1.8); show(note, t, tNote);
+  };
+});
+
+// 1 先把问题问对
+BUILD.push((R, s) => {
+  const c = n => cue(1, n);
+  const H = el(R, '「AI 见顶了吗」= <span class="amber">三个问题</span>', { left: '110px', top: '120px', fontSize: '50px', fontWeight: 900 });
+  const Q = ['AI 有没有用？', '谁来付账？钱从哪来？', '暴利：是周期，还是结构？'].map((q, i) => card(R, `<span class="mono amber" style="font-size:40px;font-weight:800;margin-right:18px">0${i + 1}</span><span style="font-size:50px;font-weight:900">${q}</span>`, { left: '110px', top: `${230 + i * 150}px`, width: '1000px', padding: '22px 30px' }));
+  const strike = el(R, '', { left: '190px', top: '282px', height: '8px', width: '0', background: 'var(--red)', borderRadius: '4px' });
+  const nobody = el(R, '几乎没人吵了', { left: '760px', top: '232px', fontSize: '34px' }, 'stamp');
+  const rows = [['谷歌', '明年多花', '−13%', 'down'], ['Meta', '明年多花', '−7%', 'down'], ['亚马逊', '明年多花', '−6%', 'down'], ['微软', '花得少', '涨', 'up'], ['甲骨文', '说出哪年不再烧钱', '+12%', 'up']];
+  const tbl = card(R, `<div class="tag">财报后股价（据报道）</div>` + rows.map(([n, a, v, cl]) => `<div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px dashed var(--line);padding:10px 0"><span style="font-size:36px;font-weight:900;width:150px">${n}</span><span class="muted" style="font-size:28px;font-weight:700;flex:1">${a}</span><span class="mono ${cl}" style="font-size:44px;font-weight:800">${v}</span></div>`).join(''), { left: '1160px', top: '230px', width: '650px' });
+  const ruler = el(R, '<div class="tag" style="font-size:30px">市场的尺子变了</div><div style="font-size:52px;font-weight:900;margin-top:8px"><span class="muted" style="text-decoration:line-through;text-decoration-thickness:5px">花了多少</span>　→　<span class="hl">花完还剩多少现金</span></div>', { left: '110px', top: '760px' });
+  const zhu = quote(R, '朱啸虎 · 9 月（据报道）', '今年只要强调加大资本开支的公司，<br>股价都跌', '腾讯新闻 · 9/19', 'var(--muted)', { left: '110px', top: '680px', width: '1700px' });
+  const veil = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(244,239,228,.96)' });
+  const big = el(R, '<div class="tag" style="font-size:34px">对存储和芯片最要命的</div><div style="font-size:110px;font-weight:900;margin-top:10px">暴利，是<span class="amber">周期</span>，还是<span class="blue">结构</span>？</div>', { left: '0', right: '0', top: '330px', textAlign: 'center' });
+  const tQ2 = c('第二个'), tZ = c('朱啸虎'), tQ3 = c('第三个问题');
+  return t => {
+    show(H, t, s);
+    Q.forEach((q, i) => show(q, t, [s + 0.4, c('第一个'), tQ2][i] - (i ? 0 : 0)));
+    grow(strike, t, c('几乎没人'), 'width', 420, 0.4); bounce(nobody, t, c('几乎没人') + 0.3, tQ2);
+    Q[0].style.opacity = Math.min(+Q[0].style.opacity, t > tQ2 ? 0.35 : 1); strike.style.opacity = t > tQ2 ? 0.35 : 1;
+    show(tbl, t, c('这一周'), tQ3 - 0.2);
+    show(ruler, t, c('市场的尺子'), tZ - 0.2); show(zhu, t, tZ, tQ3 - 0.2);
+    show(veil, t, tQ3, Infinity, 0.3, 0); show(big, t, tQ3 + 0.1, Infinity, 0.4, 30);
+  };
+});
+
+// 2 泡沫派
+BUILD.push((R, s) => {
+  const c = n => cue(2, n);
+  const H = head(R, s, '泡', '第一派 · <span class="red">泡沫派</span>：技术是真的，泡沫也是真的');
+  const P = [['李录', '喜马拉雅资本'], ['马克斯', '橡树资本'], ['达利欧', '桥水创始人'], ['哈特尼特', '美银首席策略师']].map(([n, r], i) => plate(R, n, r, '#F1B9B6', { left: `${110 + i * 250}px`, top: '230px', width: '220px' }));
+  const P2 = P.map(p => p.cloneNode(true));
+  // 李录：一次性投入 vs 每次都烧
+  const net = card(R, '<div class="tag">互联网</div><div style="font-size:44px;font-weight:900;margin-top:6px">网站建好一次</div><div class="green" style="font-size:36px;font-weight:900;margin-top:8px">多一个用户 ≈ 不花钱</div>', { left: '1100px', top: '230px', width: '710px' });
+  const ai = card(R, '<div class="tag">AI</div><div style="font-size:44px;font-weight:900;margin-top:6px">每问一次</div><div class="red" style="font-size:36px;font-weight:900;margin-top:8px">烧一次算力（Token）</div>', { left: '1100px', top: '470px', width: '710px' });
+  const ceil = el(R, '利润率天花板，<span class="hl">可能低得多</span>', { left: '110px', top: '560px', fontSize: '56px', fontWeight: 900 });
+  const cycles = el(R, '不止一轮繁荣与崩溃', { left: '110px', top: '660px', fontSize: '40px', fontWeight: 700, color: 'var(--muted)' });
+  // 马克斯：两种泡沫
+  const b1 = card(R, '<div class="tag">一种 · 纯炒作</div><div style="font-size:46px;font-weight:900;margin-top:8px">最后什么都不剩</div>', { left: '110px', top: '520px', width: '800px' });
+  const b2 = card(R, '<div class="tag">另一种 · 拐点型泡沫</div><div style="font-size:46px;font-weight:900;margin-top:8px">技术赢了，<span class="red">钱照样被摧毁</span></div><div style="margin-top:14px"><span class="pill">铁路</span>　<span class="pill">互联网</span></div>', { left: '960px', top: '520px', width: '850px' });
+  const debt = card(R, '<div class="tag">马克斯的问题</div><div style="display:flex;align-items:center;gap:30px;margin-top:14px"><div><div class="muted" style="font-size:26px;font-weight:700">借的钱</div><div class="mono" style="font-size:80px;font-weight:800">30 年</div></div><div style="font-size:70px;font-weight:900">vs</div><div><div class="muted" style="font-size:26px;font-weight:700">买的芯片</div><div class="mono red" style="font-size:80px;font-weight:800">几年就过时</div></div></div><div style="font-size:40px;font-weight:900;margin-top:10px">撑得到还清吗？</div>', { left: '110px', top: '520px', width: '1700px' });
+  // 达利欧：刺破泡沫的
+  const dal = quote(R, '达利欧 · 10 月访谈（据报道）', '刺破泡沫的，往往不是技术失败，<br>而是<span class="hl">利率上升</span>，和<span class="hl">不得不卖资产换钱</span>', '彭博 / PPC Land · 10/14', 'var(--red)', { left: '110px', top: '520px', width: '1700px' });
+  // 数据：美债、原油、长债
+  const rate = card(R, '<div class="tag">十年期美债 · 10 月</div><div class="mono up" style="font-size:110px;font-weight:800">≈5%</div><div class="muted" style="font-size:26px;font-weight:700">一度 5.35%（2002 年来最高）</div>', { left: '110px', top: '520px', width: '700px' });
+  const oil = card(R, '<div class="tag">原油 · 10 月底</div><div class="mono up" style="font-size:110px;font-weight:800">$110+</div><div class="muted" style="font-size:26px;font-weight:700">布伦特，中东战事</div>', { left: '860px', top: '520px', width: '560px' });
+  const bonds = card(R, '<div class="tag">长期债券收益率（据美银哈特尼特）</div>', { left: '110px', top: '520px', width: '1700px', height: '330px' });
+  const BR = [['甲骨文', 8.4], ['Meta', 7.5], ['谷歌', 6.9]].map(([n, v], i) => {
+    const l = el(bonds, n, { left: '32px', top: `${80 + i * 76}px`, fontSize: '34px', fontWeight: 900 });
+    const b = el(bonds, '', { left: '220px', top: `${82 + i * 76}px`, height: '50px', width: '0', background: 'var(--red)' }, 'bar');
+    const vt = el(bonds, `<span class="mono" style="font-size:40px;font-weight:800">${v}%</span>`, { left: `${240 + v * 120}px`, top: `${80 + i * 76}px` });
+    return [l, b, vt, v];
+  });
+  const cheap = el(bonds, '在他看来：<span class="hl">比买它们的股票还划算</span>', { left: '1150px', top: '120px', width: '500px', fontSize: '38px', fontWeight: 900, lineHeight: 1.4 });
+  // 内房比喻
+  const hk = el(R, '', { left: '110px', top: '520px', width: '1700px', height: '360px' });
+  const h1 = card(hk, '<div class="tag">内房</div><div style="font-size:42px;font-weight:900;margin-top:8px">卖不掉房子 → <span class="red">现金流断</span></div>', { left: '0', top: '0', width: '820px' });
+  const h2 = card(hk, '<div class="tag">云巨头</div><div style="font-size:42px;font-weight:900;margin-top:8px">广告 · 电商 · 办公软件<br><span class="green">天天赚钱</span></div>', { left: '880px', top: '0', width: '820px' });
+  const h3 = card(hk, '<div style="font-size:44px;font-weight:900">真正像内房的：<span class="red">只靠租显卡、只靠借钱的新云</span></div>', { left: '0', top: '210px', width: '1700px', borderColor: 'var(--red)' });
+  const half = el(hk, '只对了一半', { left: '1300px', top: '-70px', fontSize: '34px' }, 'stamp');
+  const veil = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(244,239,228,.96)' });
+  const take = el(R, '<div style="font-size:30px;font-weight:700" class="muted">泡沫派的提醒</div><div style="font-size:76px;font-weight:900;margin-top:10px">技术会赢，<br>但不是<span class="red">每个投钱的人</span>都会赢</div>', { left: '0', right: '0', top: '330px', textAlign: 'center' });
+  const tL = c('李录'), tM = c('马克斯'), tAsk = c('他还问'), tD = c('达利欧'), tR = c('而十月份'), tHa = c('哈特尼特'), tHK = c('很多人说'), tT = c('泡沫派给的');
+  const who = t => t < tM ? 0 : t < tD ? 1 : t < tHa ? 2 : 3;
+  return t => {
+    H(t);
+    P.forEach((p, i) => { show(p, t, s + 0.3 + i * 0.15, tT - 0.2); if (t > tL) dim(p, who(t) === i); });
+    show(net, t, c('互联网是'), tM - 0.2); show(ai, t, c('但 AI 不一样'), tM - 0.2); show(ceil, t, c('这意味着'), tM - 0.2); show(cycles, t, c('所以他说'), tM - 0.2);
+    show(b1, t, c('一种是纯炒作'), tAsk - 0.2); show(b2, t, c('另一种'), tAsk - 0.2);
+    show(debt, t, tAsk, tD - 0.2);
+    show(dal, t, tD, tR - 0.2);
+    show(rate, t, tR, tHa - 0.2); show(oil, t, c('原油'), tHa - 0.2);
+    show(bonds, t, tHa, tHK - 0.2); BR.forEach(([l, b, v], i) => { show(l, t, tHa + 0.2 + i * 0.2); grow(b, t, tHa + 0.3 + i * 0.2, 'width', BR[i][3] * 120); show(v, t, tHa + 0.7 + i * 0.2); });
+    show(cheap, t, c('在他看来'));
+    show(hk, t, tHK, tT - 0.2); show(h1, t, c('内房卖不掉')); show(h2, t, c('云巨头背后')); show(h3, t, c('真正像内房')); bounce(half, t, c('只对了一半'));
+    show(veil, t, tT, Infinity, 0.3, 0); show(take, t, tT + 0.1);
+  };
+});
+
+// 3 瓶颈派
+BUILD.push((R, s) => {
+  const c = n => cue(3, n);
+  const H = head(R, s, '瓶', '第二派 · <span class="blue">瓶颈派</span>：最聪明的钱没有撤，在挑');
+  const dr = plate(R, '德鲁肯米勒', '宏观交易员', '#B9C8F2', { left: '110px', top: '230px' });
+  const pos = card(R, '<div class="tag">AI 相关仓位（据报道）</div>', { left: '400px', top: '230px', width: '700px', height: '250px' });
+  const pBar = el(pos, '', { left: '32px', top: '80px', height: '64px', width: '600px', background: 'var(--blue)' }, 'bar');
+  const pTxt = el(pos, '<span class="mono" style="font-size:44px;font-weight:800">半年前 100%</span>', { left: '32px', top: '160px' });
+  const map = svg(R, 700, 380, `
+    <path d="M60 300 C200 80 460 40 620 120" fill="none" stroke="#1F2430" stroke-width="6" stroke-dasharray="16 12" id="fly"/>
+    <circle cx="60" cy="300" r="16" fill="#3A63D6" stroke="#1F2430" stroke-width="5"/><text x="20" y="350" font-size="30" font-weight="900" fill="#1F2430">纽约</text>
+    <circle cx="620" cy="120" r="20" fill="#E39A12" stroke="#1F2430" stroke-width="5"/><text x="560" y="80" font-size="34" font-weight="900" fill="#1F2430">首尔</text>
+    <text x="300" y="360" font-size="24" font-weight="700" fill="#6B6F78">第一次公开访韩 · 见芯片和电力公司</text>`, { left: '1120px', top: '200px' });
+  const pick = el(R, '降了八成仓位，<span class="blue">却在找卡脖子的环节</span>', { left: '110px', top: '560px', fontSize: '54px', fontWeight: 900 });
+  const sel = el(R, '<span class="hl">最聪明的钱，不是在撤，是在挑</span>', { left: '110px', top: '660px', fontSize: '60px', fontWeight: 900 });
+  const gb = plate(R, '加文·贝克', '硅谷投资人 · 重仓芯片', '#B9C8F2', { left: '110px', top: '230px' });
+  const gq = el(R, '大家怕建多了，<br>真正的风险：<span class="blue">建得不够</span>', { left: '420px', top: '240px', fontSize: '52px' }, 'say');
+  const warn = el(R, '利益相关：屁股决定脑袋', { left: '1320px', top: '250px', fontSize: '30px', borderColor: 'var(--amber)', color: 'var(--amber)' }, 'stamp');
+  const thermo = card(R, '<div class="tag">贝克的温度计</div><div style="font-size:50px;font-weight:900;margin-top:8px">台积电，敢不敢大规模扩产？</div>', { left: '110px', top: '560px', width: '1100px' });
+  const tube = svg(R, 140, 380, `<rect x="45" y="20" width="50" height="300" rx="25" fill="#fff" stroke="#1F2430" stroke-width="6"/><circle cx="70" cy="330" r="42" fill="#E0464B" stroke="#1F2430" stroke-width="6"/><rect id="merc" x="57" y="300" width="26" height="0" fill="#E0464B"/>`, { left: '1300px', top: '480px' });
+  const boom = el(R, '最卡脖子的环节一旦<span class="red">猛扩</span>，<br>泡沫才真正开始', { left: '1480px', top: '560px', width: '360px', fontSize: '36px', fontWeight: 900, lineHeight: 1.4 });
+  const ind = el(R, '', { left: '110px', top: '230px', width: '1700px', height: '640px' });
+  const hy = quote(ind, 'SK 海力士 · 三季报', '供不应求，要到 <span class="mono">2030</span> 年', '', 'var(--blue)', { left: '0', top: '0', width: '820px' });
+  const ss = quote(ind, '三星 · 三季报', '明年的 HBM，<span class="hl">已经卖完</span>', '', 'var(--blue)', { left: '880px', top: '0', width: '820px' });
+  const scale = el(ind, '听产业的话：分清是<span class="green">数据</span>，还是<span class="red">立场</span>', { left: '0', top: '230px', fontSize: '48px', fontWeight: 900 });
+  const kr = card(ind, '<div class="tag">韩国 · 10 月整月芯片出口（11/1 公布）</div><div style="display:flex;align-items:baseline;gap:40px;margin-top:8px"><span class="mono" style="font-size:120px;font-weight:800">$564亿</span><span class="mono up" style="font-size:90px;font-weight:800">×3.6</span><span class="muted" style="font-size:30px;font-weight:700">去年同期</span></div><div class="src">韩国产业部 · 同比 +259.4%</div>', { left: '0', top: '330px', width: '1700px', borderColor: 'var(--green)' });
+  const nostance = el(ind, '不分立场的数据', { left: '1280px', top: '300px', fontSize: '34px', borderColor: 'var(--green)', color: 'var(--green)' }, 'stamp');
+  const tG = c('加文·贝克说'), tTh = c('温度计'), tI = c('产业里的人'), tK = c('有一个数据');
+  return t => {
+    H(t);
+    show(dr, t, s + 0.3, tG - 0.2); show(pos, t, c('盈利泡沫'), tG - 0.2);
+    const k = ease((t - c('把 AI 相关')) / 0.9); pBar.style.width = (600 - 480 * k) + 'px'; pTxt.innerHTML = k > 0.5 ? '<span class="mono blue" style="font-size:44px;font-weight:800">现在 ≈ 1/5</span>' : '<span class="mono" style="font-size:44px;font-weight:800">半年前 100%</span>';
+    show(map, t, c('飞到韩国'), tG - 0.2, 0.3, 0); draw(map.querySelector('#fly'), t, c('飞到韩国') + 0.2, 1.2);
+    show(pick, t, c('降了八成'), tG - 0.2); show(sel, t, c('最聪明'), tG - 0.2);
+    show(gb, t, tG, tI - 0.2); bounce(gq, t, c('大家都在担心'), tI - 0.2); bounce(warn, t, c('屁股决定'), tI - 0.2);
+    show(thermo, t, tTh, tI - 0.2); show(tube, t, tTh, tI - 0.2, 0.3, 0);
+    const m = tube.querySelector('#merc'); const hh = 260 * ease((t - c('判断 AI')) / 1.2); m.setAttribute('height', hh); m.setAttribute('y', 300 - hh);
+    show(boom, t, c('最卡脖子'), tI - 0.2);
+    show(ind, t, tI); show(hy, t, c('海力士说')); show(ss, t, c('海力士说') + 1.2); show(scale, t, c('要分清'));
+    show(kr, t, tK); bounce(nostance, t, tK + 0.6);
+  };
+});
+
+// 4 周期派
+BUILD.push((R, s) => {
+  const c = n => cue(4, n);
+  const H = head(R, s, '周', '第三派 · <span class="amber">周期派</span>：暴利，会自己消灭自己');
+  const saw = svg(R, 1100, 330, `
+    <polygon points="550,300 500,320 600,320" fill="#1F2430"/>
+    <g id="plank"><rect x="80" y="270" width="940" height="26" rx="10" fill="#E39A12" stroke="#1F2430" stroke-width="6"/>
+    <rect x="100" y="170" width="300" height="96" rx="14" fill="#fff" stroke="#1F2430" stroke-width="6"/><text x="250" y="232" font-size="40" font-weight="900" text-anchor="middle" fill="#E0464B">利润率 80%</text>
+    <rect x="700" y="170" width="300" height="96" rx="14" fill="#fff" stroke="#1F2430" stroke-width="6"/><text x="850" y="232" font-size="36" font-weight="900" text-anchor="middle" fill="#1F2430">扩产 · 需求破坏</text></g>`, { left: '110px', top: '230px' });
+  const mascot = el(R, xiaocun('think', 0.8), { left: '1380px', top: '300px' });
+  const inside = el(R, '最强的周期信号，往往来自<span class="hl">产业内部</span>', { left: '110px', top: '620px', fontSize: '48px', fontWeight: 900 });
+  const SIG = [['信号一 · 卖方的老板', 'SK 集团会长崔泰源（7 月）', '存储价格不正常，应该降下来；<br>宁可牺牲毛利，也要扩产', '第一个信号'],
+               ['信号二 · 最大的客户', '英特尔 CEO 陈立武（9/15）', '内存已占低端手机和电脑成本的<span class="mono red">七八成</span>', '第二个信号'],
+               ['信号三 · 卖铲子的人', '博通 CEO 陈福阳（10/12）', '晶圆和存储的短缺正在过去，<br>下一个瓶颈：<span class="hl">资本</span>', '第三个信号']];
+  const sig = SIG.map(([a, w, q, n], i) => [card(R, `<div class="mono amber" style="font-size:26px;font-weight:800">${a}</div><div class="tag" style="margin-top:6px">${w}</div><div style="font-size:40px;font-weight:900;line-height:1.4;margin-top:10px">${q}</div>`, { left: '110px', top: '230px', width: '1700px', borderLeft: '14px solid var(--amber)' }), c(n)]);
+  const intel = card(R, '<div class="tag">10/30 · 英特尔</div><div class="mono down" style="font-size:110px;font-weight:800">−28%</div>', { left: '110px', top: '560px', width: '520px' });
+  const dy = card(R, '<div class="tag">段永平（据媒体转述）· 囚徒困境</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;font-size:34px;font-weight:900;text-align:center"><div style="border:3px solid #1F2430;border-radius:12px;padding:18px">我停 · 你投<br><span class="red">我掉队</span></div><div style="border:3px solid #1F2430;border-radius:12px;padding:18px;background:#FBE7C2">我投 · 你投<br><span class="amber">都在扩产</span></div></div><div style="font-size:40px;font-weight:900;margin-top:18px">三五年后：大概率同质化，<span class="hl">像光伏</span></div>', { left: '110px', top: '230px', width: '1100px' });
+  const goog = el(R, '这也解释了：<br>谷歌明知挨罚，<br>还要加码', { left: '1300px', top: '300px', width: '520px', fontSize: '44px', fontWeight: 900, lineHeight: 1.4 });
+  const veil = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(244,239,228,.96)' });
+  const odd = el(R, '<div class="tag" style="font-size:34px">最反常识的一句</div><div style="font-size:96px;font-weight:900;margin-top:10px">来自<span class="blue">多头</span>自己</div>', { left: '0', right: '0', top: '360px', textAlign: 'center' });
+  const gb = quote(R, '加文·贝克（据报道）', '按过去 25 年的存储规律，<br><span class="hl">现在正是最危险的位置</span>', '', 'var(--blue)', { left: '110px', top: '230px', width: '1700px' });
+  const bet = el(R, '但他赌：这次像 <span class="mono">1990</span> 年代中期，<span class="blue">真正的产能大周期</span>', { left: '110px', top: '520px', fontSize: '46px', fontWeight: 900 });
+  const lead = svg(R, 1100, 430, `
+    <line x1="40" y1="380" x2="1060" y2="380" stroke="#1F2430" stroke-width="4"/>
+    <path id="eps" d="M40 340 C300 320 500 200 700 90 S980 120 1060 200" fill="none" stroke="#E39A12" stroke-width="9"/>
+    <path id="px" d="M40 300 C200 250 380 70 480 70 S760 230 1060 330" fill="none" stroke="#1F2430" stroke-width="9"/>
+    <text x="720" y="70" font-size="32" font-weight="900" fill="#E39A12">利润</text><text x="380" y="50" font-size="32" font-weight="900" fill="#1F2430">股价</text>
+    <line x1="480" y1="70" x2="480" y2="380" stroke="#6B6F78" stroke-width="3" stroke-dasharray="10 8"/><line x1="700" y1="90" x2="700" y2="380" stroke="#6B6F78" stroke-width="3" stroke-dasharray="10 8"/>
+    <text x="520" y="420" font-size="26" font-weight="700" fill="#6B6F78">股价先见顶</text><text x="40" y="420" font-size="18" fill="#8B8F98">示意</text>`, { left: '110px', top: '220px' });
+  const pe = card(R, '<div class="tag">明年市盈率（据摩根士丹利）</div><div style="margin-top:6px"><span style="font-size:36px;font-weight:900">三星 · 海力士 </span><span class="mono amber" style="font-size:100px;font-weight:800">≈3.5×</span></div>', { left: '1260px', top: '260px', width: '560px' });
+  const hy = card(R, '<div class="tag">SK 海力士</div><div style="font-size:42px;font-weight:900;margin-top:6px">利润率 <span class="mono up">80%</span></div><div style="font-size:42px;font-weight:900">财报两天后 <span class="mono down">−7%</span></div>', { left: '1260px', top: '560px', width: '560px' });
+  const veil2 = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(244,239,228,.96)' });
+  const fin = el(R, '<div style="font-size:72px;font-weight:900">利润还在<span class="up">涨</span>，<br>估值已经<span class="hl">提前反映</span></div>', { left: '0', right: '0', top: '360px', textAlign: 'center' });
+  const tS1 = c('第一个信号'), tD = c('段永平'), tO = c('最反常识'), tB = c('加文·贝克也'), tMS = c('摩根士丹利'), tF = c('所以存储现在');
+  return t => {
+    H(t);
+    show(saw, t, s + 0.3, tS1 - 0.2); show(mascot, t, s + 0.6, tS1 - 0.2); show(inside, t, c('因为最强'), tS1 - 0.2);
+    const tilt = -6 + 12 * ease((t - c('因为最强')) / 1.2); const pl = saw.querySelector('#plank'); pl.setAttribute('transform', `rotate(${tilt} 550 283)`);
+    sig.forEach(([e, t0], i) => show(e, t, t0, (i < 2 ? sig[i + 1][1] : tD) - 0.2));
+    show(intel, t, c('10 月 30 号'), c('第三个信号') - 0.2);
+    show(dy, t, tD, tO - 0.2); show(goog, t, c('这也解释'), tO - 0.2);
+    show(veil, t, tO, tB - 0.2, 0.3, 0); show(odd, t, tO + 0.1, tB - 0.2);
+    show(gb, t, tB, tMS - 0.2); show(bet, t, c('但他赌'), tMS - 0.2);
+    show(lead, t, tMS, tF - 0.2, 0.3, 0); draw(lead.querySelector('#px'), t, tMS + 0.2, 1.2); draw(lead.querySelector('#eps'), t, tMS + 0.8, 1.2);
+    show(pe, t, c('它算出'), tF - 0.2); show(hy, t, c('这就是为什么'), tF - 0.2);
+    show(veil2, t, tF, Infinity, 0.3, 0); show(fin, t, tF + 0.1);
+  };
+});
+
+// 5 钱在怎么投票
+BUILD.push((R, s) => {
+  const c = n => cue(5, n);
+  const H = el(R, '观点之外，<span class="amber">看钱怎么投票</span>', { left: '110px', top: '120px', fontSize: '50px', fontWeight: 900 });
+  const X = d => ({ 27: 300, 29: 900, 30: 1500 })[d];
+  const axis = svg(R, 1920, 120, `<line x1="200" y1="60" x2="1720" y2="60" stroke="#1F2430" stroke-width="6"/>` + [27, 29, 30].map(d => `<circle cx="${X(d)}" cy="60" r="16" fill="#fff" stroke="#1F2430" stroke-width="6"/><text x="${X(d)}" y="110" font-size="30" font-weight="900" text-anchor="middle" fill="#1F2430" font-family="JetBrains Mono">10/${d}</text>`).join(''), { left: '0', top: '210px' });
+  const q = card(R, '<div class="tag">摩根士丹利量化团队 · 10/27（媒体转述）</div><div style="font-size:42px;font-weight:900;margin-top:8px">反弹 = <span class="red">减仓机会</span>，调整没走完</div>', { left: '110px', top: '360px', width: '800px' });
+  const e1 = el(R, '<span class="pill">谷歌暴跌</span>', { left: '820px', top: '150px' });
+  const e2 = el(R, '<span class="pill" style="border-color:var(--red);color:var(--red)">黑色星期五</span>', { left: '1400px', top: '150px' });
+  const w = card(R, '<div class="tag">同一家公司 · 策略师威尔逊</div><div style="font-size:42px;font-weight:900;margin-top:8px">11 月中旬，<span class="green">抛压就会结束</span></div>', { left: '1010px', top: '360px', width: '800px' });
+  const gs = card(R, '<div class="tag">高盛主经纪商数据（据报道）</div><div style="font-size:40px;font-weight:900;margin-top:8px">对冲基金卖科技股：<span class="red">十年来最快</span></div><div style="font-size:40px;font-weight:900;margin-top:6px">净杠杆 <span class="mono">48.6%</span>：一年来最低</div>', { left: '110px', top: '600px', width: '1000px' });
+  const retail = card(R, '<div class="tag">另一边</div><div style="font-size:40px;font-weight:900;margin-top:8px">散户在买 · 空头仓位<br><span class="red">五年来最高</span></div>', { left: '1160px', top: '600px', width: '650px' });
+  const veil = el(R, '', { left: '0', top: '0', width: '1920px', height: '1080px', background: 'rgba(244,239,228,.96)' });
+  const end = el(R, '<div style="font-size:84px;font-weight:900">该卖的人，<br>卖了<span class="hl">一大半</span>，还<span class="red">没卖完</span></div>', { left: '0', right: '0', top: '340px', textAlign: 'center' });
+  const tE = c('该卖的人');
+  return t => {
+    show(H, t, s); show(axis, t, s + 0.3, Infinity, 0.3, 0);
+    show(q, t, c('量化团队')); show(e1, t, c('两天后')); show(e2, t, c('三天后') > 0 ? c('两天后') + 0.9 : 0);
+    show(w, t, c('威尔逊')); show(gs, t, c('高盛')); show(retail, t, c('散户'));
+    show(veil, t, tE, Infinity, 0.3, 0); show(end, t, tE + 0.1);
+  };
+});
+
+// 6 我们的判断
+BUILD.push((R, s) => {
+  const c = n => cue(6, n);
+  const top = el(R, '<span style="font-size:60px;font-weight:900">我的判断</span>　<span class="muted" style="font-size:32px;font-weight:700">是判断，不是结论</span>', { left: '110px', top: '130px' });
+  const J = [['第一', '见顶的不是 AI 的需求，<br>是<span class="hl">借钱砸钱、市场照单全收</span>的那一段', '第一，见顶'], ['第二', 'AI 不是下一个互联网：<br>利润流向<span class="blue">卡脖子的环节</span>，不是平均分', '第二，AI'], ['第三', '存储是最周期的环节：<br>长约和 HBM 是真的，<span class="amber">涨价减速和需求破坏</span>也是真的', '第三，存储']]
+    .map(([n, x, k], i) => [card(R, `<div style="display:flex;gap:28px;align-items:flex-start"><span class="mono amber" style="font-size:40px;font-weight:800;white-space:nowrap">${n}</span><span style="font-size:40px;font-weight:900;line-height:1.4">${x}</span></div>`, { left: '110px', top: `${240 + i * 200}px`, width: '1700px', padding: '22px 30px' }), c(k)]);
+  const ask = el(R, '与其问还能不能涨，<span class="hl">不如盯住几个会先变的东西</span>', { left: '110px', top: '860px', fontSize: '40px', fontWeight: 900 });
+  return t => { show(top, t, s); J.forEach(([e, t0]) => show(e, t, t0)); show(ask, t, c('所以与其')); };
+});
+
+// 7 跟踪清单
+BUILD.push((R, s) => {
+  const c = n => cue(7, n);
+  const H = el(R, '跟踪清单 · <span class="amber">每一条都对应一位聪明人的框架</span>', { left: '110px', top: '120px', fontSize: '48px', fontWeight: 900 });
+  const L = [['瓶', '台积电扩产计划', '扩得越猛，越要小心', '贝克的温度计', '第一'], ['泡', '云巨头现金流转正时间表', '能不能给出年份', '达利欧和马克斯的尺子', '第二'], ['周', '每月 1 号韩国芯片出口 · 月底 DRAM 合约价', '涨价减速到零附近就是信号', '周期派的信号', '第三'], ['', '11 月中旬', '量化派和威尔逊，谁说对了', '钱的投票', '第四']]
+    .map(([k, a, b, w, n], i) => [card(R, `<div style="display:flex;gap:22px;align-items:center">${k ? badge(k, 84) : `<div style="width:84px;height:84px;border-radius:18px;border:6px solid #1F2430;display:grid;place-items:center;font-size:44px;font-weight:900">$</div>`}<div style="flex:1"><div style="font-size:36px;font-weight:900">${a}</div><div class="muted" style="font-size:26px;font-weight:700;margin-top:4px">${b}</div></div><span class="pill" style="font-size:22px">${w}</span></div>`, { left: `${110 + (i % 2) * 870}px`, top: `${220 + Math.floor(i / 2) * 230}px`, width: '830px', padding: '22px 26px' }), c(n)]);
+  const mid = card(R, '<div class="tag">11 月 3 日 · 美国中期选举</div><div style="font-size:38px;font-weight:900;margin-top:8px">历史上选后一年，美股平均 <span class="mono up">+12%</span>　<span class="muted" style="font-size:26px">（1900 年来 31 次）</span></div><div style="font-size:32px;font-weight:700;margin-top:6px">但高利率、高油价这样的冲击，<span class="red">也盖过过这个规律</span></div>', { left: '110px', top: '700px', width: '1700px' });
+  return t => {
+    show(H, t, s);
+    L.forEach(([e, t0]) => { show(e, t, s + 0.3); e.style.opacity = Math.min(+e.style.opacity, t > t0 ? 1 : 0.35); e.style.boxShadow = t > t0 ? '8px 8px 0 #E39A12' : '8px 8px 0 rgba(31,36,48,.9)'; });
+    show(mid, t, c('中期选举'));
+  };
+});
+
+// 8 收尾：你站哪一派
+BUILD.push((R, s) => {
+  const c = n => cue(8, n);
+  const rg = ring(R, { left: '260px', top: '300px' });
+  const mc = el(R, xiaocun('point', 0.9), { left: '780px', top: '470px' });
+  const labs = ['泡', '瓶', '周'].map((k, i) => el(R, `<div style="display:flex;align-items:center;gap:12px">${badge(k, 70)}<span style="font-size:40px;font-weight:900;color:${C[k]}">${CN[k]}</span></div>`, { left: ['300px', '1340px', '110px'][i], top: ['180px', '180px', '900px'][i] }));
+  const ask = el(R, '你站哪一派？', { left: '0', right: '0', top: '120px', textAlign: 'center', fontSize: '64px', fontWeight: 900 });
+  const chips = el(R, '评论区打一个字：<span class="pill" style="border-color:var(--red);color:var(--red);font-size:44px">泡</span> <span class="pill" style="border-color:var(--blue);color:var(--blue);font-size:44px">瓶</span> <span class="pill" style="border-color:var(--amber);color:var(--amber);font-size:44px">周</span>', { left: '1240px', top: '880px', fontSize: '36px', fontWeight: 900 });
+  const d = el(R, '本期只做观点和信息整理，人物观点均为媒体转述；不提任何买卖建议，不构成任何投资建议', { left: '0', right: '0', top: '990px', textAlign: 'center', fontSize: '24px', color: 'var(--muted)' });
+  return t => {
+    show(rg, t, s, Infinity, 0.4, 0); bounce(mc, t, s + 0.3); show(ask, t, c('最后'));
+    labs.forEach((e, i) => bounce(e, t, c('你站') + i * 0.35));
+    show(chips, t, c('评论区')); show(d, t, c('本期只做'));
+  };
+});
+
+// ---------- 主控 ----------
+const sub = document.getElementById('sub'), chip = document.getElementById('chip'), score = document.getElementById('score');
+const SCORE = { 2: '泡', 3: '瓶', 4: '周' };
+window.setup = async tl => {
+  TL = tl;
+  const n = Math.max(...TL.lines.map(l => l.sec)) + 1;
+  for (let i = 0; i < n; i++) {
+    const R = el($s, '', {}, 'scene');
+    SC.push({ R, title: TL.lines.find(l => l.sec === i).title.replace(/^\[[^\]]*\]\s*/, '').split('：')[0], up: BUILD[i] ? BUILD[i](R, secStart(i), i) : () => {} });
+  }
+  el(document.body, TL.lines.map(l => l.text).join(''), { opacity: 0, fontWeight: 900 });
+  await document.fonts.ready;
+  return n;
+};
+window.render = t => {
+  SC.forEach((sc, i) => {
+    const a = secStart(i) - 0.45, b = secEnd(i) - 0.45;
+    const o = t < a || t > b + 0.4 ? 0 : Math.min(i === 0 ? 1 : clamp((t - a) / 0.4), clamp((b + 0.4 - t) / 0.4));
+    sc.R.style.opacity = o;
+    if (o > 0) sc.up(t);
+    if (t >= a && t < b) chip.textContent = sc.title;
+  });
+  // 三派计分条：进入三派以后常驻，当前一派点亮
+  const cur = SC.findIndex((_, i) => t >= secStart(i) - 0.45 && t < secEnd(i) - 0.45);
+  score.style.opacity = cur >= 2 && cur <= 7 ? 1 : 0;
+  score.querySelectorAll('span').forEach(e => { const on = SCORE[cur] === e.dataset.k || (cur > 4 && cur < 8); e.className = on ? 'on' : ''; e.style.background = on ? C[e.dataset.k] : 'var(--panel)'; });
+  const line = TL.lines.find(l => l.text && t >= l.start - 0.05 && t < l.end + 0.25);
+  sub.textContent = line ? line.text : '';
+};
+</script>
+</body>
+</html>
