@@ -38,7 +38,8 @@ cd video/storage-ring
 npm i --prefix out --no-save playwright-core@1.56 @fontsource/noto-sans-sc@5 @fontsource/jetbrains-mono@5 && echo '{"type":"module"}' > out/package.json
 node production/render.mjs --estimate --dump                 # 没配音时按 270 字/分钟估算时间轴 → out/timeline-estimate.json
 node production/render.mjs --estimate --stills 0.8,111,250   # 抽关键帧 → out/stills/run/
-node production/render.mjs --estimate                        # 无声样片 → out/video/picture.mp4（约 30 分钟）
+node production/render.mjs --estimate --audit                # 版面体检：字幕超宽、元素压字幕、孤字（几秒跑完，出片前必跑）
+node production/render.mjs --estimate                        # 无声样片 → out/video/picture.mp4（约 15 分钟）
 ```
 
 配音完成后去掉 `--estimate`，就按 `out/audio/timeline.json` 的真实时间轴渲染；配乐、混音、封面沿用 `video/neocloud/production/` 的 `mix.py`、`cover.mjs`（改路径即可）。

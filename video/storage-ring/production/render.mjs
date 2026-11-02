@@ -3,6 +3,7 @@
 //   node production/render.mjs                       全片 → out/video/picture.mp4
 //   node production/render.mjs --stills 3,95,200     抽帧检查 → out/stills/
 //   node production/render.mjs --from 90 --to 120    渲染一段
+//   node production/render.mjs --audit               版面体检：字幕超宽、画面元素压字幕、孤字折行
 //   --estimate  没有配音时按 270 字/分钟估算时间轴（只用于预览）
 import { readFileSync, mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
@@ -45,7 +46,40 @@ page.on('pageerror', e => { console.error('页面错误：', e.message); process
 await page.goto('file://' + ROOT + 'production/scenes.html');
 await page.evaluate(tl => window.setup(tl), TL);
 
-if (opt('stills')) {
+if (args.includes('--audit')) {
+  // 每 0.5 秒查一次版面，同类问题只报一次
+  const seen = new Map();
+  for (let t = 0; t < TL.duration; t += 0.5) {
+    await page.evaluate(t => window.render(t), t);
+    const found = await page.evaluate(() => {
+      const out = [], vis = e => e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true });
+      const sub = document.getElementById('sub');
+      if (sub.textContent && parseFloat(sub.style.fontSize || '44') < 44) out.push(`字幕超宽已缩字号（正式字幕要拆句）：${sub.textContent}`);
+      const sr = sub.textContent ? sub.getBoundingClientRect() : null;
+      for (const sc of document.querySelectorAll('.scene')) {
+        if (!vis(sc)) continue;
+        for (const e of sc.querySelectorAll(':scope > *')) {
+          if (!vis(e) || parseFloat(getComputedStyle(e).opacity) < 0.3) continue;
+          const r = e.getBoundingClientRect(), label = (e.textContent || '').trim().slice(0, 16) || e.className;
+          if (sr && r.width && r.left < sr.right && r.right > sr.left && r.top < sr.bottom && r.bottom > sr.top && e.textContent.trim()) out.push(`压字幕：${label}`);
+          // 孤字：一段文字最后一行只剩一个字
+          const w = document.createTreeWalker(e, NodeFilter.SHOW_TEXT);
+          for (let n; (n = w.nextNode());) {
+            const tx = n.textContent.replace(/\s+$/, ''); if (tx.length < 3) continue;
+            const rg = document.createRange(), top = i => { rg.setStart(n, i); rg.setEnd(n, i + 1); return rg.getBoundingClientRect().top; };
+            const L = tx.length - 1;
+            if (top(L) - top(L - 1) > 8 && !/[，。、；：？！）」]/.test(tx[L])) out.push(`孤字：「${tx.slice(-8)}」最后一行只剩「${tx[L]}」`);
+          }
+        }
+      }
+      return out;
+    });
+    for (const m of found) if (!seen.has(m)) seen.set(m, t);
+  }
+  for (const [m, t] of seen) console.log(`${t.toFixed(1)}s  ${m}`);
+  console.log(seen.size ? `版面体检：${seen.size} 处要看` : '版面体检：通过');
+  process.exitCode = seen.size ? 1 : 0;
+} else if (opt('stills')) {
   const SD = ROOT + 'out/stills/' + opt('tag', 'run') + '/'; mkdirSync(SD, { recursive: true });
   for (const s of opt('stills').split(',').map(Number)) {
     await page.evaluate(t => window.render(t), s);
