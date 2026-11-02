@@ -26,8 +26,23 @@
 | 文件 | 内容 |
 |---|---|
 | [01-洞见库.md](01-洞见库.md) | 三派观点（泡沫与债务派、瓶颈派、周期派）+ 资金面 + 我们的判断 + 跟踪信号，也可单独看 |
-| [02-脚本-10分钟.md](02-脚本-10分钟.md) | 口播稿 v3：AI 见顶了吗？最聪明的一群人分成了三派（成片约 9–10 分钟） |
+| [02-脚本-10分钟.md](02-脚本-10分钟.md) | 口播稿 v3.1（11/2 数据更新）：AI 见顶了吗？最聪明的一群人分成了三派（成片约 9–10 分钟） |
 | [facts.csv](facts.csv) | 事实台账 37 条；人物观点均为媒体转述（T3），口播已加「据报道」 |
+
+## 画面引擎（v1，2026-11-02）
+
+`production/scenes.html` + `production/render.mjs`：扁平卡通擂台画风，浅色纸面；泡沫派红、瓶颈派蓝、周期派琥珀，小存（绿色内存条）当解说，人物一律用名牌剪影；红涨绿跌。9 段口播各一个场景，画面元素按口播关键词出现（改稿后依然对得上，找不到关键词会直接报错）。首帧 = 封面（小存被打倒 +「芯片股一天 −1 万亿美元」）；进入三派后右上角常驻「三派计分条」，当前一派点亮。
+
+```bash
+cd video/storage-ring
+npm i --prefix out --no-save playwright-core@1.56 @fontsource/noto-sans-sc@5 @fontsource/jetbrains-mono@5 && echo '{"type":"module"}' > out/package.json
+node production/render.mjs --estimate --dump                 # 没配音时按 270 字/分钟估算时间轴 → out/timeline-estimate.json
+node production/render.mjs --estimate --stills 0.8,111,250   # 抽关键帧 → out/stills/run/
+node production/render.mjs --estimate --audit                # 版面体检：字幕超宽、元素压字幕、孤字（几秒跑完，出片前必跑）
+node production/render.mjs --estimate                        # 无声样片 → out/video/picture.mp4（约 15 分钟）
+```
+
+配音完成后去掉 `--estimate`，就按 `out/audio/timeline.json` 的真实时间轴渲染；配乐、混音、封面沿用 `video/neocloud/production/` 的 `mix.py`、`cover.mjs`（改路径即可）。
 
 ## 新会话交接（下一步从这里开始）
 
@@ -35,6 +50,6 @@
 
 1. **过稿**：主理人确认 v3（未确认前不要配音）。
 2. **声音（G3）**：复刻第一期声音，等主理人给配音工具和音色名，或第一期 mp4 / 音频。配音前跑 `npm run video:lint -- <配音文本> --tts`，DRAM 读 D + RAM（`ABBR` 表）。配音库用 sherpa-onnx 1.13.8（2.0.0 会吞掉英文词）。
-3. **画面**：程序绘制的扁平卡通擂台（三个角落：泡沫派、瓶颈派、周期派；小存解说；人物用名牌剪影，不画真人脸）。可从 `video/neocloud/production/` 的画面引擎改起（`scenes.html` + `render.mjs` + `mix.py`），先出关键帧拼图。
+3. **画面**：~~先出关键帧拼图~~ v1 已完成（见上一节「画面引擎」），等主理人看样张定风格；过稿改词后重抽关键帧即可。
 4. **发布**：主理人在 Claude 桌面端 Remote Control 里加一个文件夹并保持在线，再连 Chrome 进 YouTube Studio 存草稿。
-5. **发布前更新**：11/1 韩国 10 月全月出口（F19）、最新美债和油价（F16）；核对人物观点原文（李录授权全文、马克斯备忘录、段永平原帖）。
+5. **发布前更新**：~~11/1 韩国 10 月全月出口（F19）、最新美债和油价（F16）~~ 已在 v3.1（11/2）更新。人物观点核对结果：陈立武、哈特尼特、达利欧、德鲁肯米勒、加文·贝克已交叉印证；摩根士丹利只部分核实（口播已删去找不到出处的「早 4–8 个月」）；**摩根士丹利量化团队 10/27 报告（F23）仍没找到原文**；李录授权全文、马克斯备忘录、段永平原帖、朱啸虎仍待核一手。录制前再跑一次 `node video/storage-ring/check.mjs`：F16 在 11/16、F23 在 11/15 会再次到期。
