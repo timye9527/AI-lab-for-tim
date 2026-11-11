@@ -313,3 +313,36 @@
 差到 cha4 dao4
 当一家人 dang1 yi4 jia1 ren2
 愿意为 yuan4 yi4 wei4
+
+# ── 006 期新词（伯克希尔回购）──
+阿贝尔 a1 bei4 er3
+奥马哈 ao4 ma3 ha1
+瑞银 rui4 yin2
+回应 hui2 ying4
+应对 ying4 dui4
+家当 jia1 dang4
+舍得 she3 de5
+最舍得 zui4 she3 de5
+弹药 dan4 yao4
+子弹 zi3 dan4
+账面 zhang4 mian4
+交割 jiao1 ge1
+腰斩 yao1 zhan3
+接飞刀 jie1 fei1 dao1
+划不划算 hua2 bu5 hua2 suan4
+划算 hua2 suan4
+写得 xie3 de5
+熬得 ao2 de5
+花得 hua1 de5
+
+# ── 人工审过、确认无误的词（006 期）──
+最差 zui4 cha4
+躺着 tang3 zhe5
+相当于 xiang1 dang1 yu2
+当然 dang1 ran2
+重启 chong2 qi3
+意味着 yi4 wei4 zhe5
+以为 yi3 wei2
+应急 ying4 ji2
+扛得住 kang2 de5 zhu4
+闲着 xian2 zhe5

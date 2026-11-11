@@ -11,6 +11,9 @@ function inspectScene() {
   const issues = [];
   const name = (el) => (el.textContent || el.className.baseVal || el.className || el.tagName).toString().replace(/\s+/g, '').slice(0, 14);
   const content = sc.querySelector('.content');
+  // 顶部主钩子必须一行（006 期 19 个字折成两行，「外 / 面太贵」被拆开，质检没抓到）
+  const tt = document.getElementById('title');
+  if (tt && tt.getBoundingClientRect().height > parseFloat(getComputedStyle(tt).lineHeight) * 1.5) issues.push('顶部主钩子折成了两行，标题要缩短');
   for (const el of [sc.querySelector('.label'), ...content.querySelectorAll('*')]) {
     if (el.closest('svg') && el.tagName.toLowerCase() !== 'svg') continue;
     const r = el.getBoundingClientRect();
