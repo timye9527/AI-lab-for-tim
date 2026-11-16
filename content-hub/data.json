@@ -1,0 +1,602 @@
+{
+  "asof": "2026-11-16",
+  "groups": [
+    {
+      "id": "finance",
+      "name": "财经视频",
+      "why": "金融内容主线：Tim 的主阵地，做过的期数最多，也最容易重做。",
+      "lines": [
+        {
+          "id": "kandong",
+          "name": "看懂AI主线 · 擂台系列",
+          "format": "横屏 10 分钟左右解读",
+          "platform": "YouTube / B 站",
+          "cadence": "不定期（接着上一期的结论做）",
+          "status": "运行中",
+          "source": "video/storage-ring、video/neocloud",
+          "note": "第一期是 invest-video 的 EP04（存储四回合）；第二期换了画风，第三期回到擂台形式。",
+          "episodes": [
+            {
+              "no": "第二期",
+              "title": "CoreWeave 一个月跌掉 37%：AI 的第一张骨牌，倒在了债上",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-26",
+              "blocker": "CoreWeave 读音要人耳确认（1:29 之后）",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/neocloud"
+                }
+              ]
+            },
+            {
+              "no": "第三期",
+              "title": "AI 见顶了吗？黑色星期五之后，存储和半导体怎么看",
+              "stage": "已发布",
+              "published": "是",
+              "publish_url": "",
+              "date": "2026-11-03前",
+              "blocker": "",
+              "next": "补上发布链接和数据",
+              "links": [
+                {
+                  "label": "脚本 v3.1",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/storage-ring"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "cunli",
+          "name": "存力研究所",
+          "format": "横屏 8 分钟存储行业解读",
+          "platform": "YouTube",
+          "cadence": "不定期",
+          "status": "运行中",
+          "source": "video/memory-wallst",
+          "note": "配音用网络解说风格男声，不用本人声音；上传包已写好。",
+          "episodes": [
+            {
+              "no": "v3",
+              "title": "存储一周被砸 26%，真凶不是长鑫",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-19",
+              "blocker": "README 写「待过稿」；成片 6:47 在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/memory-wallst"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "factory",
+          "name": "内容工厂 · 投资人深度改编",
+          "format": "竖屏成片，一份脚本数据出片",
+          "platform": "抖音 / 视频号等（未核实）",
+          "cadence": "约每周一期（10-19 至 11-08 六期）",
+          "status": "运行中",
+          "source": "factory/episodes/",
+          "note": "人物池、读音规范、错误档案和质检都在 factory/；006 起可在本机跑全流程。",
+          "episodes": [
+            {
+              "no": "001",
+              "title": "李录哥大演讲：你是目标还是代价",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-19",
+              "blocker": "仓库只记到成片，成片在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
+                }
+              ]
+            },
+            {
+              "no": "002",
+              "title": "马克斯：你是怕泡沫，还是吹泡沫",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-20",
+              "blocker": "仓库只记到成片，成片在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
+                }
+              ]
+            },
+            {
+              "no": "003",
+              "title": "段永平：投AI，是入局还是入坑",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-24",
+              "blocker": "仓库只记到成片，成片在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
+                }
+              ]
+            },
+            {
+              "no": "004",
+              "title": "达利欧：你手里的是财富，还是钱",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-26",
+              "blocker": "仓库只记到成片，成片在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
+                }
+              ]
+            },
+            {
+              "no": "005",
+              "title": "港股科技：是黄金坑，还是价值陷阱",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-27",
+              "blocker": "仓库只记到成片，成片在 out/ 不入库",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
+                }
+              ]
+            },
+            {
+              "no": "006",
+              "title": "伯克希尔回购",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-11-08",
+              "blocker": "在 claude/factory-006-berkshire 分支，PR #8 是否合并未核实；成片 7:49",
+              "next": "确认发没发布；发了贴链接和数据，没发就写下一步",
+              "links": [
+                {
+                  "label": "PR #8",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/pull/8"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "invest",
+          "name": "普通话投研栏目（invest-video）",
+          "format": "横屏 YouTube 投研视频",
+          "platform": "YouTube",
+          "cadence": "按集",
+          "status": "运行中",
+          "source": "AI-supply-chain 仓库 video/（不在本仓库）",
+          "note": "从投研中枢出选题，按集出制作包。EP05 在另一个仓库，这里只记录。",
+          "episodes": [
+            {
+              "no": "EP04",
+              "title": "存储芯片还能涨吗？华尔街多空四回合大对决",
+              "stage": "已发布",
+              "published": "是",
+              "publish_url": "",
+              "date": "2026-10-17前",
+              "blocker": "",
+              "next": "补上发布链接；点击率 3.4%、0:24 流失过半，已做表现诊断",
+              "links": [
+                {
+                  "label": "仓库",
+                  "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
+                }
+              ]
+            },
+            {
+              "no": "EP05",
+              "title": "重做开头钩子的版本",
+              "stage": "画面",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "",
+              "blocker": "仓库里只有脚本、配音稿、字幕、分镜表、三版封面和无声样片",
+              "next": "先问 Tim 是否已做完或发布，再决定配音",
+              "links": [
+                {
+                  "label": "仓库",
+                  "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "dram",
+          "name": "DRAM / HBM 图解短视频",
+          "format": "约 2 分钟图解科普",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "video/dram-hbm",
+          "note": "晶圆和 HBM 两段，深浅两版，用录屏出片。",
+          "episodes": [
+            {
+              "no": "晶圆 + HBM",
+              "title": "两段图解",
+              "stage": "画面",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-15",
+              "blocker": "发布前要核对 TrendForce 数据",
+              "next": "封存，不主动重启；要用先问 Tim",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/dram-hbm"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fv",
+          "name": "财经视频生产线（早期）",
+          "format": "选题到剪辑的整套流程",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "finance-video/",
+          "note": "主播是占位剪影，只有 10 秒开头样片。",
+          "episodes": [
+            {
+              "no": "样片",
+              "title": "10 秒开头样片",
+              "stage": "画面",
+              "published": "否",
+              "publish_url": "",
+              "date": "2026-10-08",
+              "blocker": "",
+              "next": "封存，被内容工厂取代",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/finance-video"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cantonese",
+      "name": "粤语与 Finance 930",
+      "why": "职业相关：粤语财经频道和 Finance 930 的日常运营与新节目。",
+      "lines": [
+        {
+          "id": "hits",
+          "name": "粤语财经 YouTube 爆款周报",
+          "format": "周报网站（简繁切换）",
+          "platform": "GitHub Pages",
+          "cadence": "每周",
+          "status": "运行中",
+          "source": "finance-hits 仓库（不在本仓库）",
+          "note": "在 Codex / 本机推进，这里只记录。W43 起的期数仓库里没有，要问 Tim。",
+          "episodes": [
+            {
+              "no": "W42",
+              "title": "爆款周报第 42 周",
+              "stage": "已发布",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-19",
+              "blocker": "W43 起在 Codex / 本机推进，这里没有记录",
+              "next": "问 Tim：W43 以后出到哪一期、有没有更新网站",
+              "links": [
+                {
+                  "label": "线上网站",
+                  "url": "https://timye9527.github.io/finance-hits/"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "f930",
+          "name": "Finance 930 自频道周复盘",
+          "format": "周度数据摘要",
+          "platform": "内部（频道数据）",
+          "cadence": "每周（现已停）",
+          "status": "暂停",
+          "source": "finance930-ops 仓库（不在本仓库）",
+          "note": "采集停在 9-21，Studio 导出没恢复；对外不发布。",
+          "episodes": [
+            {
+              "no": "频道体检",
+              "title": "10-29 一页体检",
+              "stage": "成片",
+              "published": "否",
+              "publish_url": "",
+              "date": "2026-10-29",
+              "blocker": "采集和 Studio 导出未恢复",
+              "next": "是否恢复周复盘，等 Tim 定",
+              "links": [
+                {
+                  "label": "频道体检",
+                  "url": "https://claude.ai/artifact/6tRcCLTcfiPC7T4rDnLLcL"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fun",
+          "name": "新节目《FUN傾股海》",
+          "format": "每周一期 10–12 分钟故事型解说",
+          "platform": "YouTube（Finance 930）",
+          "cadence": "每周（计划）",
+          "status": "运行中",
+          "source": "finance930-ops 仓库（不在本仓库）",
+          "note": "建议停掉財經浩談图文短片、重启本节目；只有策划页，还没开做。",
+          "episodes": [
+            {
+              "no": "策划",
+              "title": "重启方案与 6 期选题",
+              "stage": "选题",
+              "published": "否",
+              "publish_url": "",
+              "date": "2026-11-05",
+              "blocker": "等 Tim 确认：是否重启、主持形态（动画角色加真人配音 / AI 主播）",
+              "next": "确认后出第一期选题和稿件",
+              "links": [
+                {
+                  "label": "打开策划",
+                  "url": "https://claude.ai/artifact/3vDTpsqo2uvFmsUEw64SBD"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "canto-pipe",
+          "name": "粤语视频流水线",
+          "format": "稿件到长视频、Shorts、封面、字幕",
+          "platform": "YouTube",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "分支 claude/sharp-edison-krhqfp（没进 main）",
+          "note": "v1 和 v2 的早期流水线，没有具体期数。",
+          "episodes": [
+            {
+              "no": "流水线",
+              "title": "v1 / v2 与数据复盘闭环",
+              "stage": "画面",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-20",
+              "blocker": "3 个提交没进 main",
+              "next": "封存；要用先问 Tim",
+              "links": [
+                {
+                  "label": "分支",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/sharp-edison-krhqfp/video"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "brand",
+      "name": "个人品牌",
+      "why": "短片、音乐和小红书：Tim 自己的作品，多数在工作分支或本机。",
+      "lines": [
+        {
+          "id": "t1",
+          "name": "把時間拿回來",
+          "format": "32 秒个人短片",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "分支 claude/loving-albattani-okwtpd",
+          "note": "画面和配乐都由程序生成，有网页播放器。",
+          "episodes": [
+            {
+              "no": "单片",
+              "title": "32 秒 1080p 短片",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-12",
+              "blocker": "源码 1 个提交没进 main",
+              "next": "封存；确认发没发布",
+              "links": [
+                {
+                  "label": "播放",
+                  "url": "https://claude.ai/artifact/MgmG42STtXfzrhpTSDBMxW"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "t2",
+          "name": "一个社恐的两年奇遇记",
+          "format": "七幕火柴人动画，94.5 秒",
+          "platform": "小红书（计划）",
+          "cadence": "一次性",
+          "status": "运行中",
+          "source": "分支 claude/magical-fermi-3qgr4p（film/qichun）",
+          "note": "本人声音和成片不进公开仓库，还没有私有存放处。",
+          "episodes": [
+            {
+              "no": "单片",
+              "title": "动画微电影",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-22",
+              "blocker": "等 Tim 选版本、核对事实",
+              "next": "选定优化版本后做发布",
+              "links": [
+                {
+                  "label": "成片",
+                  "url": "https://claude.ai/artifact/NKvYzboLEtPxpAn8AbBRtt"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "t3",
+          "name": "婚庆片《AI省下的钱，被谁赚走了？》",
+          "format": "5 分 03 秒横版二维动画",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "运行中",
+          "source": "分支 claude/sleepy-lamport-qqxiud（video/ai-wedding）",
+          "note": "成片在 out/film/ 不入库，容器回收前要下载。",
+          "episodes": [
+            {
+              "no": "单片",
+              "title": "经济科普动画",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-28",
+              "blocker": "等 Tim 验收",
+              "next": "验收通过后确认用途和发布",
+              "links": [
+                {
+                  "label": "分镜审阅",
+                  "url": "https://claude.ai/artifact/6XisdZEHnHxrmWz2G7cG2W"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "t4",
+          "name": "九月九日，与母后Battle",
+          "format": "套唱歌谱和琴谱页",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "分支 claude/festive-gauss-r749wi（music/）",
+          "note": "家庭向改编，琴谱页已发布成网页。",
+          "episodes": [
+            {
+              "no": "单曲",
+              "title": "套唱歌谱和琴谱页",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-21",
+              "blocker": "6 个提交没进 main",
+              "next": "确认是否用过、是否对外发布",
+              "links": [
+                {
+                  "label": "琴谱页",
+                  "url": "https://claude.ai/artifact/23Q9TweyW4BtenKsYDFasi"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "xhs",
+          "name": "小红书个人号",
+          "format": "图文笔记",
+          "platform": "小红书",
+          "cadence": "不定期",
+          "status": "运行中",
+          "source": "分支 claude/awesome-bohr-9gc09m、claude/xiaohongshu-e01-production-gd18aa",
+          "note": "主要在 Codex / 本机推进，这里只记录。出图用撕纸卡片模板。",
+          "episodes": [
+            {
+              "no": "E01",
+              "title": "首期内容（四版迭代）+ 韭菜测试素材包",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-10",
+              "blocker": "8 个提交没进 main",
+              "next": "确认首期发没发布",
+              "links": [
+                {
+                  "label": "分支",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/xiaohongshu-e01-production-gd18aa"
+                }
+              ]
+            },
+            {
+              "no": "闫妮稿",
+              "title": "4 张 1080×1440 图和文案",
+              "stage": "成片",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-12",
+              "blocker": "飞天奖细节待核对",
+              "next": "核对后确认发没发布",
+              "links": [
+                {
+                  "label": "分支",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-bohr-9gc09m"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "shared": [
+    {
+      "name": "video-qa 技能与错误档案",
+      "what": "做视频的关卡流程：需求卡、稿件预检、读音表、声音样片、成片体检；犯过的错都记在错误档案里。",
+      "path": ".claude/skills/video-qa/"
+    },
+    {
+      "name": "财经视频管线",
+      "what": "内容工厂、存力研究所、看懂AI主线三条线共用的做法和脚本。",
+      "path": "video/、factory/"
+    },
+    {
+      "name": "factory/",
+      "what": "内容工厂：一份脚本数据直接出竖屏成片，配读音规范和质检。",
+      "path": "factory/"
+    },
+    {
+      "name": "选题来源：投研中枢「视频选题」页",
+      "what": "按集出选题和制作包的起点。",
+      "path": "https://claude.ai/artifact/13iTa2ZVCGDphgQggCZk7U"
+    }
+  ],
+  "rules": [
+    "做任何一期之前先查这里。",
+    "发布后当天把 published 改成「是」并贴链接。",
+    "状态不明先问 Tim，不重做。",
+    "别的会话或 Codex 做的内容同样登记。"
+  ]
+}
