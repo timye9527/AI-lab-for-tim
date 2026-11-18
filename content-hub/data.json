@@ -1,10 +1,10 @@
 {
-  "asof": "2026-11-16",
+  "asof": "2026-11-18",
   "groups": [
     {
-      "id": "finance",
-      "name": "财经视频",
-      "why": "金融内容主线：Tim 的主阵地，做过的期数最多，也最容易重做。",
+      "id": "publish",
+      "name": "财经内容 · 要上线",
+      "why": "金融内容主线，做出来就是要发、要看数据。",
       "lines": [
         {
           "id": "kandong",
@@ -30,7 +30,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/neocloud"
                 }
-              ]
+              ],
+              "id": "kandong-2"
             },
             {
               "no": "第三期",
@@ -46,7 +47,9 @@
                   "label": "脚本 v3.1",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/storage-ring"
                 }
-              ]
+              ],
+              "id": "kandong-3",
+              "default_mark": "已发布"
             }
           ]
         },
@@ -74,7 +77,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/memory-wallst"
                 }
-              ]
+              ],
+              "id": "cunli-v3"
             }
           ]
         },
@@ -102,7 +106,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
                 }
-              ]
+              ],
+              "id": "factory-001"
             },
             {
               "no": "002",
@@ -118,7 +123,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
                 }
-              ]
+              ],
+              "id": "factory-002"
             },
             {
               "no": "003",
@@ -134,7 +140,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
                 }
-              ]
+              ],
+              "id": "factory-003"
             },
             {
               "no": "004",
@@ -150,7 +157,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
                 }
-              ]
+              ],
+              "id": "factory-004"
             },
             {
               "no": "005",
@@ -166,7 +174,8 @@
                   "label": "源码",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/factory/episodes/"
                 }
-              ]
+              ],
+              "id": "factory-005"
             },
             {
               "no": "006",
@@ -182,7 +191,8 @@
                   "label": "PR #8",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/pull/8"
                 }
-              ]
+              ],
+              "id": "factory-006"
             }
           ]
         },
@@ -210,7 +220,9 @@
                   "label": "仓库",
                   "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
                 }
-              ]
+              ],
+              "id": "invest-ep04",
+              "default_mark": "已发布"
             },
             {
               "no": "EP05",
@@ -226,72 +238,17 @@
                   "label": "仓库",
                   "url": "https://github.com/timye9527/AI-supply-chain/tree/main/video"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "dram",
-          "name": "DRAM / HBM 图解短视频",
-          "format": "约 2 分钟图解科普",
-          "platform": "未定",
-          "cadence": "一次性",
-          "status": "封存",
-          "source": "video/dram-hbm",
-          "note": "晶圆和 HBM 两段，深浅两版，用录屏出片。",
-          "episodes": [
-            {
-              "no": "晶圆 + HBM",
-              "title": "两段图解",
-              "stage": "画面",
-              "published": "未核实",
-              "publish_url": "",
-              "date": "2026-10-15",
-              "blocker": "发布前要核对 TrendForce 数据",
-              "next": "封存，不主动重启；要用先问 Tim",
-              "links": [
-                {
-                  "label": "源码",
-                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/dram-hbm"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "fv",
-          "name": "财经视频生产线（早期）",
-          "format": "选题到剪辑的整套流程",
-          "platform": "未定",
-          "cadence": "一次性",
-          "status": "封存",
-          "source": "finance-video/",
-          "note": "主播是占位剪影，只有 10 秒开头样片。",
-          "episodes": [
-            {
-              "no": "样片",
-              "title": "10 秒开头样片",
-              "stage": "画面",
-              "published": "否",
-              "publish_url": "",
-              "date": "2026-10-08",
-              "blocker": "",
-              "next": "封存，被内容工厂取代",
-              "links": [
-                {
-                  "label": "源码",
-                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/finance-video"
-                }
-              ]
+              ],
+              "id": "invest-ep05"
             }
           ]
         }
       ]
     },
     {
-      "id": "cantonese",
-      "name": "粤语与 Finance 930",
-      "why": "职业相关：粤语财经频道和 Finance 930 的日常运营与新节目。",
+      "id": "career",
+      "name": "职业 · 粤语与 Finance 930",
+      "why": "和运营本职相关，看的是频道和栏目，不只是单期。",
       "lines": [
         {
           "id": "hits",
@@ -317,7 +274,8 @@
                   "label": "线上网站",
                   "url": "https://timye9527.github.io/finance-hits/"
                 }
-              ]
+              ],
+              "id": "hits-w42"
             }
           ]
         },
@@ -345,7 +303,8 @@
                   "label": "频道体检",
                   "url": "https://claude.ai/artifact/6tRcCLTcfiPC7T4rDnLLcL"
                 }
-              ]
+              ],
+              "id": "f930-checkup"
             }
           ]
         },
@@ -373,44 +332,17 @@
                   "label": "打开策划",
                   "url": "https://claude.ai/artifact/3vDTpsqo2uvFmsUEw64SBD"
                 }
-              ]
-            }
-          ]
-        },
-        {
-          "id": "canto-pipe",
-          "name": "粤语视频流水线",
-          "format": "稿件到长视频、Shorts、封面、字幕",
-          "platform": "YouTube",
-          "cadence": "一次性",
-          "status": "封存",
-          "source": "分支 claude/sharp-edison-krhqfp（没进 main）",
-          "note": "v1 和 v2 的早期流水线，没有具体期数。",
-          "episodes": [
-            {
-              "no": "流水线",
-              "title": "v1 / v2 与数据复盘闭环",
-              "stage": "画面",
-              "published": "未核实",
-              "publish_url": "",
-              "date": "2026-10-20",
-              "blocker": "3 个提交没进 main",
-              "next": "封存；要用先问 Tim",
-              "links": [
-                {
-                  "label": "分支",
-                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/sharp-edison-krhqfp/video"
-                }
-              ]
+              ],
+              "id": "fun-plan"
             }
           ]
         }
       ]
     },
     {
-      "id": "brand",
-      "name": "个人品牌",
-      "why": "短片、音乐和小红书：Tim 自己的作品，多数在工作分支或本机。",
+      "id": "express",
+      "name": "个人表达 · 短片、音乐、演讲",
+      "why": "趣味和作品向，发不发看心情和场合，不追数据。",
       "lines": [
         {
           "id": "t1",
@@ -436,7 +368,8 @@
                   "label": "播放",
                   "url": "https://claude.ai/artifact/MgmG42STtXfzrhpTSDBMxW"
                 }
-              ]
+              ],
+              "id": "t1-single"
             }
           ]
         },
@@ -464,7 +397,8 @@
                   "label": "成片",
                   "url": "https://claude.ai/artifact/NKvYzboLEtPxpAn8AbBRtt"
                 }
-              ]
+              ],
+              "id": "t2-single"
             }
           ]
         },
@@ -492,7 +426,8 @@
                   "label": "分镜审阅",
                   "url": "https://claude.ai/artifact/6XisdZEHnHxrmWz2G7cG2W"
                 }
-              ]
+              ],
+              "id": "t3-single"
             }
           ]
         },
@@ -520,10 +455,18 @@
                   "label": "琴谱页",
                   "url": "https://claude.ai/artifact/23Q9TweyW4BtenKsYDFasi"
                 }
-              ]
+              ],
+              "id": "t4-single"
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "id": "account",
+      "name": "账号运营 · 小红书",
+      "why": "个人品牌阵地，主要在 Codex 推进，这里只记录。",
+      "lines": [
         {
           "id": "xhs",
           "name": "小红书个人号",
@@ -548,7 +491,8 @@
                   "label": "分支",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/xiaohongshu-e01-production-gd18aa"
                 }
-              ]
+              ],
+              "id": "xhs-e01"
             },
             {
               "no": "闫妮稿",
@@ -564,7 +508,105 @@
                   "label": "分支",
                   "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/awesome-bohr-9gc09m"
                 }
-              ]
+              ],
+              "id": "xhs-yanni"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "practice",
+      "name": "能力验证 · 跑流程",
+      "why": "用来练制作能力、验证流程，本来就不一定发布。",
+      "lines": [
+        {
+          "id": "dram",
+          "name": "DRAM / HBM 图解短视频",
+          "format": "约 2 分钟图解科普",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "video/dram-hbm",
+          "note": "晶圆和 HBM 两段，深浅两版，用录屏出片。",
+          "episodes": [
+            {
+              "no": "晶圆 + HBM",
+              "title": "两段图解",
+              "stage": "画面",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-15",
+              "blocker": "发布前要核对 TrendForce 数据",
+              "next": "封存，不主动重启；要用先问 Tim",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/video/dram-hbm"
+                }
+              ],
+              "id": "dram-wafer-hbm",
+              "default_mark": "仅验证"
+            }
+          ]
+        },
+        {
+          "id": "fv",
+          "name": "财经视频生产线（早期）",
+          "format": "选题到剪辑的整套流程",
+          "platform": "未定",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "finance-video/",
+          "note": "主播是占位剪影，只有 10 秒开头样片。",
+          "episodes": [
+            {
+              "no": "样片",
+              "title": "10 秒开头样片",
+              "stage": "画面",
+              "published": "否",
+              "publish_url": "",
+              "date": "2026-10-08",
+              "blocker": "",
+              "next": "封存，被内容工厂取代",
+              "links": [
+                {
+                  "label": "源码",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/main/finance-video"
+                }
+              ],
+              "id": "fv-sample",
+              "default_mark": "仅验证"
+            }
+          ]
+        },
+        {
+          "id": "canto-pipe",
+          "name": "粤语视频流水线",
+          "format": "稿件到长视频、Shorts、封面、字幕",
+          "platform": "YouTube",
+          "cadence": "一次性",
+          "status": "封存",
+          "source": "分支 claude/sharp-edison-krhqfp（没进 main）",
+          "note": "v1 和 v2 的早期流水线，没有具体期数。",
+          "episodes": [
+            {
+              "no": "流水线",
+              "title": "v1 / v2 与数据复盘闭环",
+              "stage": "画面",
+              "published": "未核实",
+              "publish_url": "",
+              "date": "2026-10-20",
+              "blocker": "3 个提交没进 main",
+              "next": "封存；要用先问 Tim",
+              "links": [
+                {
+                  "label": "分支",
+                  "url": "https://github.com/timye9527/AI-lab-for-tim/tree/claude/sharp-edison-krhqfp/video"
+                }
+              ],
+              "id": "canto-pipe-pipeline",
+              "default_mark": "仅验证"
             }
           ]
         }
@@ -597,6 +639,7 @@
     "做任何一期之前先查这里。",
     "发布后当天把 published 改成「是」并贴链接。",
     "状态不明先问 Tim，不重做。",
-    "别的会话或 Codex 做的内容同样登记。"
+    "别的会话或 Codex 做的内容同样登记。",
+    "勾选会存在页面里；Claude 每周把勾选同步回 data.json"
   ]
 }
