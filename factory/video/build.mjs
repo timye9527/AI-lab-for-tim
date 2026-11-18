@@ -188,10 +188,11 @@ if (ep.bgm) {
   audio = ['-i', join(out, 'voice.wav'), '-i', bgm, '-filter_complex',
     '[1:a]loudnorm=I=-16:TP=-1.5,apad,asplit=2[v1][v2];[2:a]aresample=44100,volume=0.25[m];' +
     '[m][v1]sidechaincompress=threshold=0.05:ratio=2:attack=30:release=500[md];' +
-    '[v2][md]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.95[a]', '-map', '0:v', '-map', '[a]'];
+    '[v2][md]amix=inputs=2:duration=first:normalize=0,alimiter=limit=0.85:level=disabled[a]', '-map', '0:v', '-map', '[a]'];
 }
 const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(FPS), '-c:v', 'mjpeg', '-i', '-',
-  ...audio, '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
+  ...audio, '-vf', 'scale=out_range=tv,format=yuv420p', '-color_range', 'tv', // 截图是 JPEG 全范围，新版 ffmpeg 会原样输出 yuvj420p，手机上可能发绿
+  '-c:v', 'libx264', '-preset', 'medium', '-crf', '21', '-pix_fmt', 'yuv420p',
   '-c:a', 'aac', '-b:a', '160k', '-ar', '44100', '-shortest', '-movflags', '+faststart', mp4], { stdio: ['pipe', 'inherit', 'inherit'] });
 const frames = Math.ceil(duration * FPS);
 let lastSig = null, lastBuf = null, shots = 0;
